@@ -1,4 +1,4 @@
-LCSLO Octagon Barn
+# LCSLO Octagon Barn
 
 A management platform to streamline process for vendors and clients to submit insurance documents at the Octagon Barn.
 
@@ -10,7 +10,6 @@ A management platform to streamline process for vendors and clients to submit in
 - [Getting Started And Contributing](#getting-started-and-contributing)
 
 ## Overview
-**Overview:** 
 
 ### Purpose
 The Octagon Barn Center aims to showcase the rare and iconic landmark to guests with the help of volunteer and donors. The Land Conservancy of SLO works with landowners and government to care for the diverse wildlands and critical habitats of the Central Coast through conservation, restoration, and stewardship, all while connecting people to the land and one another. 
