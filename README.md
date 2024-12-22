@@ -1,6 +1,6 @@
-# name of non-profit
+LCSLO Octagon Barn
 
-{One sentence description of the project}
+A management platform to streamline process for vendors and clients to submit insurance documents at the Octagon Barn.
 
 ## Table of Contents
 
@@ -10,19 +10,22 @@
 - [Getting Started And Contributing](#getting-started-and-contributing)
 
 ## Overview
+**Overview:** 
 
 ### Purpose
-
-{Short paragraph description of the non-profit mission and the purpose of this project. Who will this project help, why is it necessary. Impact of the project.}
+The Octagon Barn Center aims to showcase the rare and iconic landmark to guests with the help of volunteer and donors. The Land Conservancy of SLO works with landowners and government to care for the diverse wildlands and critical habitats of the Central Coast through conservation, restoration, and stewardship, all while connecting people to the land and one another. 
+Currently there is no streamlined process for vendors and clients to submit insurance documents directly on the website which leads to inefficiencies in handling and approval. Our goal is to develop management platform for vendors and clients at the Octagon Barn. This platform will greatly improve efficiency and organization, reducing manual tasks and helping ensure they stay on top of event logistics. 
 
 ### Team
 
-The {non-profit name} team consists of {#} Cal Poly students. Over the course of about 9 months, we worked as a team to deploy this web application. The team members are listed below:
+The LCSLO Octagon Barn team consists of {#} Cal Poly students. Over the course of about 9 months, we worked as a team to deploy this web application. The team members are listed below:
 
-- [First Last](https://www.linkedin.com/) - Project Manager
-- [First Last](https://www.linkedin.com/) - Designer
-- [First Last](https://www.linkedin.com/) - Tech Lead
-- [First Last](https://www.linkedin.com/) - Tech Lead
+- [Sofia Dias](https://www.linkedin.com/) - Project Manager
+- [Kyle Taschek](https://www.linkedin.com/) - Tech Lead
+- [Aarav Sharma](https://www.linkedin.com/) - Tech Lead
+- [Brian Kwong](https://www.linkedin.com/) - Designer
+- [Navya Vemuri](https://www.linkedin.com/) - Designer
+- [Emily Yarvis](https://www.linkedin.com/) - Designer
 - [First Last](https://www.linkedin.com/) - Software Developer
 
 ## Getting Started And Contributing
