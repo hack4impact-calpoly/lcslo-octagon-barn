@@ -1,4 +1,7 @@
 import type { Metadata } from "next";
+import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
+import { eb_garamond } from "@/styles/fonts";
 import "./globals.css";
 
 //! Update metadata to match your project
@@ -10,7 +13,11 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        <Navbar />
+        <div className={`${eb_garamond.className}`}>{children}</div>
+        <Footer />
+      </body>
     </html>
   );
 }
