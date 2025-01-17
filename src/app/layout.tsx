@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { eb_garamond } from "@/styles/fonts";
-import "./globals.css";
+import "../styles/global.css";
 
 //! Update metadata to match your project
 export const metadata: Metadata = {
