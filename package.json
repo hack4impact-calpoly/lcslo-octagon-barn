@@ -19,6 +19,7 @@
     "lucide-react": "^0.471.1",
     "mongoose": "^8.9.5",
     "next": "^14.2.21",
+    "radix-ui": "^1.0.1",
     "react": "^18",
     "react-dom": "^18",
     "tailwind-merge": "^2.6.0",
