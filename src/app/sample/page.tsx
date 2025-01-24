@@ -2,7 +2,6 @@
 
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { AlignCenter, FileX } from "lucide-react";
 
 export default function Sample() {
   const router = useRouter();
