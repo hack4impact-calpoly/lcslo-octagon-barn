@@ -27,6 +27,7 @@ The LCSLO Octagon Barn team consists of {#} Cal Poly students. Over the course o
 - [Navya Vemuri](https://www.linkedin.com/) - Designer
 - [Emily Yarvis](https://www.linkedin.com/) - Designer
 - [Sharan Krishna](https://www.linkedin.com/in/sharankrishna14/) - Developer
+- [Oli Lane](https://www.linkedin.com/in/oliver-lane-0919351bb/) - Developer
 - [First Last](https://www.linkedin.com/) - Software Developer
 
 ## Getting Started And Contributing
