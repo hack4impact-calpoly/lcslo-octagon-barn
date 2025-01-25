@@ -28,6 +28,7 @@ The LCSLO Octagon Barn team consists of {#} Cal Poly students. Over the course o
 - [Emily Yarvis](https://www.linkedin.com/) - Designer
 - [Sharan Krishna](https://www.linkedin.com/in/sharankrishna14/) - Developer
 - [Oli Lane](https://www.linkedin.com/in/oliver-lane-0919351bb/) - Developer
+- [Kevin Beltran](https://www.linkedin.com/in/kevin-beltran-4305a1236/)
 - [First Last](https://www.linkedin.com/) - Software Developer
 
 ## Getting Started And Contributing
