@@ -26,10 +26,10 @@ The LCSLO Octagon Barn team consists of {#} Cal Poly students. Over the course o
 - [Brian Kwong](https://www.linkedin.com/) - Designer
 - [Navya Vemuri](https://www.linkedin.com/) - Designer
 - [Emily Yarvis](https://www.linkedin.com/) - Designer
-- [Justin Chan](https://www.linkedin.com/in/justchan/) - Software Developer
+- [Justin Chan](https://www.linkedin.com/in/justchan/) - Developer
 - [First Last](https://www.linkedin.com/) - Software Developer
 
-## Getting Started And Contributing
+## Getting Started And Contributingm
 
 Visit [getting-started.md](docs/getting-started.md) on info for how to set up this repo.
 
