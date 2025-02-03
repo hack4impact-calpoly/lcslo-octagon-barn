@@ -1,6 +1,6 @@
 import mongoose, { Schema, Document } from "mongoose";
 
-interface IDocument extends Document {
+type IDocument = Document & {
   clerkId: string;
   eventId: string;
   s3DocId: string;
@@ -8,7 +8,7 @@ interface IDocument extends Document {
   createdAt: Date;
   status: "Completed" | "Pending" | "Not Submitted";
   checkList: string[];
-}
+};
 
 const DocumentSchema = new Schema<IDocument>({
   clerkId: { type: String, required: true },
