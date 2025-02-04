@@ -1,5 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
+import { UserButton } from "@clerk/nextjs";
 
 export default function Navbar() {
   return (
@@ -18,9 +19,7 @@ export default function Navbar() {
             Notification {/* CHANGE TO IMAGE */}
           </Link>
 
-          <Link href="/somePage" className="text-black hover:text-blue-500">
-            Profile {/* CHANGE TO IMAGE */}
-          </Link>
+          <UserButton />
         </div>
       </nav>
     </div>
