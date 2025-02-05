@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
-import { UserButton } from "@clerk/nextjs";
+import { UserButton, SignedIn } from "@clerk/nextjs";
 
 export default function Navbar() {
   return (
@@ -14,13 +14,14 @@ export default function Navbar() {
         </div>
 
         {/* notification & profile */}
-        <div className="flex items-center space-x-20 pl-10 pr-16 pt-10">
-          <Link href="/somePage" className="text-black hover:text-blue-500">
-            Notification {/* CHANGE TO IMAGE */}
-          </Link>
-
-          <UserButton />
-        </div>
+        <SignedIn>
+          <div className="flex items-center space-x-20 pl-10 pr-16 pt-10">
+            <Link href="/somePage" className="text-black hover:text-blue-500">
+              Notification {/* CHANGE TO IMAGE */}
+            </Link>
+            <UserButton />
+          </div>
+        </SignedIn>
       </nav>
     </div>
   );
