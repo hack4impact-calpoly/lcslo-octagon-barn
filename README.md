@@ -29,7 +29,7 @@ The LCSLO Octagon Barn team consists of {#} Cal Poly students. Over the course o
 - [Justin Chan](https://www.linkedin.com/in/justchan/) - Developer
 - [First Last](https://www.linkedin.com/) - Software Developer
 
-## Getting Started And Contributingm
+## Getting Started And Contributing
 
 Visit [getting-started.md](docs/getting-started.md) on info for how to set up this repo.
 
