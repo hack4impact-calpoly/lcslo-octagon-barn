@@ -32,6 +32,7 @@ The LCSLO Octagon Barn team consists of {#} Cal Poly students. Over the course o
 - [Briana Kirkman](www.linkedin.com/in/briana-kirkman-9bb210289) - Developer
 - [Jasmine Ng](www.linkedin.com/in/jasmineng3) - Developer
 - [Sabrina Huang](https://www.linkedin.com/in/sabrina-huang-9b719b240) - Developer
+- [Justin Chan](https://www.linkedin.com/in/justchan/) - Developer
 
 ## Getting Started And Contributing
 
