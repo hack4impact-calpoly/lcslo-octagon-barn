@@ -36,7 +36,7 @@ const DocumentUpload: React.FC = () => {
 
       {file && (
         <div className="mt-4 text-center">
-          <p className="text-sm text-gray-700">Selected File: {file.name}</p>
+          <p className="text-lg text-gray-700">Selected File: {file.name}</p>
         </div>
       )}
     </FileUploader>
