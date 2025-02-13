@@ -16,6 +16,7 @@ const ClientUploadPage: React.FC = () => {
         </div>
 
         {/* Checklist Placeholder */}
+        {/* TODO: Note to review checklist requirements with the nonprofit */}
         <div className="w-1/3 border border-gray-300 rounded-lg p-6 bg-gray-50 shadow-md">
           <h2 className="text-lg font-semibold mb-4">Checklist</h2>
           <ul className="list-disc pl-5 space-y-2">
@@ -30,6 +31,7 @@ const ClientUploadPage: React.FC = () => {
       </div>
 
       {/* Buttons */}
+      {/* TODO: Note to add functionality for the buttons in a later issue */}
       <div className="flex justify-center gap-4 mt-6">
         <Button variant="outline" className="bg-[#3A6F8F] text-white hover:bg-[#305a73]" disabled size={"sm"}>
           <Trash /> Delete
