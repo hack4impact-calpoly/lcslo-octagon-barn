@@ -4,9 +4,8 @@ import Event from "@/database/eventSchema";
 import { createSuccessResponse, createErrorResponse } from "@/lib/response";
 
 export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
-  await connectToDB();
-
   try {
+    await connectToDB();
     const event = await Event.findById(params.id);
     if (!event) {
       return createErrorResponse("NotFound", "Event not found", 404);

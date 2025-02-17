@@ -4,9 +4,8 @@ import Event from "@/database/eventSchema";
 import { createSuccessResponse, createErrorResponse } from "@/lib/response";
 
 export async function GET() {
-  await connectToDB();
-
   try {
+    await connectToDB();
     const events = await Event.find();
     return createSuccessResponse(events, 200);
   } catch {
