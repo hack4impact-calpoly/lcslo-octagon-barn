@@ -1,19 +1,31 @@
 import mongoose from "mongoose";
 
-const url: string = process.env.MONGO_URI as string;
-let connection: typeof mongoose;
+const url: string | undefined = process.env.MONGO_URI;
+if (!url) {
+  throw new Error("MONGO_URI is not defined in environment variables");
+}
 
-/**
- * Makes a connection to a MongoDB database. If a connection already exists, does nothing
- * Call this function before all api routes
- * @returns {Promise<typeof mongoose>}
- */
+let isConnected = false; // Track connection status
+
 const connectDB = async () => {
-  if (!connection) {
-    // uncomment this line once you have the MONGO_URI set up
-    // connection = await mongoose.connect(url);
-    connection = "remove me" as any; // remove me
-    return connection;
+  if (isConnected) {
+    console.log("Using existing database connection");
+    return;
+  }
+
+  try {
+    const db = await mongoose.connect(url, {
+      dbName: "test", // Ensure this matches your database name in Compass
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    } as any);
+
+    isConnected = true;
+    console.log("Connected to MongoDB");
+    return db;
+  } catch (error) {
+    console.error("MongoDB connection error:", error);
+    throw new Error("Failed to connect to MongoDB");
   }
 };
 
