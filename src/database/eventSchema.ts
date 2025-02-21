@@ -1,7 +1,7 @@
 import mongoose, { Schema } from "mongoose";
 
 type IEvent = Document & {
-  clerkId: mongoose.Types.ObjectId;
+  clerkId: string;
   docIds: mongoose.Types.ObjectId[];
   venue: "TBD"; // update with venues
   eventName: string;
@@ -25,7 +25,7 @@ type IEvent = Document & {
 };
 
 const EventSchema = new Schema<IEvent>({
-  clerkId: { type: Schema.Types.ObjectId, ref: "User", required: true },
+  clerkId: { type: String, ref: "User", required: true },
   docIds: [{ type: Schema.Types.ObjectId, ref: "Document" }],
   venue: { type: String, enum: ["TBD"], required: true }, // update with venues
   eventName: { type: String, required: true },
