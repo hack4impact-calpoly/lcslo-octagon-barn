@@ -1,38 +1,38 @@
 import { NextRequest, NextResponse } from "next/server";
 import Document from "@/database/documentSchema";
 import mongoose from "mongoose";
-import { auth } from "@clerk/nextjs/server";
-import connectDB from "@/database/db"; // Import the connectDB function
-
-type UpdateableDocumentFields = {
-  documentType?: string;
-  status?: "Completed" | "Pending" | "Not Submitted";
-  checkList?: string[];
-};
+import connectDB from "@/database/db";
 
 export async function PUT(req: NextRequest, { params }: { params: { id: string } }) {
   try {
-    await connectDB(); // Ensure database connection
-
-    const { userId } = await auth();
-    if (!userId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    await connectDB();
 
     const { id } = params;
     if (!mongoose.isValidObjectId(id)) {
       return NextResponse.json({ error: "Invalid document ID" }, { status: 400 });
     }
 
-    const body: UpdateableDocumentFields = await req.json();
+    const body = await req.json();
+    const { clerkId, eventId, s3DocId, ...updateFields } = body;
 
     // Find document and verify ownership
-    const document = await Document.findOne({ _id: id, clerkId: userId });
+    const document = await Document.findOne({
+      _id: id,
+      clerkId: clerkId,
+      eventId: eventId,
+      s3DocId: s3DocId,
+    });
+
     if (!document) {
       return NextResponse.json({ error: "Document not found or unauthorized" }, { status: 404 });
     }
 
-    const updatedDocument = await Document.findByIdAndUpdate(id, { ...body }, { new: true, runValidators: true });
+    // Update only the allowed fields
+    const updatedDocument = await Document.findByIdAndUpdate(
+      id,
+      { ...updateFields },
+      { new: true, runValidators: true },
+    );
 
     return NextResponse.json(updatedDocument);
   } catch (error) {
@@ -43,20 +43,24 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
 
 export async function DELETE(req: NextRequest, { params }: { params: { id: string } }) {
   try {
-    await connectDB(); // Ensure database connection
-
-    const { userId } = await auth();
-    if (!userId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    await connectDB();
 
     const { id } = params;
     if (!mongoose.isValidObjectId(id)) {
       return NextResponse.json({ error: "Invalid document ID" }, { status: 400 });
     }
 
+    const body = await req.json();
+    const { clerkId, eventId, s3DocId } = body;
+
     // Find document and verify ownership
-    const document = await Document.findOne({ _id: id, clerkId: userId });
+    const document = await Document.findOne({
+      _id: id,
+      clerkId: clerkId,
+      eventId: eventId,
+      s3DocId: s3DocId,
+    });
+
     if (!document) {
       return NextResponse.json({ error: "Document not found or unauthorized" }, { status: 404 });
     }
