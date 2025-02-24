@@ -82,6 +82,7 @@ const SignUpPage: React.FC = () => {
 
       <div className="relative flex items-center justify-center min-h-screen">
         <div className="bg-white/80 shadow-lg rounded-lg p-8 w-full max-w-4xl">
+          <h2 className="text-2xl font-bold text-center mb-6 text-sky-700">Create Account</h2>
           <form onSubmit={handleSubmit} className="grid grid-cols-2 gap-4" noValidate>
             <div className="col-span-1">
               <label htmlFor="firstName" className="block mb-1 font-medium text-sky-700">
