@@ -4,5 +4,6 @@
 @layer base {
   :root {
     --radius: 0.5rem;
+    --primary-blue: #3a6f8f;
   }
 }
