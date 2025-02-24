@@ -5,18 +5,6 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { Calendar, FileText, MapPin, User } from "lucide-react";
 
-const formatDateTime = (date: Date) => {
-  const options: Intl.DateTimeFormatOptions = {
-    weekday: "short",
-    year: "numeric",
-    month: "numeric",
-    day: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  };
-  return new Date(date).toLocaleString("en-US", options);
-};
-
 interface EventTileProps {
   id: string;
   eventName: string;
@@ -40,16 +28,27 @@ const EventTile: React.FC<EventTileProps> = ({
 }) => {
   const router = useRouter();
 
-  const formattedDate = formatDateTime(eventDate);
+  // Format the event date (e.g., "2025-02-28") and time (e.g., "11:00")
+  const eventFormattedDate = eventDate.toLocaleDateString("en-CA", {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  });
+  const eventFormattedTime = eventDate.toLocaleTimeString("en-IE", { hour: "2-digit", minute: "2-digit" });
+
+  // Combine date and time for display.
+  // This may need to be updated to handle event end times in the future. (Ex: `${eventFormattedDate} ${eventFormattedTime} - ${eventFormattedEndTime}`)
+  const formattedDate = `${eventFormattedDate} ${eventFormattedTime}`;
 
   return (
     <div
       className="relative flex items-center rounded-lg overflow-hidden shadow-md cursor-pointer border border-gray-300 hover:shadow-lg transition w-2/3 m-2"
       onClick={() => router.push(`/event/${id}`)}
+      aria-label={`View details for ${eventName} on ${formattedDate}`}
     >
       {/* Background Image */}
       <Image
-        src={imageSrc || "/octagon_barn_plaza.jpg"} // Default image if none provided
+        src={imageSrc || "/octagon_barn_plaza.jpg"} // Default image if none provided, imageSrc should be a photo of the venue
         alt={eventName}
         layout="fill"
         objectFit="cover"
@@ -60,7 +59,7 @@ const EventTile: React.FC<EventTileProps> = ({
       <div className="absolute inset-0 bg-gradient-to-r from-black/50 via-transparent to-black/30" />
 
       {/* Content */}
-      <div className="relative z-10 p-6 text-white w-full flex justify-between items-center">
+      <div className="relative z-10 p-6 text-white w-full flex flex-col lg:flex-row justify-between items-center">
         <div>
           <h3 className="text-2xl font-bold px-1 py-1">{eventName}</h3>
           <div className="flex flex-col items-start gap-1 px-1 py-1">
@@ -68,7 +67,7 @@ const EventTile: React.FC<EventTileProps> = ({
               <Calendar size={18} /> {formattedDate}
             </p>
             <p className="text-lg flex items-center gap-2">
-              <MapPin size={18} /> {venue}
+              <MapPin size={18} /> {venue || "Not Available"}
             </p>
           </div>
         </div>
@@ -76,7 +75,7 @@ const EventTile: React.FC<EventTileProps> = ({
         {/* Event Stats */}
         <div className="flex flex-col items-start gap-1 p-1">
           <p className="text-lg flex items-center gap-2">
-            <User size={18} /> {attendees}
+            <User size={18} /> {attendees || "N/A"}
           </p>
           <p className="text-lg flex items-center gap-2">
             <FileText size={18} /> {documentsCompleted}/{totalDocuments}
