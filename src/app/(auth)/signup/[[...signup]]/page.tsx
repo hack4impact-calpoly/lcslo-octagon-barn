@@ -80,7 +80,7 @@ const SignUpPage: React.FC = () => {
         <Image src="/octagon_barn_background.jpg" alt="Background" fill className="object-cover filter blur-sm" />
       </div>
 
-      <div className="relative flex items-center justify-center min-h-screen">
+      <div className="relative flex items-center justify-center min-h-screen min-h-[90vh]">
         <div className="bg-white/80 shadow-lg rounded-lg p-8 w-full max-w-4xl">
           <h2 className="text-2xl font-bold text-center mb-6 text-sky-700">Create Account</h2>
           <form onSubmit={handleSubmit} className="grid grid-cols-2 gap-4" noValidate>
