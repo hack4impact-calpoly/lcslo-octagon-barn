@@ -2,14 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import Document from "@/database/documentSchema";
 import mongoose from "mongoose";
 import connectDB from "@/database/db";
-
-// Standardized API response format based off https://medium.com/@bojanmajed/standard-json-api-response-format-c6c1aabcaa6d
-type ApiResponse<T> = {
-  error?: string;
-  success: boolean;
-  message?: string;
-  data?: T;
-};
+import { createSuccessResponse, createErrorResponse } from "@/lib/response";
 
 export async function PUT(req: NextRequest, { params }: { params: { id: string } }) {
   try {
@@ -17,15 +10,7 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
     const { id } = params;
 
     if (!mongoose.isValidObjectId(id)) {
-      return NextResponse.json<ApiResponse<null>>(
-        {
-          error: "Invalid document ID",
-          success: false,
-          message: undefined,
-          data: undefined,
-        },
-        { status: 400 },
-      );
+      return createErrorResponse("Invalid document ID", "Invalid document ID", 400);
     }
 
     const body = await req.json();
@@ -40,15 +25,7 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
     });
 
     if (!document) {
-      return NextResponse.json<ApiResponse<null>>(
-        {
-          error: "Document not found or unauthorized",
-          success: false,
-          message: undefined,
-          data: undefined,
-        },
-        { status: 404 },
-      );
+      return createErrorResponse("Document not found or unauthorized", "Document not found or unauthorized", 404);
     }
 
     // Update only the allowed fields
@@ -58,23 +35,10 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
       { new: true, runValidators: true },
     );
 
-    return NextResponse.json<ApiResponse<typeof updatedDocument>>({
-      error: undefined,
-      success: true,
-      message: "Document updated successfully",
-      data: updatedDocument,
-    });
+    return createSuccessResponse({ document: updatedDocument }, 200);
   } catch (error) {
     console.error("Error updating document:", error);
-    return NextResponse.json<ApiResponse<null>>(
-      {
-        error: "Error updating document",
-        success: false,
-        message: undefined,
-        data: undefined,
-      },
-      { status: 500 },
-    );
+    return createErrorResponse("Error updating document", "Error updating document", 500);
   }
 }
 
@@ -84,15 +48,7 @@ export async function DELETE(req: NextRequest, { params }: { params: { id: strin
     const { id } = params;
 
     if (!mongoose.isValidObjectId(id)) {
-      return NextResponse.json<ApiResponse<null>>(
-        {
-          error: "Invalid document ID",
-          success: false,
-          message: undefined,
-          data: undefined,
-        },
-        { status: 400 },
-      );
+      return createErrorResponse("Invalid document ID", "Invalid document ID", 400);
     }
 
     const body = await req.json();
@@ -107,35 +63,13 @@ export async function DELETE(req: NextRequest, { params }: { params: { id: strin
     });
 
     if (!document) {
-      return NextResponse.json<ApiResponse<null>>(
-        {
-          error: "Document not found or unauthorized",
-          success: false,
-          message: undefined,
-          data: undefined,
-        },
-        { status: 404 },
-      );
+      return createErrorResponse("Document not found or unauthorized", "Document not found or unauthorized", 404);
     }
 
     await Document.findByIdAndDelete(id);
-
-    return NextResponse.json<ApiResponse<null>>({
-      error: undefined,
-      success: true,
-      message: "Document deleted successfully",
-      data: undefined,
-    });
+    return createSuccessResponse({}, 200);
   } catch (error) {
     console.error("Error deleting document:", error);
-    return NextResponse.json<ApiResponse<null>>(
-      {
-        error: "Error updating document",
-        success: false,
-        message: undefined,
-        data: undefined,
-      },
-      { status: 500 },
-    );
+    return createErrorResponse("Error deleting document", "Error deleting document", 500);
   }
 }
