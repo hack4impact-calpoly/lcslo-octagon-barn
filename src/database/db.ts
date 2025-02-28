@@ -23,10 +23,12 @@ const connectDB = async () => {
     isConnected = true;
     console.log("Connected to MongoDB");
     return db;
+    
   } catch (error) {
     console.error("MongoDB connection error:", error);
     throw new Error("Failed to connect to MongoDB");
   }
+  
 };
 
 export default connectDB;
