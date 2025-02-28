@@ -2,6 +2,7 @@ import { NextRequest } from "next/server";
 import { PutObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import client from "@/lib/aws-s3";
+import { createErrorResponse, createSuccessResponse } from "@/lib/response";
 
 export async function GET(request: NextRequest) {
   try {
@@ -9,7 +10,7 @@ export async function GET(request: NextRequest) {
     const file = searchParams.get("file");
 
     if (!file) {
-      return Response.json({ error: "fileName is required" }, { status: 400 });
+      return createErrorResponse("Bad Request", "fileName is required", 400);
     }
 
     const command = new PutObjectCommand({
@@ -21,9 +22,9 @@ export async function GET(request: NextRequest) {
       expiresIn: 3600, // URL expires in 1 hour
     });
 
-    return Response.json({ uploadUrl });
+    return createSuccessResponse({ uploadUrl }, 200);
   } catch (error) {
     console.error("Error generating upload URL:", error);
-    return Response.json({ error: "Failed to generate upload URL" }, { status: 500 });
+    return createErrorResponse("Internal Server Error", "Failed to generate upload URL", 500);
   }
 }
