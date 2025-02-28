@@ -1,4 +1,3 @@
-
 import { NextRequest } from "next/server";
 import Document from "@/database/documentSchema";
 import mongoose from "mongoose";
@@ -7,7 +6,7 @@ import { createSuccessResponse, createErrorResponse } from "@/lib/response";
 
 export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
   try {
-    await dbConnect();
+    await connectDB();
     const { id } = params;
     const doc = await Document.findById(id);
 
