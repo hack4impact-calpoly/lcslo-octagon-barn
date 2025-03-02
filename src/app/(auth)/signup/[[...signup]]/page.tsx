@@ -2,6 +2,7 @@
 
 import React, { useState, FormEvent } from "react";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 
 interface FormValues {
   firstName: string;
@@ -12,6 +13,8 @@ interface FormValues {
 }
 
 const SignUpPage: React.FC = () => {
+  const router = useRouter();
+
   const [formValues, setFormValues] = useState<FormValues>({
     firstName: "",
     lastName: "",
@@ -21,7 +24,9 @@ const SignUpPage: React.FC = () => {
   });
 
   const [errors, setErrors] = useState<Partial<FormValues>>({});
-  const [showPassword, setShowPassword] = useState<boolean>(false); // SHOW PASSWORD STATE
+  const [loading, setLoading] = useState<boolean>(false);
+  const [apiError, setApiError] = useState<string | null>(null);
+  const [showPassword, setShowPassword] = useState<boolean>(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -32,45 +37,59 @@ const SignUpPage: React.FC = () => {
   const validateForm = (): boolean => {
     const newErrors: Partial<FormValues> = {};
 
-    if (!formValues.firstName.trim()) {
-      newErrors.firstName = "First name is required";
-    }
-    if (!formValues.lastName.trim()) {
-      newErrors.lastName = "Last name is required";
-    }
-    if (!formValues.organization.trim()) {
-      newErrors.organization = "Organization is required";
-    }
+    if (!formValues.firstName.trim()) newErrors.firstName = "First name is required";
+    if (!formValues.lastName.trim()) newErrors.lastName = "Last name is required";
+    if (!formValues.organization.trim()) newErrors.organization = "Organization is required";
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!formValues.email.trim()) {
-      newErrors.email = "Email Address is required";
+      newErrors.email = "Email is required";
     } else if (!emailRegex.test(formValues.email)) {
-      newErrors.email = "Invalid Email Address format";
+      newErrors.email = "Invalid email format";
     }
 
     if (!formValues.password.trim()) {
       newErrors.password = "Password is required";
-    } else if (formValues.password.length < 6) {
-      newErrors.password = "Password must be at least 6 characters";
+    } else if (formValues.password.length < 8) {
+      newErrors.password = "Password must be at least 8 characters";
     }
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
-  // replace with actual functionality?
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    if (validateForm()) {
-      alert("Form submitted successfully!");
-      setFormValues({
-        firstName: "",
-        lastName: "",
-        organization: "",
-        email: "",
-        password: "",
+    setApiError(null);
+    setLoading(true);
+
+    if (!validateForm()) {
+      setLoading(false);
+      return;
+    }
+
+    try {
+      const response = await fetch("/api/user/create", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formValues),
       });
+
+      const result = await response.json();
+      if (!response.ok) {
+        if (response.status === 409) {
+          setApiError("User already exists. Please sign in instead.");
+        } else {
+          setApiError(result.error || "Failed to create user");
+        }
+        throw new Error(result.error);
+      }
+
+      router.push("/");
+    } catch (error: any) {
+      console.error("Sign up error:", error.message);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -82,15 +101,15 @@ const SignUpPage: React.FC = () => {
 
       <div className="relative flex items-center justify-center min-h-[85vh]">
         <div className="bg-white/80 shadow-lg rounded-lg p-8 w-full max-w-4xl">
-          <h2 className="text-2xl font-bold text-center mb-6 text-sky-700">Create Account</h2>
+          <h2 className="text-2xl font-bold text-center mb-6 text-basic-blue">Create Account</h2>
+
+          {apiError && <p className="text-red-500 text-center">{apiError}</p>}
+
           <form onSubmit={handleSubmit} className="grid grid-cols-2 gap-4" noValidate>
             <div className="col-span-1">
-              <label htmlFor="firstName" className="block mb-1 font-medium text-sky-700">
-                First Name
-              </label>
+              <label className="block mb-1 font-medium text-basic-blue">First Name</label>
               <input
                 type="text"
-                id="firstName"
                 name="firstName"
                 value={formValues.firstName}
                 onChange={handleChange}
@@ -102,12 +121,9 @@ const SignUpPage: React.FC = () => {
             </div>
 
             <div className="col-span-1">
-              <label htmlFor="lastName" className="block mb-1 font-medium text-sky-700">
-                Last Name
-              </label>
+              <label className="block mb-1 font-medium text-basic-blue">Last Name</label>
               <input
                 type="text"
-                id="lastName"
                 name="lastName"
                 value={formValues.lastName}
                 onChange={handleChange}
@@ -119,12 +135,9 @@ const SignUpPage: React.FC = () => {
             </div>
 
             <div className="col-span-2">
-              <label htmlFor="organization" className="block mb-1 font-medium text-sky-700">
-                Organization
-              </label>
+              <label className="block mb-1 font-medium text-basic-blue">Organization</label>
               <input
                 type="text"
-                id="organization"
                 name="organization"
                 value={formValues.organization}
                 onChange={handleChange}
@@ -136,12 +149,9 @@ const SignUpPage: React.FC = () => {
             </div>
 
             <div className="col-span-2">
-              <label htmlFor="email" className="block mb-1 font-medium text-sky-700">
-                Email Address
-              </label>
+              <label className="block mb-1 font-medium text-basic-blue">Email Address</label>
               <input
                 type="email"
-                id="email"
                 name="email"
                 value={formValues.email}
                 onChange={handleChange}
@@ -153,13 +163,10 @@ const SignUpPage: React.FC = () => {
             </div>
 
             <div className="col-span-2">
-              <label htmlFor="password" className="block mb-1 font-medium text-sky-700">
-                Password
-              </label>
+              <label className="block mb-1 font-medium text-basic-blue">Password</label>
               <div className="relative">
                 <input
                   type={showPassword ? "text" : "password"}
-                  id="password"
                   name="password"
                   value={formValues.password}
                   onChange={handleChange}
@@ -169,8 +176,8 @@ const SignUpPage: React.FC = () => {
                 />
                 <button
                   type="button"
-                  onClick={() => setShowPassword((prev) => !prev)}
-                  className="absolute inset-y-0 right-0 flex items-center px-2 text-sm text-sky-600 hover:text-sky-800 focus:outline-none"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute inset-y-0 right-0 flex items-center px-2 text-sm text-sky-600 hover:text-sky-800"
                 >
                   {showPassword ? "Hide" : "Show"}
                 </button>
@@ -178,15 +185,14 @@ const SignUpPage: React.FC = () => {
               {errors.password && <p className="text-red-500 text-sm mt-1">{errors.password}</p>}
             </div>
 
-            <div className="col-span-2 mt-2">
-              <p className="text-center">
-                <button
-                  type="submit"
-                  className="w-1/2 bg-sky-700 text-white py-2 rounded hover:bg-sky-800 transition-colors"
-                >
-                  Create Account
-                </button>
-              </p>
+            <div className="col-span-2 mt-2 text-center">
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-1/2 bg-basic-blue text-white py-2 rounded hover:bg-sky-800 transition-colors"
+              >
+                {loading ? "Creating Account..." : "Create Account"}
+              </button>
             </div>
           </form>
         </div>
