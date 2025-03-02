@@ -3,7 +3,6 @@
 import React, { useState, FormEvent } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useSignIn } from "@clerk/nextjs";
 
 interface FormValues {
   firstName: string;
@@ -15,7 +14,6 @@ interface FormValues {
 
 const SignUpPage: React.FC = () => {
   const router = useRouter();
-  const { signIn, setActive } = useSignIn();
 
   const [formValues, setFormValues] = useState<FormValues>({
     firstName: "",
@@ -39,15 +37,9 @@ const SignUpPage: React.FC = () => {
   const validateForm = (): boolean => {
     const newErrors: Partial<FormValues> = {};
 
-    if (!formValues.firstName.trim()) {
-      newErrors.firstName = "First name is required";
-    }
-    if (!formValues.lastName.trim()) {
-      newErrors.lastName = "Last name is required";
-    }
-    if (!formValues.organization.trim()) {
-      newErrors.organization = "Organization is required";
-    }
+    if (!formValues.firstName.trim()) newErrors.firstName = "First name is required";
+    if (!formValues.lastName.trim()) newErrors.lastName = "Last name is required";
+    if (!formValues.organization.trim()) newErrors.organization = "Organization is required";
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!formValues.email.trim()) {
@@ -58,8 +50,8 @@ const SignUpPage: React.FC = () => {
 
     if (!formValues.password.trim()) {
       newErrors.password = "Password is required";
-    } else if (formValues.password.length < 6) {
-      newErrors.password = "Password must be at least 6 characters";
+    } else if (formValues.password.length < 8) {
+      newErrors.password = "Password must be at least 8 characters";
     }
 
     setErrors(newErrors);
@@ -93,21 +85,7 @@ const SignUpPage: React.FC = () => {
         throw new Error(result.error);
       }
 
-      if (!signIn) {
-        throw new Error("Clerk signIn is not available. Check your ClerkProvider setup.");
-      }
-
-      const signInResult = await signIn.create({
-        identifier: formValues.email,
-        password: formValues.password,
-      });
-
-      if (signInResult.status === "complete") {
-        await setActive({ session: signInResult.createdSessionId });
-        router.push("/");
-      } else {
-        setApiError("Sign in could not be completed. Please try again.");
-      }
+      router.push("/");
     } catch (error: any) {
       console.error("Sign up error:", error.message);
     } finally {
@@ -123,13 +101,13 @@ const SignUpPage: React.FC = () => {
 
       <div className="relative flex items-center justify-center min-h-[85vh]">
         <div className="bg-white/80 shadow-lg rounded-lg p-8 w-full max-w-4xl">
-          <h2 className="text-2xl font-bold text-center mb-6 text-sky-700">Create Account</h2>
+          <h2 className="text-2xl font-bold text-center mb-6 text-basic-blue">Create Account</h2>
 
           {apiError && <p className="text-red-500 text-center">{apiError}</p>}
 
           <form onSubmit={handleSubmit} className="grid grid-cols-2 gap-4" noValidate>
             <div className="col-span-1">
-              <label className="block mb-1 font-medium text-sky-700">First Name</label>
+              <label className="block mb-1 font-medium text-basic-blue">First Name</label>
               <input
                 type="text"
                 name="firstName"
@@ -143,7 +121,7 @@ const SignUpPage: React.FC = () => {
             </div>
 
             <div className="col-span-1">
-              <label className="block mb-1 font-medium text-sky-700">Last Name</label>
+              <label className="block mb-1 font-medium text-basic-blue">Last Name</label>
               <input
                 type="text"
                 name="lastName"
@@ -157,7 +135,7 @@ const SignUpPage: React.FC = () => {
             </div>
 
             <div className="col-span-2">
-              <label className="block mb-1 font-medium text-sky-700">Organization</label>
+              <label className="block mb-1 font-medium text-basic-blue">Organization</label>
               <input
                 type="text"
                 name="organization"
@@ -171,7 +149,7 @@ const SignUpPage: React.FC = () => {
             </div>
 
             <div className="col-span-2">
-              <label className="block mb-1 font-medium text-sky-700">Email Address</label>
+              <label className="block mb-1 font-medium text-basic-blue">Email Address</label>
               <input
                 type="email"
                 name="email"
@@ -185,7 +163,7 @@ const SignUpPage: React.FC = () => {
             </div>
 
             <div className="col-span-2">
-              <label className="block mb-1 font-medium text-sky-700">Password</label>
+              <label className="block mb-1 font-medium text-basic-blue">Password</label>
               <div className="relative">
                 <input
                   type={showPassword ? "text" : "password"}
@@ -207,16 +185,14 @@ const SignUpPage: React.FC = () => {
               {errors.password && <p className="text-red-500 text-sm mt-1">{errors.password}</p>}
             </div>
 
-            <div className="col-span-2 mt-2">
-              <p className="text-center">
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className="w-1/2 bg-sky-700 text-white py-2 rounded hover:bg-sky-800 transition-colors"
-                >
-                  {loading ? "Creating Account..." : "Create Account"}
-                </button>
-              </p>
+            <div className="col-span-2 mt-2 text-center">
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-1/2 bg-basic-blue text-white py-2 rounded hover:bg-sky-800 transition-colors"
+              >
+                {loading ? "Creating Account..." : "Create Account"}
+              </button>
             </div>
           </form>
         </div>
