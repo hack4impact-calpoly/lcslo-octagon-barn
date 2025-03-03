@@ -31,7 +31,11 @@ const DocumentUpload: React.FC<DocumentUploadProps> = ({ file, setFile }) => {
       <div className="flex flex-col items-center text-black pointer-events-none">
         <Upload size={48} className="mb-2 text-black" />
         <p className="font-medium text-lg">Drag and Drop or Click to Select</p>
-        <p className="text-base">the desired document to be uploaded</p>
+        {file ? (
+          <p className="text-base">the desired document to be re-uploaded </p>
+        ) : (
+          <p className="text-base">the desired document to be uploaded </p>
+        )}
       </div>
 
       {file && (

@@ -6,21 +6,77 @@ import { Button } from "@/components/ui/button";
 import { Trash, Download, Upload } from "lucide-react";
 import { useState } from "react";
 
+function downloadDocument(file: File) {
+  return new Promise<string>((resolve, reject) => {
+    fetch("/api/download-url?file=" + file.name)
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Failed to get download URL");
+        }
+        return response.json();
+      })
+      .then((data) => resolve(data.downloadUrl))
+      .catch((error) => {
+        console.error("Error getting download URL:", error);
+        reject(error);
+      });
+  })
+    .then((url) => {
+      window.open(url, "_blank");
+    })
+    .catch((error) => {
+      alert("Error: " + error.message);
+    });
+}
+
 function uploadDoc(file: File) {
-  // Simulate uploading the document by sleeeping for 2 seconds
-  return new Promise<void>((resolve) => {
-    setTimeout(() => {
-      resolve();
-    }, 2000);
-  }).then(() => {
-    alert(`Document ${file.name} uploaded successfully!`);
-  });
+  return new Promise<string>((resolve, reject) => {
+    // First, get the upload URL for the file
+    fetch("/api/upload-url?file=" + file.name)
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Failed to get upload URL");
+        }
+        return response.json();
+      })
+      .then((data) => resolve(data.uploadUrl))
+      .catch((error) => {
+        console.error("Error getting upload URL:", error);
+        reject(error);
+      });
+  })
+    .then((dataURL: string) => {
+      // Upload the file to the S3 bucket
+      fetch("/api/upload-document", {
+        method: "PUT",
+        body: (() => {
+          const formData = new FormData();
+          formData.append("upload-url", dataURL);
+          formData.append("file", file);
+          return formData;
+        })(),
+      })
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error("Failed to upload document");
+          }
+          response.text();
+        })
+        .then(() => {
+          alert("Document uploaded successfully");
+        });
+    })
+    .catch((error) => {
+      alert("Error: " + error.message);
+    });
 }
 
 const ClientUploadPage: React.FC = () => {
   const [file, setFile] = useState<File | null>(null);
+  const [hasUploaded, setHasUploaded] = useState(false);
 
   const handleChange = (file: File) => {
+    setHasUploaded(false);
     setFile(file);
   };
 
@@ -57,17 +113,23 @@ const ClientUploadPage: React.FC = () => {
 
         <Button
           className="bg-[#3A6F8F] text-white hover:bg-[#305a73]"
-          disabled={file === null}
+          disabled={file === null && !hasUploaded}
           size={"sm"}
-          onClick={() => uploadDoc(file!)}
+          onClick={() => {
+            if (file && !hasUploaded) {
+              uploadDoc(file).then(() => setHasUploaded(true));
+            } else {
+              downloadDocument(file as File);
+            }
+          }}
         >
-          {file ? (
+          {!file || hasUploaded ? (
             <>
-              <Upload /> Upload
+              <Download /> Download
             </>
           ) : (
             <>
-              <Download /> Download
+              <Upload /> Upload
             </>
           )}
         </Button>
