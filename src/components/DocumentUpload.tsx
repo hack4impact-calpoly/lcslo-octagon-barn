@@ -4,17 +4,17 @@ import { Upload } from "lucide-react";
 
 const fileTypes = ["PDF", "JPEG", "PNG", "DOCX", "DOC", "WORD"];
 
-const DocumentUpload: React.FC = () => {
-  const [file, setFile] = useState<File | null>(null);
-  const [isDragging, setIsDragging] = useState(false);
+interface DocumentUploadProps {
+  file: File | null;
+  setFile: (file: File) => void;
+}
 
-  const handleChange = (file: File) => {
-    setFile(file);
-  };
+const DocumentUpload: React.FC<DocumentUploadProps> = ({ file, setFile }) => {
+  const [isDragging, setIsDragging] = useState(false);
 
   return (
     <FileUploader
-      handleChange={handleChange}
+      handleChange={setFile}
       name="document"
       types={fileTypes}
       hoverTitle="Drop the file here"
