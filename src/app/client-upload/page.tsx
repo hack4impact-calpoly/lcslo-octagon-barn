@@ -5,6 +5,11 @@ import DocumentUpload from "@/components/DocumentUpload";
 import { Button } from "@/components/ui/button";
 import { Trash, Download, Upload } from "lucide-react";
 import { useState } from "react";
+import { useUser } from "@clerk/nextjs";
+import { UserResource } from "@clerk/types";
+
+// Temp Event ID for demo purposes
+const eventId = "67bd28d5e038c1eb96c03f53";
 
 function downloadDocument(file: File) {
   return new Promise<string>((resolve, reject) => {
@@ -29,7 +34,7 @@ function downloadDocument(file: File) {
     });
 }
 
-function uploadDoc(file: File) {
+function uploadDoc(file: File, user: UserResource | null | undefined) {
   return new Promise<string>((resolve, reject) => {
     // First, get the upload URL for the file
     fetch("/api/upload-url?file=" + file.name)
@@ -63,7 +68,29 @@ function uploadDoc(file: File) {
           response.text();
         })
         .then(() => {
-          alert("Document uploaded successfully");
+          fetch("/api/document", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              clerkId: user?.id.split("_")[1],
+              eventId,
+              s3DocId: file.name,
+              documentType: file.type,
+              createdAt: new Date(),
+              status: "Pending",
+              checkList: [],
+            }),
+          }).then((response) => {
+            if (!response.ok) {
+              throw new Error("Failed to create document record");
+            }
+            response.json();
+          });
+        })
+        .then(() => {
+          alert("Document uploaded successfully from " + user?.id.split("_")[1]);
         });
     })
     .catch((error) => {
@@ -74,6 +101,7 @@ function uploadDoc(file: File) {
 const ClientUploadPage: React.FC = () => {
   const [file, setFile] = useState<File | null>(null);
   const [hasUploaded, setHasUploaded] = useState(false);
+  const { user } = useUser();
 
   const handleChange = (file: File) => {
     setHasUploaded(false);
@@ -117,7 +145,7 @@ const ClientUploadPage: React.FC = () => {
           size={"sm"}
           onClick={() => {
             if (file && !hasUploaded) {
-              uploadDoc(file).then(() => setHasUploaded(true));
+              uploadDoc(file, user).then(() => setHasUploaded(true));
             } else {
               downloadDocument(file as File);
             }

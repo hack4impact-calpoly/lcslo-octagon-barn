@@ -34,3 +34,16 @@ export async function POST(request: NextRequest) {
     return createErrorResponse("Internal Server Error", error.message, 500);
   }
 }
+
+export async function PUT(nextRequest: NextRequest) {
+  try {
+    await dbConnect();
+    const body = await nextRequest.json();
+    const { id, ...update } = body;
+
+    const updatedDoc = await Document.findByIdAndUpdate(id, update, { new: true });
+    return createSuccessResponse(updatedDoc, 200);
+  } catch (error: any) {
+    return createErrorResponse("Internal Server Error", error.message, 500);
+  }
+}
