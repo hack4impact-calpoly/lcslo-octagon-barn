@@ -90,7 +90,7 @@ function uploadDoc(file: File, user: UserResource | null | undefined) {
           });
         })
         .then(() => {
-          alert("Document uploaded successfully from " + user?.id.split("_")[1]);
+          alert("Document" + file.name + " uploaded successfully");
         });
     })
     .catch((error) => {
