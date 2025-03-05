@@ -12,19 +12,9 @@ export async function PUT(request: NextRequest) {
 
     // Cgeck if the file and upload URL were provided
     if (file === null || file === undefined) {
-      return {
-        status: 400,
-        body: {
-          message: "No file was provided",
-        },
-      };
+      return createErrorResponse("No file was provided", "No file was provided", 400);
     } else if (uploadUrl === null || uploadUrl === undefined) {
-      return {
-        status: 400,
-        body: {
-          message: "No upload URL was provided",
-        },
-      };
+      return createErrorResponse("No upload URL was provided", "No upload URL was provided", 400);
     }
 
     // Upload the file to the S3 bucket
