@@ -3,12 +3,6 @@ import { NextRequest } from "next/server";
 import { IncomingForm } from "formidable";
 import { IncomingMessage } from "http";
 
-export const config = {
-  api: {
-    bodyParser: false, // Required for handling raw binary data
-  },
-};
-
 export async function PUT(request: NextRequest) {
   try {
     // Pull data from the incoming request
@@ -50,3 +44,5 @@ export async function PUT(request: NextRequest) {
     return createErrorResponse("Internal Server Error", error.message, 500);
   }
 }
+
+export const bodyParser = false;
