@@ -44,5 +44,3 @@ export async function PUT(request: NextRequest) {
     return createErrorResponse("Internal Server Error", error.message, 500);
   }
 }
-
-export const bodyParser = false;
