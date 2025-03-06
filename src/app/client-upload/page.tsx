@@ -135,23 +135,25 @@ const ClientUploadPage: React.FC = () => {
       {/* Buttons */}
       {/* TODO: Note to add functionality for the buttons in a later issue */}
       <div className="flex justify-center gap-4 mt-6">
-        <Button className="bg-[#3A6F8F] text-white hover:bg-[#305a73]" disabled size={"sm"}>
+        <Button className="bg-[ bg-basic-blue ] text-white hover:bg-[#305a73]" disabled size={"sm"}>
           <Trash /> Delete
         </Button>
 
         <Button
-          className="bg-[#3A6F8F] text-white hover:bg-[#305a73]"
+          className="bg-[ bg-basic-blue ] text-white hover:bg-[#305a73]"
           disabled={file === null && !hasUploaded}
           size={"sm"}
           onClick={() => {
             if (file && !hasUploaded) {
-              uploadDoc(file, user).then(() => setHasUploaded(true));
+              uploadDoc(file, user)
+                .then(() => setHasUploaded(true))
+                .catch(() => setHasUploaded(false));
             } else {
               downloadDocument(file as File);
             }
           }}
         >
-          {!file || hasUploaded ? (
+          {!file && hasUploaded ? (
             <>
               <Download /> Download
             </>
