@@ -14,9 +14,13 @@
   },
   "dependencies": {
     "@clerk/elements": "^0.22.23",
+    "@clerk/clerk-sdk-node": "^4.13.22",
+    "@aws-sdk/client-s3": "^3.750.0",
+    "@aws-sdk/s3-request-presigner": "^3.750.0",
     "@clerk/nextjs": "^6.11.0",
     "@radix-ui/react-slot": "^1.1.1",
     "class-variance-authority": "^0.7.1",
+    "clerk": "^0.8.3",
     "clsx": "^2.1.1",
     "lucide-react": "^0.471.1",
     "mongoose": "^8.9.5",
