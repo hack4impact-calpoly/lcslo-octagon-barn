@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -8,6 +9,8 @@ import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@
 import { DateTimePicker } from "@/components/ui/datetime-picker";
 
 export default function CreateEventPage() {
+  const router = useRouter();
+
   // State for form inputs
   const [eventName, setEventName] = useState("");
   const [venue, setVenue] = useState("");
@@ -26,6 +29,7 @@ export default function CreateEventPage() {
     endDate: false,
     eventDetails: false,
     user: false,
+    invalidDateRange: false,
   });
 
   // Handle form submission
@@ -41,6 +45,7 @@ export default function CreateEventPage() {
       endDate: !endDate,
       eventDetails: eventDetails.trim() === "",
       user: user.trim() === "",
+      invalidDateRange: !!(startDate && endDate && startDate >= endDate),
     };
 
     setErrors(newErrors);
@@ -93,6 +98,8 @@ export default function CreateEventPage() {
           <DateTimePicker date={endDate} setDate={setEndDate} error={errors.endDate} />
         </div>
 
+        {errors.invalidDateRange && <p className="text-red-500">End time must be after the start time.</p>}
+
         <Textarea
           name="eventDetails"
           placeholder="Event Details"
@@ -118,11 +125,11 @@ export default function CreateEventPage() {
           </Button>
         </div>
 
-        <div className="flex space-x-2">
-          <Button type="button" variant="destructive" className="w-1/2 text-lg">
+        <div className="flex justify-end space-x-2 w-full">
+          <Button type="button" variant="destructive" className="w-1/4 text-lg" onClick={() => router.push("/")}>
             Cancel
           </Button>
-          <Button type="submit" className="w-1/2 bg-[var(--primary-blue)] text-lg">
+          <Button type="submit" className="w-1/4 bg-[var(--primary-blue)] text-lg">
             Create Event
           </Button>
         </div>
