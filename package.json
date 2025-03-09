@@ -13,12 +13,13 @@
     "prepare": "husky"
   },
   "dependencies": {
-    "@clerk/elements": "^0.22.23",
-    "@clerk/clerk-sdk-node": "^4.13.22",
     "@aws-sdk/client-s3": "^3.750.0",
     "@aws-sdk/s3-request-presigner": "^3.750.0",
+    "@clerk/clerk-sdk-node": "^4.13.22",
+    "@clerk/elements": "^0.22.23",
     "@clerk/nextjs": "^6.11.0",
-    "@radix-ui/react-slot": "^1.1.1",
+    "@radix-ui/react-slot": "^1.1.2",
+    "@tanstack/react-table": "^8.21.2",
     "class-variance-authority": "^0.7.1",
     "clerk": "^0.8.3",
     "clsx": "^2.1.1",
