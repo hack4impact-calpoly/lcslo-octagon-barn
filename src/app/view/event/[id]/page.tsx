@@ -1,11 +1,14 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useUser } from "@clerk/nextjs";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { X } from "lucide-react";
+import { Textarea } from "@/components/ui/textarea";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faUser, faFileInvoice, faFile, faDownload } from "@fortawesome/free-solid-svg-icons";
 
 // Temporary Interface because event schema does not match
 // the info on the visual - I imagine we will import the actual
@@ -20,12 +23,15 @@ interface IEventData {
   adminName?: string;
   email: string;
   phone: string;
+  description: string;
   vendorList: string;
   documents: IDocument[];
-  attendees: {
+  attendees: number;
+  forms: {
+    completed: number;
     total: number;
-    confirmed: number;
   };
+  headerImageUrl?: string;
 }
 
 // another temporary interface
@@ -46,37 +52,44 @@ export default function AdminEventView() {
     adminName: "Admin Name",
     email: "contact@email.com",
     phone: "(805)-123-4567",
+    description: "description placeholder",
     vendorList:
       "The following is a temporary placeholder for what eventually will be filled in with text that will contain information about the venue and its features",
     documents: [{ name: "brochure.pdf", url: "/brochure.pdf" }],
-    attendees: {
-      total: 16,
-      confirmed: 2,
+    attendees: 16,
+    forms: {
+      total: 8,
+      completed: 2,
     },
+    headerImageUrl: "https://upload.wikimedia.org/wikipedia/commons/8/84/Male_and_female_chicken_sitting_together.jpg", // Placeholder image path, replace with your actual image
   };
 
   const { user } = useUser();
   const [isEditing, setIsEditing] = useState(false);
-
   const [eventData, setEventData] = useState<IEventData>(initialData);
+  const [editCache, setEditCache] = useState<IEventData>(initialData);
 
   // Disabled admin check temporarily so I can see the contents
   if (!user /* || !user.publicMetadata.isAdmin*/) {
     return <div className="p-6">You do not have permission to view this page.</div>;
   }
 
-  const handleEditToggle = () => {
-    setIsEditing(!isEditing);
+  const handleEditClick = () => {
+    // Save the current state to editCache when entering edit mode
+    setEditCache({ ...eventData });
+    setIsEditing(true);
+  };
+
+  const handleCancel = () => {
+    // Revert to the saved state
+    setEventData(editCache);
+    setIsEditing(false);
   };
 
   const handleSave = async () => {
     console.log("Saving event data:", eventData);
     // API to save the data
-    setIsEditing(false);
-  };
-
-  const handleCancel = () => {
-    setEventData(initialData);
+    setEditCache({ ...eventData }); // Update the edit cache with saved data
     setIsEditing(false);
   };
 
@@ -86,8 +99,8 @@ export default function AdminEventView() {
     setEventData({ ...eventData, documents: updatedDocs });
   };
 
-  const formatAttendeeRatio = () => {
-    return `${eventData.attendees.confirmed}/${eventData.attendees.total}`;
+  const formsFilled = () => {
+    return `${eventData.forms.completed}/${eventData.forms.total}`;
   };
 
   const formatDateTimeRange = () => {
@@ -95,91 +108,114 @@ export default function AdminEventView() {
   };
 
   return (
-    <div className="p-16">
-      {/* Event Header Section */}
-      <div className="flex justify-between items-center bg-gray-200 rounded p-4 relative mb-6">
-        <div className="flex flex-col">
-          <h2 className="text-lg font-bold">{eventData.eventName}</h2>
-          <p className="text-sm">{formatDateTimeRange()}</p>
-          <p className="text-sm">{eventData.location}</p>
+    <div className="p-4 md:p-8 lg:p-16">
+      {/* Event Header Section with Background Image */}
+      <div
+        className="flex flex-col sm:flex-row justify-between items-start sm:items-center rounded p-4 relative mb-6 space-y-2 overflow-hidden"
+        style={{
+          backgroundImage: `url(${eventData.headerImageUrl})`,
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+        }}
+      >
+        {/* Semi-transparent overlay for better text visibility */}
+        <div className="absolute inset-0 bg-gray-200 bg-opacity-70"></div>
+
+        <div className="flex flex-col mb-4 mt-4 z-10 relative">
+          <h2 className="text-2xl font-bold">{eventData.eventName}</h2>
+          <p className="text-md">{formatDateTimeRange()}</p>
+          <p className="text-md">{eventData.location}</p>
         </div>
 
-        {/* Attendee data */}
-        <div className="flex flex-col justify-end items-center pr-20 text-sm">
-          <div className="flex items-center justify-end">
-            <span className="mr-2">{/* add icon */}</span>
-            <span>{eventData.attendees.total}</span>
+        {/* Attendee data - pulled further from the right edge */}
+        <div className="flex flex-col justify-end items-start sm:items-center sm:pr-8 md:pr-16 lg:pr-32 text-md z-10 relative">
+          <div className="flex items-center">
+            <span className="mr-3">
+              <FontAwesomeIcon icon={faUser} />
+            </span>
+            <span>{eventData.attendees}</span>
           </div>
-          <div className="flex items-center justify-end mt-1">
-            <span className="mr-2">{/* add icon */}</span>
-            <span>{formatAttendeeRatio()}</span>
+          <div className="flex items-center mt-2">
+            <span className="mr-3">
+              <FontAwesomeIcon icon={faFileInvoice} />
+            </span>
+            <span>{formsFilled()}</span>
           </div>
         </div>
       </div>
 
       {/* Tabs Container */}
-      <div className="border rounded-lg p-4">
-        {/* These are the edit and save buttons */}
+      <div>
         <Tabs defaultValue="details">
-          <div className="flex justify-between items-center mb-4">
-            <TabsList>
-              <TabsTrigger value="details">Event Details</TabsTrigger>
-              <TabsTrigger value="documents">Documents</TabsTrigger>
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-3 sm:space-y-0 mb-0">
+            <TabsList className="mb-0">
+              <TabsTrigger
+                value="details"
+                className="text-md data-[state=active]:bg-gray-200 data-[state=active]:text-black data-[state=active]:underline data-[state=inactive]:bg-gray-100 data-[state=active]:rounded-b-none"
+              >
+                Event Details
+              </TabsTrigger>
+              <TabsTrigger
+                value="documents"
+                className="text-md data-[state=active]:bg-gray-200 data-[state=active]:text-black data-[state=active]:underline data-[state=inactive]:bg-gray-100 data-[state=active]:rounded-b-none"
+              >
+                Documents
+              </TabsTrigger>
             </TabsList>
 
-            {isEditing ? (
-              <div className="space-x-2">
-                <Button className="w-24" variant="outline" onClick={handleCancel}>
-                  Cancel
-                </Button>
-                <Button className="w-24" variant="outline" onClick={handleSave}>
-                  Save
-                </Button>
-              </div>
-            ) : (
-              <div className="space-x-2">
-                <Button className="w-24" variant="outline" onClick={handleEditToggle}>
+            <div className="space-x-2">
+              {!isEditing && (
+                <Button className="w-24 bg-gray-100 hover:bg-gray-200" variant="outline" onClick={handleEditClick}>
                   Edit
                 </Button>
-                <Button className="w-24" variant="outline">
-                  Upload
-                </Button>
-              </div>
-            )}
+              )}
+              <Button className="w-24 bg-gray-100 hover:bg-gray-200" variant="outline">
+                Upload
+              </Button>
+            </div>
           </div>
 
           {/* Event Details tab */}
-          <TabsContent value="details">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <TabsContent value="details" className="mt-0 pt-4">
+            <div className="grid grid-cols-1 md:grid-cols-2">
               {/* Left Column */}
-              <div className="space-y-4 bg-gray-100 p-4 rounded">
-                <p className="text-gray-600 text-sm">
-                  The following is a temporary placeholder for what eventually will be filled in with text that will
-                  contain information about the venue and its features
-                </p>
+              <div className="space-y-4 bg-gray-200 p-4 rounded">
+                {isEditing ? (
+                  <Textarea
+                    id="eventDescription"
+                    value={eventData.description}
+                    onChange={(e) => setEventData({ ...eventData, description: e.target.value })}
+                    rows={4}
+                    className="resize-none"
+                  />
+                ) : (
+                  <p className="text-sm">{eventData.description}</p>
+                )}
 
                 <div>
-                  <label htmlFor="vendorList" className="block text-sm font-medium">
+                  <label htmlFor="vendorList" className="block text-md font-medium mb-2">
                     Vendor List:
                   </label>
                   {isEditing ? (
-                    <Input
+                    <Textarea
                       id="vendorList"
                       value={eventData.vendorList}
                       onChange={(e) => setEventData({ ...eventData, vendorList: e.target.value })}
+                      rows={4}
+                      className="resize-none"
                     />
                   ) : (
-                    <p className="text-gray-600 text-sm">{eventData.vendorList}</p>
+                    <p className="text-sm">{eventData.vendorList}</p>
                   )}
                 </div>
               </div>
 
               {/* Right Column */}
-              <div className="space-y-4 bg-gray-100 p-4 rounded">
+              <div className="space-y-4 bg-gray-200 p-4 rounded">
                 {isEditing ? (
                   <ul className="space-y-4">
                     <li>
-                      <label htmlFor="adminName" className="block text-sm font-medium">
+                      <label htmlFor="adminName" className="block text-md font-medium mb-2">
                         Admin Name
                       </label>
                       <Input
@@ -189,23 +225,23 @@ export default function AdminEventView() {
                       />
                     </li>
                     <li>
-                      <label htmlFor="email" className="block text-sm font-medium">
+                      <label htmlFor="email" className="block text-md font-medium mb-2">
                         Email
                       </label>
                       <Input
                         id="email"
                         value={eventData.email || ""}
-                        onChange={(e) => setEventData({ ...eventData, adminName: e.target.value })}
+                        onChange={(e) => setEventData({ ...eventData, email: e.target.value })}
                       />
                     </li>
                     <li>
-                      <label htmlFor="phone" className="block text-sm font-medium">
+                      <label htmlFor="phone" className="block text-md font-medium mb-2">
                         Phone Number
                       </label>
                       <Input
                         id="phone"
                         value={eventData.phone || ""}
-                        onChange={(e) => setEventData({ ...eventData, adminName: e.target.value })}
+                        onChange={(e) => setEventData({ ...eventData, phone: e.target.value })}
                       />
                     </li>
                   </ul>
@@ -218,60 +254,51 @@ export default function AdminEventView() {
                 )}
 
                 {/* Document list */}
-                <div>
+                <div className="space-y-3">
                   {eventData.documents.map((doc, index) => (
-                    <div key={index} className="flex items-center mt-2">
-                      <div className="flex-1">
-                        <a href={doc.url} className="flex items-center text-blue-500 hover:underline">
-                          <span className="mr-2">{/* add icon */}</span>
-                          {doc.name}
-                        </a>
-                      </div>
+                    <div key={index} className="flex items-center">
+                      <FontAwesomeIcon icon={faFile} className="mr-3 text-gray-600" />
+                      <a href={doc.url} className="mr-3 text-blue-500 underline">
+                        {doc.name}
+                      </a>
+                      <a href={doc.url} download={doc.name} className="mr-4">
+                        <FontAwesomeIcon
+                          icon={faDownload}
+                          className="text-gray-600 cursor-pointer hover:text-gray-800"
+                        />
+                      </a>
                       {isEditing && (
-                        <Button variant="ghost" size="sm" onClick={() => removeDocument(index)}>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => removeDocument(index)}
+                          className="bg-gray-300 hover:bg-gray-400 p-1 rounded mr-2"
+                        >
                           <X className="h-4 w-4" />
                         </Button>
                       )}
                     </div>
                   ))}
                 </div>
+
+                {/* Save and Cancel buttons appear only if editing */}
+                {isEditing && (
+                  <div className="flex justify-end mt-4 space-x-2">
+                    <Button className="w-24 bg-gray-300 hover:bg-gray-400" variant="outline" onClick={handleSave}>
+                      Save
+                    </Button>
+                    <Button className="w-24 bg-gray-300 hover:bg-gray-400" variant="outline" onClick={handleCancel}>
+                      Cancel
+                    </Button>
+                  </div>
+                )}
               </div>
             </div>
           </TabsContent>
 
           {/* Documents tab */}
-          <TabsContent value="documents">
-            <div className="p-4 bg-gray-100 rounded">
-              {eventData.documents.length > 0 ? (
-                <div className="space-y-2">
-                  {eventData.documents.map((doc, index) => (
-                    <div key={index} className="flex items-center">
-                      <a href={doc.url} className="flex items-center text-blue-500 hover:underline">
-                        <span className="mr-2">📄</span>
-                        {doc.name}
-                      </a>
-                      {isEditing && (
-                        <Button variant="ghost" size="sm" className="ml-2" onClick={() => removeDocument(index)}>
-                          <X className="h-4 w-4" />
-                        </Button>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <div className="text-center p-4">
-                  <p className="text-gray-500">No documents available.</p>
-                </div>
-              )}
-
-              {isEditing && (
-                <div className="mt-4">
-                  <Button variant="outline" className="w-full">
-                    Add Document
-                  </Button>
-                </div>
-              )}
-            </div>
+          <TabsContent value="documents" className="mt-0 pt-4">
+            <div className="p-4 bg-gray-200 rounded">{/* empty for now */}</div>
           </TabsContent>
         </Tabs>
       </div>
