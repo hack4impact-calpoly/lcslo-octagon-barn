@@ -90,6 +90,7 @@ function uploadDoc(file: File, user: UserResource | null | undefined) {
         })
         .then(() => {
           alert(file.name + " is successfully uploaded");
+          return Promise.resolve();
         });
     })
     .catch((error) => {
@@ -155,16 +156,22 @@ const ClientUploadPage: React.FC = () => {
       </div>
 
       {/* Buttons */}
-      {/* TODO: Note to add functionality for the delete button */}
       <div className="flex justify-center gap-4 mt-6">
-        <Button
-          variant="outline"
-          className="bg-[ bg-basic-blue ] text-white hover:bg-[#305a73]"
-          disabled={true}
-          size={"sm"}
-        >
-          <Trash /> Delete
-        </Button>
+        {file && hasUploaded && (
+          <>
+            <Button
+              variant="outline"
+              className="bg-[ bg-basic-blue ] text-white hover:bg-[#305a73]"
+              size={"sm"}
+              onClick={() => {
+                /* TODO: Note to add functionality for the delete button */
+                alert("Deleting functionality not added yet");
+              }}
+            >
+              <Trash /> Delete
+            </Button>
+          </>
+        )}
 
         <Button
           className="bg-[ bg-basic-blue ] text-white hover:bg-[#305a73]"
@@ -180,7 +187,7 @@ const ClientUploadPage: React.FC = () => {
             }
           }}
         >
-          {!file && hasUploaded ? (
+          {file && hasUploaded ? (
             <>
               <Download /> Download
             </>
