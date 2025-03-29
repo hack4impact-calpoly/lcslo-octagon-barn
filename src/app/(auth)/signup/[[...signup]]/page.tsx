@@ -96,7 +96,7 @@ const SignUpPage: React.FC = () => {
   return (
     <div className="relative w-full min-h-screen overflow-hidden">
       <div className="absolute inset-0">
-        <Image src="/octagon_barn_background.jpg" alt="Background" fill className="object-cover filter blur-sm" />
+        <Image src="/auth_background.png" alt="Background" fill className="object-cover filter blur-sm" />
       </div>
 
       <div className="relative flex items-center justify-center min-h-[85vh]">
