@@ -25,7 +25,7 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
     const updatedEvent = await Event.findByIdAndUpdate(
       params.id,
       { $set: updateData },
-      { new: true, runValidators: true }
+      { new: true, runValidators: true },
     );
 
     if (!updatedEvent) {
