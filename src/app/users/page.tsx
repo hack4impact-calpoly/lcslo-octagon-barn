@@ -44,13 +44,13 @@ export default async function Page() {
 
   return (
     <div className="container mx-auto py-10">
-      <div className="flex items-center gap-2 py-5">
-        <Input type="text" placeholder="Search users..." className="w-[700px] text-lg placeholder:text-lg pxd" />
-        <Button className="bg-[#3A6F8F] text-white px-4 py-2 text-lg w-[200px]">Create User</Button>
+      <div className="flex items-center justify-between py-5">
+        <Input type="text" placeholder="Search users..." className="w-[500px] text-2xl placeholder:text-xl pxd" />
       </div>
       <DataTable columns={columns} data={data} />
-      <div className="flex justify-end py-2">
-        <Button className="bg-red-500 text-white px-4 py-2 text-lg w-[300px]">Cancel</Button>
+      <div className="flex justify-end py-8 space-x-6">
+        <Button className="bg-red-500 text-white px-4 py-2 text-lg w-[250px]">Cancel</Button>
+        <Button className="bg-[#3A6F8F] text-white px-4 py-2 text-lg w-[250px]">Create User</Button>
       </div>
     </div>
   );
