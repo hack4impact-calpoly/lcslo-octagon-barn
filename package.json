@@ -15,7 +15,7 @@
   "dependencies": {
     "@aws-sdk/client-s3": "^3.750.0",
     "@aws-sdk/s3-request-presigner": "^3.750.0",
-    "@clerk/clerk-sdk-node": "^5.1.6",
+    "@clerk/clerk-sdk-node": "^4.13.22",
     "@clerk/elements": "^0.22.23",
     "@clerk/nextjs": "^6.11.0",
     "@radix-ui/react-slot": "^1.1.2",
