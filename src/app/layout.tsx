@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import { ClerkProvider, SignInButton, SignedIn, SignedOut, UserButton } from "@clerk/nextjs";
+import { ClerkProvider, SignedIn } from "@clerk/nextjs";
 import { eb_garamond } from "@/styles/fonts";
 import "../styles/global.css";
 
@@ -16,9 +16,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <ClerkProvider>
       <html lang="en">
         <body>
-          <Navbar />
+          <SignedIn>
+            <Navbar />
+          </SignedIn>
           <div className={`${eb_garamond.className}`}>{children}</div>
-          <Footer />
+          <SignedIn>
+            <Footer />
+          </SignedIn>
         </body>
       </html>
     </ClerkProvider>
