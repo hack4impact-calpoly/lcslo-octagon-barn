@@ -60,12 +60,12 @@ export default function CreateEventPage() {
   };
 
   return (
-    <div className="max-w-2xl mx-auto p-6 bg-white">
+    <div className="max-w-2xl mx-auto p-6 bg-white text-[var(--primary-blue)]  rounded-lg shadow-md">
       <h1 className="text-3xl font-bold mb-4">Create Event</h1>
       <form className="space-y-4" onSubmit={handleSubmit}>
         <Input
           name="eventName"
-          className={`bg-[var(--primary-fill)] !text-lg placeholder:text-lg ${errors.eventName ? "border-red-500" : ""}`}
+          className={`bg-[var(--primary-fill)] !text-lg placeholder:text-lg placeholder:text-[var(--primary-blue)] ${errors.eventName ? "border-red-500" : ""}`}
           placeholder="Event Name"
           value={eventName}
           onChange={(e) => setEventName(e.target.value)}
@@ -73,7 +73,9 @@ export default function CreateEventPage() {
 
         <div className="flex space-x-2">
           <Select onValueChange={(value) => setVenue(value)}>
-            <SelectTrigger className={`w-1/2 bg-[var(--primary-fill)] text-lg ${errors.venue ? "border-red-500" : ""}`}>
+            <SelectTrigger
+              className={`w-1/2 bg-[var(--primary-fill)] data-[placeholder]:text-[var(--primary-blue)]  ${errors.venue ? "border-red-500" : ""}`}
+            >
               <SelectValue placeholder="Venue" />
             </SelectTrigger>
             <SelectContent>
@@ -89,7 +91,7 @@ export default function CreateEventPage() {
             placeholder="Number of People"
             value={numPeople}
             onChange={(e) => setNumPeople(e.target.value)}
-            className={`w-1/2 bg-[var(--primary-fill)] !text-lg placeholder:text-lg ${errors.numPeople ? "border-red-500" : ""}`}
+            className={`w-1/2 bg-[var(--primary-fill)] !text-lg placeholder:text-lg placeholder:text-[var(--primary-blue)] ${errors.numPeople ? "border-red-500" : ""}`}
           />
         </div>
 
@@ -105,12 +107,12 @@ export default function CreateEventPage() {
           placeholder="Event Details"
           value={eventDetails}
           onChange={(e) => setEventDetails(e.target.value)}
-          className={`h-24 bg-[var(--primary-fill)] !text-lg placeholder:text-lg ${errors.eventDetails ? "border-red-500" : ""}`}
+          className={`h-24 bg-[var(--primary-fill)] !text-lg placeholder:text-lg placeholder:text-[var(--primary-blue)] ${errors.eventDetails ? "border-red-500" : ""}`}
         />
 
         <Input
           name="user"
-          className={`bg-[var(--primary-fill)] !text-lg placeholder:text-lg ${errors.user ? "border-red-500" : ""}`}
+          className={`bg-[var(--primary-fill)] placeholder:text-[var(--primary-blue)] !text-lg placeholder:text-lg ${errors.user ? "border-red-500" : ""}`}
           placeholder="User"
           value={user}
           onChange={(e) => setUser(e.target.value)}
@@ -124,14 +126,15 @@ export default function CreateEventPage() {
             Create User
           </Button>
         </div>
-
-        <div className="flex justify-end space-x-2 w-full">
-          <Button type="button" variant="destructive" className="w-1/4 text-lg" onClick={() => router.push("/")}>
-            Cancel
-          </Button>
-          <Button type="submit" className="w-1/4 bg-[var(--primary-blue)] text-lg">
-            Create Event
-          </Button>
+        <div className="flex justify-end">
+          <div className="flex  space-x-2 w-1/2 pl-1">
+            <Button type="button" variant="destructive" className="w-1/2 text-lg" onClick={() => router.push("/")}>
+              Cancel
+            </Button>
+            <Button type="submit" className="w-1/2 bg-[var(--primary-blue)] text-lg">
+              Create Event
+            </Button>
+          </div>
         </div>
       </form>
     </div>
