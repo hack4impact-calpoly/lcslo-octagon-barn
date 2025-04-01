@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useUser } from "@clerk/nextjs";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
@@ -9,6 +9,8 @@ import { X } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUser, faFileInvoice, faFile, faDownload } from "@fortawesome/free-solid-svg-icons";
+import { load } from "mime";
+import { RotatingLines } from "react-loader-spinner";
 
 // Temporary Interface because event schema does not match
 // the info on the visual - I imagine we will import the actual
@@ -65,13 +67,35 @@ export default function AdminEventView() {
   };
 
   const { user } = useUser();
+  const [loading, setLoading] = useState(true);
+  const [authorized, setAuthorized] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [eventData, setEventData] = useState<IEventData>(initialData);
   const [editCache, setEditCache] = useState<IEventData>(initialData);
 
   // Disabled admin check temporarily so I can see the contents
-  if (!user /* || !user.publicMetadata.isAdmin*/) {
-    return <div className="p-6">You do not have permission to view this page.</div>;
+  // TODO: make change
+  useEffect(() => {
+    if (!user /* || !user.publicMetadata.isAdmin*/) {
+      setAuthorized(true);
+      setLoading(false);
+    }
+  }, [user]);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <RotatingLines strokeColor="black" strokeWidth="4" animationDuration="0.75" width="96" visible={true} />;
+      </div>
+    );
+  }
+
+  if (!authorized) {
+    return (
+      <div className="flex items-center justify-center h-screen text-2xl font-bold">
+        You do not have permissions to view this page
+      </div>
+    );
   }
 
   const handleEditClick = () => {
