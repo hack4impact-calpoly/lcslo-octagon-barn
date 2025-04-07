@@ -23,7 +23,7 @@ async function downloadDocument(file: File, user: UserResource | null | undefine
   }
 }
 
-async function uploadDoc(file: File, user: UserResource | null | undefined, eventId: string) {
+async function uploadDocument(file: File, user: UserResource | null | undefined, eventId: string) {
   try {
     // 1. Get the upload URL for the file
     const url_string = `/api/upload-url?file=${encodeURIComponent(file.name)}&userId=${encodeURIComponent(user?.id || "")}
@@ -62,9 +62,58 @@ async function uploadDoc(file: File, user: UserResource | null | undefined, even
       }),
     });
     if (!createDocResponse.ok) throw new Error("Failed to create document record");
+    const document = await createDocResponse.json();
+    alert("Uploaded Successfully");
+    return {
+      docId: document._id,
+      s3DocId: document.s3DocId,
+    };
   } catch (err) {
     alert("Upload failed");
     console.error("Upload failed: ", err);
+    throw err;
+  }
+}
+
+async function deleteDocument(
+  file: File,
+  user: UserResource | null | undefined,
+  eventId: string,
+  docId: string,
+  s3DocId: string,
+  resetState: () => void,
+) {
+  try {
+    const deleteS3DocumentResponse = await fetch("/api/delete-document", {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        fileName: file.name,
+        userId: user?.id,
+        eventId,
+      }),
+    });
+    if (!deleteS3DocumentResponse.ok) throw new Error("Failed to delete document record in S3");
+
+    const deleteMongoDocumentResponse = await fetch(`/api/document/${docId}`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        clerkId: user?.id,
+        eventId,
+        s3DocId,
+      }),
+    });
+    if (!deleteMongoDocumentResponse.ok) throw new Error("Failed to delete document record in MongoDB");
+    resetState();
+    alert("Deleted Successfully");
+  } catch (err) {
+    alert("Deletion Failed");
+    console.error("Deletion Failed: ", err);
     throw err;
   }
 }
@@ -78,8 +127,18 @@ const ClientUploadPage: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [file, setFile] = useState<File | null>(null);
   const [isUploaded, setIsUploaded] = useState(false);
+  const [DocumentId, setDocumentId] = useState<string | null>(null);
+  const [s3DocumentId, setS3DocumentId] = useState<string | null>(null);
   const [checklist, setChecklist] = useState<boolean[]>(new Array(8).fill(false));
   const [eventClerkId, setEventClerkId] = useState<string | null>(null);
+
+  const resetState = () => {
+    setFile(null);
+    setIsUploaded(false);
+    setDocumentId(null);
+    setS3DocumentId(null);
+    setChecklist(new Array(8).fill(false));
+  };
 
   useEffect(() => {
     if (!userIsLoaded) return;
@@ -131,6 +190,8 @@ const ClientUploadPage: React.FC = () => {
   };
 
   const allChecked = checklist.every(Boolean);
+  console.log(DocumentId);
+  console.log(s3DocumentId);
 
   return (
     <div className="flex flex-col items-center p-8 w-full min-h-[calc(100vh-105px-40px)] bg-white">
@@ -171,36 +232,46 @@ const ClientUploadPage: React.FC = () => {
       </div>
 
       {/* Buttons */}
-      {/* TODO: Note to add functionality for the delete button */}
       <div className="flex justify-center gap-4 mt-6">
-        <Button
-          variant="outline"
-          className="bg-[ bg-basic-blue ] text-white hover:bg-[#305a73]"
-          disabled={true}
-          size={"sm"}
-        >
-          <Trash /> Delete
-        </Button>
-
-        {isUploaded ? (
-          <Button
-            className="bg-[ bg-basic-blue ] text-white hover:bg-[#305a73]"
-            size={"sm"}
-            onClick={() => downloadDocument(file as File, user, eventId as string)}
-          >
-            <Download /> Download
-          </Button>
+        {isUploaded && DocumentId && s3DocumentId ? (
+          <>
+            <Button
+              variant="outline"
+              className="bg-[ bg-basic-blue ] text-white hover:bg-[#305a73] px-6 py-3 text-lg"
+              onClick={() =>
+                deleteDocument(
+                  file as File,
+                  user,
+                  eventId as string,
+                  DocumentId as string,
+                  s3DocumentId as string,
+                  resetState,
+                )
+              }
+              size={"sm"}
+            >
+              <Trash /> Delete
+            </Button>
+            <Button
+              className="bg-[ bg-basic-blue ] text-white hover:bg-[#305a73] px-6 py-3 text-lg"
+              size={"sm"}
+              onClick={() => downloadDocument(file as File, user, eventId as string)}
+            >
+              <Download /> Download
+            </Button>
+          </>
         ) : (
           <Button
-            className="bg-[ bg-basic-blue ] text-white hover:bg-[#305a73]"
+            className="bg-[ bg-basic-blue ] text-white hover:bg-[#305a73] px-6 py-3 text-lg"
             disabled={!allChecked || !file}
             size={"sm"}
             onClick={async () => {
               if (file) {
                 try {
-                  uploadDoc(file, user, eventId as string);
+                  const { docId, s3DocId } = await uploadDocument(file, user, eventId as string);
+                  setDocumentId(docId);
+                  setS3DocumentId(s3DocId);
                   setIsUploaded(true);
-                  alert("Uploaded successfully!");
                 } catch (err) {
                   console.error("Upload failed:", err);
                 }
