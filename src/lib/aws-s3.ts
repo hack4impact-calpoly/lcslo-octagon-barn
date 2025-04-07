@@ -18,11 +18,16 @@ const client = new S3Client({
  * @param fileName - Original filename
  * @returns A unique S3 key string
  */
-export function generateUniqueS3Key(eventId: string, userId: string, fileName: string): string {
-  const hashedUserId = crypto.createHash("sha256").update(userId).digest("hex").substring(0, 4); // just use the first 4 characters
+const SALT = process.env.S3_HASH_SALT || "fallback_salt";
 
+export function generateUniqueS3Key(userId: string, eventId: string, fileName: string): string {
+  const hashedUserId = crypto
+    .createHash("sha256")
+    .update(SALT + userId)
+    .digest("hex")
+    .substring(0, 16);
   const timestamp = Date.now();
-  return `${eventId}/${hashedUserId}/${timestamp}_${fileName}`;
+  return `${hashedUserId}/${eventId}/${fileName}`;
 }
 
 export default client;

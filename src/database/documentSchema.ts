@@ -4,6 +4,7 @@ type IDocument = Document & {
   clerkId: string;
   eventId: mongoose.Types.ObjectId;
   s3DocId: string;
+  documentName: string;
   documentType: string;
   createdAt: Date;
   status: "Completed" | "Pending" | "Not Submitted";
@@ -14,6 +15,7 @@ const DocumentSchema = new Schema<IDocument>({
   clerkId: { type: String, required: true },
   eventId: { type: Schema.Types.ObjectId, ref: "Event", required: true },
   s3DocId: { type: String, required: true },
+  documentName: { type: String, required: true },
   documentType: { type: String, required: true },
   createdAt: { type: Date, default: Date.now },
   status: {

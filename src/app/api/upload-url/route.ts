@@ -24,7 +24,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Generate a unique S3 key
-    const s3Key = generateUniqueS3Key(eventId, userId, file);
+    const s3Key = generateUniqueS3Key(userId, eventId, file);
 
     const command = new PutObjectCommand({
       Bucket: process.env.S3_BUCKET_NAME as string,
@@ -32,7 +32,7 @@ export async function GET(request: NextRequest) {
     });
 
     const uploadUrl = await getSignedUrl(client, command, {
-      expiresIn: 3600, // URL expires in 1 hour
+      expiresIn: 900, // URL expires in 15 minutes
     });
 
     return createSuccessResponse({ uploadUrl }, 200);
