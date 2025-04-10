@@ -36,15 +36,8 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
 
     const body = await req.json();
 
-    // Find document and verify ownership
-    const document = await Document.findById(id);
-
-    if (!document) {
-      return createErrorResponse("Document not found or unauthorized", "Document not found or unauthorized", 404);
-    }
-
     // Update only the allowed fields
-    const updatedDocument = await Document.findByIdAndUpdate(id, { ...body }, { new: true, runValidators: true });
+    const updatedDocument = await Document.findByIdAndUpdate(id, body, { new: true, runValidators: true });
 
     return createSuccessResponse(updatedDocument, 200);
   } catch (error) {

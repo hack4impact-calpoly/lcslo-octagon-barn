@@ -66,7 +66,7 @@ async function uploadDocument(file: File, user: UserResource | null | undefined,
   }
 }
 
-async function deleteDocument(s3DocIdClient: string, resetUploadState: () => void) {
+async function deleteDocument(documentId: string, s3DocIdClient: string, resetUploadState: () => void) {
   try {
     const deleteS3DocumentResponse = await fetch("/api/delete-document", {
       method: "DELETE",
@@ -78,6 +78,19 @@ async function deleteDocument(s3DocIdClient: string, resetUploadState: () => voi
       }),
     });
     if (!deleteS3DocumentResponse.ok) throw new Error("Failed to delete document record in S3");
+
+    const updateMongoDocumentResponse = await fetch(`/api/document/${documentId}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        $unset: { s3DocIdClient: "" },
+      }),
+    });
+    if (!updateMongoDocumentResponse.ok)
+      throw new Error("Failed to delete S3DocIdClient attribute in the document in MongoDB");
+
     resetUploadState();
     alert("Deleted Successfully");
   } catch (err) {
@@ -218,7 +231,7 @@ const ClientUploadPage: React.FC = () => {
             <Button
               variant="outline"
               className="bg-[ bg-basic-blue ] text-white hover:bg-[#305a73] px-6 py-3 text-lg"
-              onClick={() => deleteDocument(s3DocIdClient as string, resetUploadState)}
+              onClick={() => deleteDocument(documentId as string, s3DocIdClient as string, resetUploadState)}
               size={"sm"}
             >
               <Trash /> Delete
