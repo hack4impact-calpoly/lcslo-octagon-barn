@@ -8,23 +8,28 @@ export async function GET(request: NextRequest) {
   try {
     const searchParams = request.nextUrl.searchParams;
     const file = searchParams.get("file");
-    const eventId = searchParams.get("eventId");
     const userId = searchParams.get("userId");
+    const eventId = searchParams.get("eventId");
+    const documentId = searchParams.get("documentId");
 
     if (!file) {
       return createErrorResponse("Bad Request", "fileName is required", 400);
-    }
-
-    if (!eventId) {
-      return createErrorResponse("Bad Request", "eventId is required", 400);
     }
 
     if (!userId) {
       return createErrorResponse("Bad Request", "userId is required", 400);
     }
 
+    if (!eventId) {
+      return createErrorResponse("Bad Request", "eventId is required", 400);
+    }
+
+    if (!documentId) {
+      return createErrorResponse("Bad Request", "documentId is required", 400);
+    }
+
     // Generate a unique S3 key
-    const s3Key = generateUniqueS3Key(userId, eventId, file);
+    const s3Key = generateUniqueS3Key(userId, eventId, documentId, file);
 
     const command = new PutObjectCommand({
       Bucket: process.env.S3_BUCKET_NAME as string,
@@ -35,7 +40,7 @@ export async function GET(request: NextRequest) {
       expiresIn: 900, // URL expires in 15 minutes
     });
 
-    return createSuccessResponse({ uploadUrl }, 200);
+    return createSuccessResponse({ uploadUrl, s3Key }, 200);
   } catch (error) {
     console.error("Error generating upload URL:", error);
     return createErrorResponse("Internal Server Error", "Failed to generate upload URL", 500);

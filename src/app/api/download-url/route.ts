@@ -1,30 +1,17 @@
 import { NextRequest } from "next/server";
 import { GetObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
-import client, { generateUniqueS3Key } from "@/lib/aws-s3";
+import client from "@/lib/aws-s3";
 import { createErrorResponse, createSuccessResponse } from "@/lib/response";
-import Document from "@/database/documentSchema";
 
 export async function GET(request: NextRequest) {
   try {
     const searchParams = request.nextUrl.searchParams;
-    const file = searchParams.get("file");
-    const eventId = searchParams.get("eventId");
-    const userId = searchParams.get("userId");
+    const s3Key = searchParams.get("s3Key");
 
-    if (!file) {
-      return createErrorResponse("Bad Request", "fileName is required", 400);
+    if (!s3Key) {
+      return createErrorResponse("Bad Request", "s3Key is required", 400);
     }
-
-    if (!eventId) {
-      return createErrorResponse("Bad Request", "eventId is required", 400);
-    }
-
-    if (!userId) {
-      return createErrorResponse("Bad Request", "userId is required", 400);
-    }
-
-    const s3Key = generateUniqueS3Key(userId, eventId, file);
 
     const command = new GetObjectCommand({
       Bucket: process.env.S3_BUCKET_NAME as string,

@@ -46,7 +46,7 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
     // Update only the allowed fields
     const updatedDocument = await Document.findByIdAndUpdate(id, { ...body }, { new: true, runValidators: true });
 
-    return createSuccessResponse({ document: updatedDocument }, 200);
+    return createSuccessResponse(updatedDocument, 200);
   } catch (error) {
     console.error("Error updating document:", error);
     return createErrorResponse("Error updating document", "Error updating document", 500);
