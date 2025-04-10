@@ -8,6 +8,11 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
   try {
     await connectDB();
     const { id } = params;
+
+    if (!mongoose.isValidObjectId(id)) {
+      return createErrorResponse("Invalid document ID", "Invalid document ID", 400);
+    }
+
     const doc = await Document.findById(id);
 
     if (!doc) {
@@ -30,26 +35,16 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
     }
 
     const body = await req.json();
-    const { clerkId, eventId, s3DocId, ...updateFields } = body;
 
     // Find document and verify ownership
-    const document = await Document.findOne({
-      _id: id,
-      clerkId: clerkId,
-      eventId: eventId,
-      s3DocId: s3DocId,
-    });
+    const document = await Document.findById(id);
 
     if (!document) {
       return createErrorResponse("Document not found or unauthorized", "Document not found or unauthorized", 404);
     }
 
     // Update only the allowed fields
-    const updatedDocument = await Document.findByIdAndUpdate(
-      id,
-      { ...updateFields },
-      { new: true, runValidators: true },
-    );
+    const updatedDocument = await Document.findByIdAndUpdate(id, { ...body }, { new: true, runValidators: true });
 
     return createSuccessResponse({ document: updatedDocument }, 200);
   } catch (error) {
@@ -67,16 +62,8 @@ export async function DELETE(req: NextRequest, { params }: { params: { id: strin
       return createErrorResponse("Invalid document ID", "Invalid document ID", 400);
     }
 
-    const body = await req.json();
-    const { clerkId, eventId, s3DocId } = body;
-
     // Find document and verify ownership
-    const document = await Document.findOne({
-      _id: id,
-      clerkId: clerkId,
-      eventId: eventId,
-      s3DocId: s3DocId,
-    });
+    const document = await Document.findById(id);
 
     if (!document) {
       return createErrorResponse("Document not found or unauthorized", "Document not found or unauthorized", 404);

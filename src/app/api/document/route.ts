@@ -17,15 +17,28 @@ export async function POST(request: NextRequest) {
   try {
     await dbConnect();
     const body = await request.json();
-    const { clerkId, eventId, s3DocId, documentName, documentType, createdAt, status, checkList } = body;
+    const {
+      clerkId,
+      eventId,
+      documentName,
+      documentType,
+      s3DocIdAdmin,
+      s3DocIdClient,
+      createdAt,
+      uploadedAt,
+      status,
+      checkList,
+    } = body;
 
     const newDoc = await Document.create({
       clerkId,
       eventId,
-      s3DocId,
+      s3DocIdAdmin,
+      s3DocIdClient,
       documentName,
       documentType,
       createdAt,
+      uploadedAt,
       status,
       checkList,
     });
