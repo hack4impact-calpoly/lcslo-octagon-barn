@@ -44,8 +44,9 @@ async function uploadDocument(file: File, user: UserResource | null | undefined,
     });
     if (!uploadDocResponse.ok) throw new Error("Failed to upload document");
 
+    // TODO: Delete the uploaded document in S3 when reuploading
     // 3. Create document object in MongoDB
-    const createDocResponse = await fetch(`/api/document/${documentId}`, {
+    const updateDocResponse = await fetch(`/api/document/${documentId}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -55,8 +56,8 @@ async function uploadDocument(file: File, user: UserResource | null | undefined,
         uploadedAt: new Date(),
       }),
     });
-    if (!createDocResponse.ok) throw new Error("Failed to create document record");
-    const document = await createDocResponse.json();
+    if (!updateDocResponse.ok) throw new Error("Failed to create document record");
+    const document = await updateDocResponse.json();
     alert("Uploaded Successfully");
     return document.s3DocIdClient;
   } catch (err) {
