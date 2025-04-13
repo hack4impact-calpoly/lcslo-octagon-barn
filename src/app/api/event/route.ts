@@ -7,7 +7,22 @@ export async function GET() {
   try {
     await connectToDB();
     const events = await Event.find();
-    return createSuccessResponse(events, 200);
+    const sanitizedEvents = events.map((event) => ({
+      id: event._id,
+      clerkId: event.clerkId,
+      docIds: event.docIds,
+      venue: event.venue,
+      eventName: event.eventName,
+      eventType: event.eventType,
+      eventDateStart: event.eventDateStart,
+      eventDateEnd: event.eventDateEnd,
+      status: event.status,
+      createdAt: event.createdAt,
+      docsTotal: event.docsTotal,
+      docsCompleted: event.docsCompleted,
+      numPeople: event.numPeople,
+    }));
+    return createSuccessResponse(sanitizedEvents, 200);
   } catch {
     return createErrorResponse("Server Error", "Failed to fetch events", 500);
   }
@@ -18,10 +33,31 @@ export async function POST(req: NextRequest) {
 
   try {
     const body = await req.json();
-    if (!body.clerkId || !body.eventName || !body.eventType || !body.eventDate) {
+    if (!body.clerkId || !body.eventName || !body.eventType || !body.eventDateStart || !body.eventDateEnd) {
       return createErrorResponse("BadRequest", "Missing required fields", 400);
     }
-    const newEvent = new Event(body);
+    const {
+      clerkId,
+      eventName,
+      eventType,
+      eventDateStart,
+      eventDateEnd,
+      docsTotal,
+      docsCompleted,
+      numPeople,
+      ...rest
+    } = body;
+    const newEvent = new Event({
+      ...rest,
+      clerkId,
+      eventName,
+      eventType,
+      eventDateStart: new Date(eventDateStart),
+      eventDateEnd: new Date(eventDateEnd),
+      docsTotal,
+      docsCompleted,
+      numPeople,
+    });
     await newEvent.save();
 
     return createSuccessResponse(newEvent, 201);
