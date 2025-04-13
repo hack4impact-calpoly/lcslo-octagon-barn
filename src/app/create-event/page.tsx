@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -32,8 +32,29 @@ export default function CreateEventPage() {
     invalidDateRange: false,
   });
 
+  //preloads form data
+  useEffect(() => {
+    const savedForm = sessionStorage.getItem("eventForm");
+    const assignedUser = sessionStorage.getItem("assignedUser");
+
+    if (savedForm) {
+      const parsedForm = JSON.parse(savedForm);
+      setEventName(parsedForm.eventName || "");
+      setVenue(parsedForm.venue || "");
+      setNumPeople(parsedForm.numPeople || "");
+      setStartDate(parsedForm.startDate ? new Date(parsedForm.startDate) : undefined);
+      setEndDate(parsedForm.endDate ? new Date(parsedForm.endDate) : undefined);
+      setEventDetails(parsedForm.eventDetails || "");
+    }
+
+    if (assignedUser) {
+      const parsedUser = JSON.parse(assignedUser);
+      setUser(parsedUser.name || "");
+    }
+  }, []);
+
   // Handle form submission
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     // Check for missing fields
@@ -56,7 +77,47 @@ export default function CreateEventPage() {
     }
 
     // Submit the form if no errors
-    console.log("Event Created:", { eventName, venue, numPeople, startDate, endDate, eventDetails, user });
+    try {
+      const response = await fetch("/api/event", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          eventName,
+          venue,
+          eventType: "Wedding", //placeholder
+          eventDateStart: startDate,
+          eventDateEnd: endDate,
+          status: "Upcoming",
+          numPeople: parseInt(numPeople),
+          clerkId: user,
+        }),
+      });
+
+      if (!response.ok) {
+        console.error("Event creation failed:", await response.json());
+        return;
+      }
+
+      const data = await response.json();
+      console.log("Event created:", data);
+
+      sessionStorage.removeItem("eventFormData");
+      router.push("/");
+    } catch (err) {
+      console.error("Unexpected error:", err);
+    }
+  };
+
+  const saveFormToSession = () => {
+    const form = {
+      eventName,
+      venue,
+      numPeople,
+      startDate,
+      endDate,
+      eventDetails,
+    };
+    sessionStorage.setItem("eventForm", JSON.stringify(form));
   };
 
   return (
@@ -79,9 +140,9 @@ export default function CreateEventPage() {
               <SelectValue placeholder="Venue" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="venue1">Venue 1</SelectItem>
-              <SelectItem value="venue2">Venue 2</SelectItem>
-              <SelectItem value="venue3">Venue 3</SelectItem>
+              <SelectItem value="The Octagon Barn">The Octagon Barn</SelectItem>
+              <SelectItem value="The Milking Parlor">The Milking Parlor</SelectItem>
+              <SelectItem value="The Shed and Courtyard">The Shed and Courtyard</SelectItem>
             </SelectContent>
           </Select>
 
@@ -119,16 +180,39 @@ export default function CreateEventPage() {
         />
 
         <div className="flex space-x-2">
-          <Button type="button" className="w-1/2 bg-[var(--primary-blue)] text-lg">
+          <Button
+            type="button"
+            className="w-1/2 bg-[var(--primary-blue)] text-lg"
+            onClick={() => {
+              saveFormToSession();
+              router.push("/users");
+            }}
+          >
             Assign User
           </Button>
-          <Button type="button" className="w-1/2 bg-[var(--primary-blue)] text-lg">
+          <Button
+            type="button"
+            className="w-1/2 bg-[var(--primary-blue)] text-lg"
+            onClick={() => {
+              saveFormToSession();
+              router.push("/signup");
+            }}
+          >
             Create User
           </Button>
         </div>
         <div className="flex justify-end">
           <div className="flex  space-x-2 w-1/2 pl-1">
-            <Button type="button" variant="destructive" className="w-1/2 text-lg" onClick={() => router.push("/")}>
+            <Button
+              type="button"
+              variant="destructive"
+              className="w-1/2 text-lg"
+              onClick={() => {
+                sessionStorage.removeItem("eventForm");
+                sessionStorage.removeItem("assignedUser");
+                router.push("/");
+              }}
+            >
               Cancel
             </Button>
             <Button type="submit" className="w-1/2 bg-[var(--primary-blue)] text-lg">
