@@ -65,9 +65,10 @@ export default function AdminEventView() {
     headerImageUrl: "/octagon_barn_plaza.jpg",
   };
 
-  const { user } = useUser();
-  const [loading, setLoading] = useState(true);
+  const { user, isLoaded } = useUser();
   const [authorized, setAuthorized] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
+
   const [isEditing, setIsEditing] = useState(false);
   const [eventData, setEventData] = useState<IEventData>(initialData);
   const [editCache, setEditCache] = useState<IEventData>(initialData);
@@ -76,13 +77,20 @@ export default function AdminEventView() {
   const [activeTab, setActiveTab] = useState<string>("details");
 
   useEffect(() => {
-    if (user && user.publicMetadata.isAdmin) {
+    if (isLoaded && user) {
       setAuthorized(true);
-      setLoading(false);
+      if (user.publicMetadata.isAdmin) {
+        setIsAdmin(true);
+      } else {
+        setIsAdmin(false);
+      }
+    } else if (isLoaded && !user) {
+      setAuthorized(false);
+      setIsAdmin(false);
     }
-  }, [user]);
+  }, [user, isLoaded]);
 
-  if (loading) {
+  if (!isLoaded) {
     return (
       <div className="flex items-center justify-center h-screen">
         <RotatingLines strokeColor="black" strokeWidth="4" animationDuration="0.75" width="96" visible={true} />;
@@ -119,7 +127,7 @@ export default function AdminEventView() {
 
   return (
     <div className="p-4 md:p-8 lg:p-16">
-      {/* START: Tab Selectors and Buttons Container */}
+      {/* Tab Selectors and Buttons Container */}
       <div className="w-3/4 mx-auto mb-6">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-3 sm:space-y-0 mb-0">
           <div className="flex border-b">
@@ -139,31 +147,33 @@ export default function AdminEventView() {
             </Button>
           </div>
 
-          <div className="space-x-2 flex-shrink-0">
-            {isEditing ? (
-              <>
-                <Button className="w-[5rem] lg:w-[7rem]" variant="outline" onClick={handleSave}>
-                  Save
+          {isAdmin && (
+            <div className="space-x-2 flex-shrink-0">
+              {isEditing ? (
+                <>
+                  <Button className="w-[5rem] lg:w-[7rem]" variant="outline" onClick={handleSave}>
+                    Save
+                  </Button>
+                  <Button className="w-[5rem] lg:w-[7rem]" variant="outline" onClick={handleCancel}>
+                    Cancel
+                  </Button>
+                </>
+              ) : (
+                <Button className="w-[5rem] lg:w-[7rem]" variant="outline" onClick={handleEditClick}>
+                  Edit
                 </Button>
-                <Button className="w-[5rem] lg:w-[7rem]" variant="outline" onClick={handleCancel}>
-                  Cancel
-                </Button>
-              </>
-            ) : (
-              <Button className="w-[5rem] lg:w-[7rem]" variant="outline" onClick={handleEditClick}>
-                Edit
+              )}
+              <Button className="w-[5rem] lg:w-[7rem]" variant="outline">
+                Upload
               </Button>
-            )}
-            <Button className="w-[5rem] lg:w-[7rem]" variant="outline">
-              Upload
-            </Button>
-          </div>
+            </div>
+          )}
         </div>
       </div>
 
       {/* Event Tile Section */}
       <div className="flex justify-center mb-6">
-        {isEditing ? (
+        {isEditing && isAdmin ? (
           // Edit Event Tile Data
           <div className="w-3/4 p-4 space-y-4 bg-gray-200 rounded-lg shadow-md border border-gray-300">
             <h3 className="text-xl font-semibold mb-4 text-center">Edit Event Details</h3>
@@ -268,7 +278,7 @@ export default function AdminEventView() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {/* Left Column */}
               <div className="space-y-4 bg-gray-200 p-4 rounded-lg shadow-md border border-gray-300">
-                {isEditing ? (
+                {isEditing && isAdmin ? (
                   <Textarea
                     id="eventDescription"
                     value={eventData.description}
@@ -284,7 +294,7 @@ export default function AdminEventView() {
                   <label htmlFor="vendorList" className="block text-sm font-medium mb-1">
                     Vendor List:
                   </label>
-                  {isEditing ? (
+                  {isEditing && isAdmin ? (
                     <Textarea
                       id="vendorList"
                       value={eventData.vendorList}
@@ -300,7 +310,7 @@ export default function AdminEventView() {
 
               {/* Right Column */}
               <div className="space-y-4 bg-gray-200 p-4 rounded-lg shadow-md border border-gray-300">
-                {isEditing ? (
+                {isEditing && isAdmin ? (
                   <ul className="space-y-4">
                     <li>
                       <label htmlFor="adminName" className="block text-sm font-medium mb-1">
@@ -355,7 +365,7 @@ export default function AdminEventView() {
                           className="text-gray-600 cursor-pointer hover:text-gray-800"
                         />
                       </a>
-                      {isEditing && (
+                      {isEditing && isAdmin && (
                         <Button
                           variant="ghost"
                           size="sm"
