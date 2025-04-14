@@ -72,7 +72,7 @@ export default function AdminEventView() {
   const [eventData, setEventData] = useState<IEventData>(initialData);
   const [editCache, setEditCache] = useState<IEventData>(initialData);
   const params = useParams();
-  const eventId = Array.isArray(params.id) ? params.id[0] : (params.id ?? "default-id");
+  const eventId = Array.isArray(params.id) ? params.id[0] : (params.id ?? "default-id"); // probably update this to just do 404 not found or something gonna asks
   const [activeTab, setActiveTab] = useState<string>("details");
 
   useEffect(() => {
@@ -139,22 +139,22 @@ export default function AdminEventView() {
             </Button>
           </div>
 
-          <div className="space-x-2">
+          <div className="space-x-2 flex-shrink-0">
             {isEditing ? (
               <>
-                <Button className="w-24" variant="outline" onClick={handleSave}>
+                <Button className="w-[5rem] lg:w-[7rem]" variant="outline" onClick={handleSave}>
                   Save
                 </Button>
-                <Button className="w-24" variant="outline" onClick={handleCancel}>
+                <Button className="w-[5rem] lg:w-[7rem]" variant="outline" onClick={handleCancel}>
                   Cancel
                 </Button>
               </>
             ) : (
-              <Button className="w-24" variant="outline" onClick={handleEditClick}>
+              <Button className="w-[5rem] lg:w-[7rem]" variant="outline" onClick={handleEditClick}>
                 Edit
               </Button>
             )}
-            <Button className="w-24" variant="outline">
+            <Button className="w-[5rem] lg:w-[7rem]" variant="outline">
               Upload
             </Button>
           </div>
