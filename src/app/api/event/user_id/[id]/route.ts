@@ -9,11 +9,27 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
     const { id: clerkId } = params;
     const events = await Event.find({ clerkId });
 
-    if (!events.length) {
+    const sanitizedEvents = events.map((event) => ({
+      id: event._id,
+      clerkId: event.clerkId,
+      docIds: event.docIds,
+      venue: event.venue,
+      eventName: event.eventName,
+      eventType: event.eventType,
+      eventDateStart: event.eventDateStart,
+      eventDateEnd: event.eventDateEnd,
+      status: event.status,
+      createdAt: event.createdAt,
+      docsTotal: event.docsTotal,
+      docsCompleted: event.docsCompleted,
+      numPeople: event.numPeople,
+    }));
+
+    if (!sanitizedEvents.length) {
       return createErrorResponse("NotFound", "No events found for this user", 404);
     }
 
-    return createSuccessResponse(events, 200);
+    return createSuccessResponse(sanitizedEvents, 200);
   } catch (error) {
     return createErrorResponse("ServerError", "Failed to fetch events", 500);
   }
