@@ -13,14 +13,15 @@ export async function GET() {
       docIds: event.docIds,
       venue: event.venue,
       eventName: event.eventName,
-      eventType: event.eventType,
       eventDateStart: event.eventDateStart,
       eventDateEnd: event.eventDateEnd,
       status: event.status,
+      eventDetails: event.eventDetails,
+      vendorList: event.vendorList,
       createdAt: event.createdAt,
       docsTotal: event.docsTotal,
       docsCompleted: event.docsCompleted,
-      numPeople: event.numPeople,
+      numGuests: event.numPeople,
     }));
     return createSuccessResponse(sanitizedEvents, 200);
   } catch {
@@ -33,30 +34,18 @@ export async function POST(req: NextRequest) {
 
   try {
     const body = await req.json();
-    if (!body.clerkId || !body.eventName || !body.eventType || !body.eventDateStart || !body.eventDateEnd) {
+    if (!body.clerkId || !body.eventName || !body.venue || !body.eventDateStart || !body.eventDateEnd || !body.status) {
       return createErrorResponse("BadRequest", "Missing required fields", 400);
     }
-    const {
-      clerkId,
-      eventName,
-      eventType,
-      eventDateStart,
-      eventDateEnd,
-      docsTotal,
-      docsCompleted,
-      numPeople,
-      ...rest
-    } = body;
+    const { clerkId, venue, eventName, eventDateStart, eventDateEnd, status, ...rest } = body;
     const newEvent = new Event({
-      ...rest,
       clerkId,
+      venue,
       eventName,
-      eventType,
       eventDateStart: new Date(eventDateStart),
       eventDateEnd: new Date(eventDateEnd),
-      docsTotal,
-      docsCompleted,
-      numPeople,
+      status,
+      ...rest,
     });
     await newEvent.save();
 

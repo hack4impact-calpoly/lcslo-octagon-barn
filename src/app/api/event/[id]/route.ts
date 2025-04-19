@@ -20,7 +20,7 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
   try {
     await connectToDB();
     const body = await req.json();
-    const { clerkId, eventDateStart, eventDateEnd, docsTotal, docsCompleted, numPeople, ...rest } = body;
+    const { clerkId, eventDateStart, eventDateEnd, docsTotal, docsCompleted, numGuests, ...rest } = body;
 
     const updateData: Record<string, any> = {
       ...rest,
@@ -28,7 +28,7 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
       ...(eventDateEnd && { eventDateEnd: new Date(eventDateEnd) }),
       ...(docsTotal !== undefined && { docsTotal }),
       ...(docsCompleted !== undefined && { docsCompleted }),
-      ...(numPeople !== undefined && { numPeople }),
+      ...(numGuests !== undefined && { numGuests }),
     };
 
     const updatedEvent = await Event.findByIdAndUpdate(
