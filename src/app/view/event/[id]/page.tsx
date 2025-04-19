@@ -12,7 +12,6 @@ import { faFile, faDownload } from "@fortawesome/free-solid-svg-icons";
 import { RotatingLines } from "react-loader-spinner";
 import { useParams } from "next/navigation";
 import EventTile from "@/components/EventTile";
-import IEvent from "@/database/eventSchema";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 // made a copy of IEvent because IEvent was a type which was giving me trouble
