@@ -7,19 +7,19 @@ import { createErrorResponse, createSuccessResponse } from "@/lib/response";
 export async function GET(request: NextRequest) {
   try {
     const searchParams = request.nextUrl.searchParams;
-    const file = searchParams.get("file");
+    const s3Key = searchParams.get("s3Key");
 
-    if (!file) {
-      return createErrorResponse("Bad Request", "fileName is required", 400);
+    if (!s3Key) {
+      return createErrorResponse("Bad Request", "s3Key is required", 400);
     }
 
     const command = new GetObjectCommand({
       Bucket: process.env.S3_BUCKET_NAME as string,
-      Key: file,
+      Key: s3Key,
     });
 
     const downloadUrl = await getSignedUrl(client, command, {
-      expiresIn: 3600, // URL expires in 1 hour
+      expiresIn: 900, // URL expires in 15 minutes
     });
 
     return createSuccessResponse({ downloadUrl }, 200);

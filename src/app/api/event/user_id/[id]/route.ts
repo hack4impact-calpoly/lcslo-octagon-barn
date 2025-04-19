@@ -15,14 +15,15 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
       docIds: event.docIds,
       venue: event.venue,
       eventName: event.eventName,
-      eventType: event.eventType,
       eventDateStart: event.eventDateStart,
       eventDateEnd: event.eventDateEnd,
       status: event.status,
+      eventDetails: event.eventDetails,
+      vendorList: event.vendorList,
       createdAt: event.createdAt,
       docsTotal: event.docsTotal,
       docsCompleted: event.docsCompleted,
-      numPeople: event.numPeople,
+      numGuests: event.numPeople,
     }));
 
     if (!sanitizedEvents.length) {
