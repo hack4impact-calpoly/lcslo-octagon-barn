@@ -68,7 +68,7 @@ export default function DocumentView() {
   }
 
   if (!document) {
-    return <div className="p-8">No document found.</div>;
+    return <div className="flex items-center justify-center h-screen text-xl">No document found.</div>;
   }
 
   // Authorization: Only allow document owner or admin to view the document.
@@ -76,7 +76,7 @@ export default function DocumentView() {
   const isAdmin = user?.publicMetadata?.role === "admin";
 
   if (!isOwner && !isAdmin) {
-    return <div className="p-8">You are not authorized to view this document.</div>;
+    return <div className="flex items-center justify-center h-screen text-xl">No document found.</div>;
   }
 
   return (
