@@ -5,63 +5,111 @@ import { useUser } from "@clerk/nextjs";
 import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { X } from "lucide-react";
+import { Brush, X } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFile, faDownload } from "@fortawesome/free-solid-svg-icons";
 import { RotatingLines } from "react-loader-spinner";
 import { useParams } from "next/navigation";
 import EventTile from "@/components/EventTile";
+import IEvent from "@/database/eventSchema";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
-// Temporary Interface because event schema does not match
-interface IEventData {
+// made a copy of IEvent because IEvent was a type which was giving me trouble
+interface IEventFrontend {
+  clerkId: string;
+  docIds: string[];
+  venue: "Full Facility" | "Octagon Barn & Plaza" | "Shed & Courtyard" | "Milking Parlor" | "Other";
   eventName: string;
-  date: string;
-  timeStart: string;
-  timeEnd: string;
-  location: string;
+  eventDateStart: Date;
+  eventDateEnd: Date;
+  status: "Upcoming" | "Ongoing" | "Completed" | "Cancelled";
+  eventDetails: string;
+  vendorList: string;
+  createdAt: Date;
+  docsTotal: number;
+  docsCompleted: number;
+  numGuests: number;
+}
+
+// Temporary data not present in the IEvent schema
+interface ITempEventData {
   clientName?: string;
   adminName?: string;
   email: string;
   phone: string;
-  description: string;
-  vendorList: string;
   documents: IDocument[];
-  attendees: number;
-  forms: {
-    completed: number;
-    total: number;
-  };
   headerImageUrl?: string;
 }
 
-// another temporary interface
+// another temp schema
 interface IDocument {
   name: string;
   url: string;
 }
 
+// date formatting
+const formatDateForInput = (date: Date): string => {
+  if (!date || !(date instanceof Date) || isNaN(date.getTime())) {
+    return "";
+  }
+  const year = date.getFullYear();
+  const month = (date.getMonth() + 1).toString().padStart(2, "0");
+  const day = date.getDate().toString().padStart(2, "0");
+  return `${year}-${month}-${day}`;
+};
+
+// time formatting
+const formatTimeForInput = (date: Date): string => {
+  if (!date || !(date instanceof Date) || isNaN(date.getTime())) {
+    return "";
+  }
+  const hours = date.getHours().toString().padStart(2, "0");
+  const minutes = date.getMinutes().toString().padStart(2, "0");
+  return `${hours}:${minutes}`;
+};
+
+// just ensure the time is good
+const updateDatePart = (currentDate: Date, newDateString: string): Date => {
+  const timePart = currentDate.toTimeString().split(" ")[0]; // HH:MM:SS
+  const [hours, minutes, seconds] = (timePart + ":00").split(":");
+  const formattedTime = `${hours}:${minutes}:${seconds}`;
+  return new Date(`${newDateString}T${formattedTime}`);
+};
+
+// just ensure the time is good
+const updateTimePart = (currentDate: Date, newTimeString: string): Date => {
+  if (!currentDate || !(currentDate instanceof Date) || isNaN(currentDate.getTime()) || !newTimeString) {
+    return currentDate;
+  }
+  const datePart = currentDate.toISOString().split("T")[0];
+  const timeWithSeconds = newTimeString.split(":").length === 2 ? `${newTimeString}:00` : newTimeString;
+  return new Date(`${datePart}T${timeWithSeconds}`);
+};
+
 export default function AdminEventView() {
-  // Sample data matching the image
-  const initialData: IEventData = {
+  // Combined IEvent and temp data
+  const initialCombinedData: IEventFrontend & ITempEventData = {
+    clerkId: "placeholder-clerk-id",
+    docIds: [],
+    venue: "Octagon Barn & Plaza",
     eventName: "Event Name",
-    date: "2025-03-13",
-    timeStart: "08:00",
-    timeEnd: "14:30",
-    location: "San Luis Obispo",
+    eventDateStart: new Date("2025-03-13T08:00:00"),
+    eventDateEnd: new Date("2025-03-13T14:30:00"),
+    status: "Upcoming",
+    eventDetails: "description placeholder",
+    vendorList:
+      "The following is a temporary placeholder for what eventually will be filled in with text that will contain information about the venue and its features",
+    createdAt: new Date(),
+    docsTotal: 8,
+    docsCompleted: 2,
+    numGuests: 16,
+    // ITempEventData fields
     clientName: "Client Name",
     adminName: "Admin Name",
     email: "contact@email.com",
     phone: "(805)-123-4567",
-    description: "description placeholder",
-    vendorList:
-      "The following is a temporary placeholder for what eventually will be filled in with text that will contain information about the venue and its features",
     documents: [{ name: "brochure.pdf", url: "/brochure.pdf" }],
-    attendees: 16,
-    forms: {
-      total: 8,
-      completed: 2,
-    },
     headerImageUrl: "/octagon_barn_plaza.jpg",
   };
 
@@ -70,11 +118,19 @@ export default function AdminEventView() {
   const [isAdmin, setIsAdmin] = useState(false);
 
   const [isEditing, setIsEditing] = useState(false);
-  const [eventData, setEventData] = useState<IEventData>(initialData);
-  const [editCache, setEditCache] = useState<IEventData>(initialData);
+  const [eventData, setEventData] = useState<IEventFrontend & ITempEventData>(initialCombinedData);
+  const [editCache, setEditCache] = useState<IEventFrontend & ITempEventData>(initialCombinedData);
   const params = useParams();
   const eventId = Array.isArray(params.id) ? params.id[0] : (params.id ?? "default-id"); // probably update this to just do 404 not found or something gonna asks
   const [activeTab, setActiveTab] = useState<string>("details");
+
+  const venueOptions: IEventFrontend["venue"][] = [
+    "Full Facility",
+    "Octagon Barn & Plaza",
+    "Shed & Courtyard",
+    "Milking Parlor",
+    "Other",
+  ];
 
   useEffect(() => {
     if (isLoaded && user) {
@@ -119,6 +175,7 @@ export default function AdminEventView() {
   const handleSave = async () => {
     setEditCache({ ...eventData });
     setIsEditing(false);
+    console.log("Save clicked. Data to send:", eventData);
   };
 
   const removeDocument = async () => {
@@ -178,6 +235,7 @@ export default function AdminEventView() {
           <div className="w-3/4 p-4 space-y-4 bg-gray-200 rounded-lg shadow-md border border-gray-300">
             <h3 className="text-xl font-semibold mb-4 text-center">Edit Event Details</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Event Name */}
               <div>
                 <label htmlFor="eventName" className="block text-sm font-medium mb-1">
                   Event Name
@@ -188,62 +246,102 @@ export default function AdminEventView() {
                   onChange={(e) => setEventData({ ...eventData, eventName: e.target.value })}
                 />
               </div>
+              {/* Venue */}
               <div>
-                <label htmlFor="location" className="block text-sm font-medium mb-1">
-                  Location
+                <label htmlFor="venue" className="block text-sm font-medium mb-1">
+                  Venue
                 </label>
-                <Input
-                  id="location"
-                  value={eventData.location}
-                  onChange={(e) => setEventData({ ...eventData, location: e.target.value })}
-                />
+                <Select
+                  value={eventData.venue}
+                  onValueChange={(value) => setEventData({ ...eventData, venue: value as IEventFrontend["venue"] })}
+                >
+                  <SelectTrigger id="venue">
+                    <SelectValue placeholder="Select venue" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {venueOptions.map((option) => (
+                      <SelectItem key={option} value={option}>
+                        {option}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
+              {/* Start Date */}
               <div>
-                <label htmlFor="date" className="block text-sm font-medium mb-1">
-                  Date
+                <label htmlFor="eventDateStart" className="block text-sm font-medium mb-1">
+                  Start Date
                 </label>
                 <Input
-                  id="date"
+                  id="eventDateStart"
                   type="date"
-                  value={eventData.date}
-                  onChange={(e) => setEventData({ ...eventData, date: e.target.value })}
+                  value={formatDateForInput(eventData.eventDateStart)}
+                  onChange={(e) =>
+                    setEventData({
+                      ...eventData,
+                      eventDateStart: updateDatePart(eventData.eventDateStart, e.target.value),
+                    })
+                  }
                 />
               </div>
-              <div className="grid grid-cols-2 gap-2">
-                <div>
-                  <label htmlFor="timeStart" className="block text-sm font-medium mb-1">
-                    Start Time
-                  </label>
-                  <Input
-                    id="timeStart"
-                    type="time"
-                    value={eventData.timeStart}
-                    onChange={(e) => setEventData({ ...eventData, timeStart: e.target.value })}
-                  />
-                </div>
-                <div>
-                  <label htmlFor="timeEnd" className="block text-sm font-medium mb-1">
-                    End Time
-                  </label>
-                  <Input
-                    id="timeEnd"
-                    type="time"
-                    value={eventData.timeEnd}
-                    onChange={(e) => setEventData({ ...eventData, timeEnd: e.target.value })}
-                  />
-                </div>
-              </div>
+              {/* End Date */}
               <div>
-                <label htmlFor="attendees" className="block text-sm font-medium mb-1">
-                  Attendees
+                <label htmlFor="eventDateEnd" className="block text-sm font-medium mb-1">
+                  End Date
                 </label>
                 <Input
-                  id="attendees"
-                  type="number"
-                  value={eventData.attendees}
-                  onChange={(e) => setEventData({ ...eventData, attendees: parseInt(e.target.value, 10) || 0 })}
+                  id="eventDateEnd"
+                  type="date"
+                  value={formatDateForInput(eventData.eventDateEnd)}
+                  onChange={(e) =>
+                    setEventData({ ...eventData, eventDateEnd: updateDatePart(eventData.eventDateEnd, e.target.value) })
+                  }
                 />
               </div>
+              {/* Start Time */}
+              <div>
+                <label htmlFor="eventStartTime" className="block text-sm font-medium mb-1">
+                  Start Time
+                </label>
+                <Input
+                  id="eventStartTime"
+                  type="time"
+                  value={formatTimeForInput(eventData.eventDateStart)}
+                  onChange={(e) =>
+                    setEventData({
+                      ...eventData,
+                      eventDateStart: updateTimePart(eventData.eventDateStart, e.target.value),
+                    })
+                  }
+                />
+              </div>
+              {/* End Time */}
+              <div>
+                <label htmlFor="eventEndTime" className="block text-sm font-medium mb-1">
+                  End Time
+                </label>
+                <Input
+                  id="eventEndTime"
+                  type="time"
+                  value={formatTimeForInput(eventData.eventDateEnd)}
+                  onChange={(e) =>
+                    setEventData({ ...eventData, eventDateEnd: updateTimePart(eventData.eventDateEnd, e.target.value) })
+                  }
+                />
+              </div>
+              {/* Number of Guests */}
+              <div>
+                <label htmlFor="numGuests" className="block text-sm font-medium mb-1">
+                  Number of Guests
+                </label>
+                <Input
+                  id="numGuests"
+                  type="number"
+                  value={eventData.numGuests}
+                  onChange={(e) => setEventData({ ...eventData, numGuests: parseInt(e.target.value, 10) || 0 })}
+                />
+              </div>
+              {/* Header Image URL (from Temp Data) */}
               <div>
                 <label htmlFor="headerImageUrl" className="block text-sm font-medium mb-1">
                   Header Image URL
@@ -257,14 +355,15 @@ export default function AdminEventView() {
             </div>
           </div>
         ) : (
+          // Display Event Tile using updated field names
           <EventTile
             id={eventId}
             eventName={eventData.eventName}
-            eventDate={new Date(`${eventData.date}T${eventData.timeStart}`)}
-            venue={eventData.location}
-            attendees={eventData.attendees}
-            documentsCompleted={eventData.forms.completed}
-            totalDocuments={eventData.forms.total}
+            eventDate={eventData.eventDateStart}
+            venue={eventData.venue}
+            attendees={eventData.numGuests}
+            documentsCompleted={eventData.docsCompleted}
+            totalDocuments={eventData.docsTotal}
             imageSrc={eventData.headerImageUrl || "/octagon_barn_plaza.jpg"}
             variant="detail"
           />
@@ -278,32 +377,40 @@ export default function AdminEventView() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {/* Left Column */}
               <div className="space-y-4 bg-gray-200 p-4 rounded-lg shadow-md border border-gray-300">
-                {isEditing && isAdmin ? (
-                  <Textarea
-                    id="eventDescription"
-                    value={eventData.description}
-                    onChange={(e) => setEventData({ ...eventData, description: e.target.value })}
-                    rows={4}
-                    className="resize-none"
-                  />
-                ) : (
-                  <p className="text-sm">{eventData.description}</p>
-                )}
-
                 <div>
-                  <label htmlFor="vendorList" className="block text-sm font-medium mb-1">
+                  <label htmlFor="eventDetailsDisplay" className="block text-sm font-medium mb-1">
+                    Event Details:
+                  </label>
+                  {isEditing && isAdmin ? (
+                    <Textarea
+                      id="eventDetailsEdit" // Changed id to avoid conflict
+                      value={eventData.eventDetails} // Use new field name
+                      onChange={(e) => setEventData({ ...eventData, eventDetails: e.target.value })} // Use new field name
+                      rows={4}
+                      className="resize-none"
+                    />
+                  ) : (
+                    <p id="eventDetailsDisplay" className="text-sm">
+                      {eventData.eventDetails}
+                    </p> // Use new field name
+                  )}
+                </div>
+                <div>
+                  <label htmlFor="vendorListDisplay" className="block text-sm font-medium mb-1">
                     Vendor List:
                   </label>
                   {isEditing && isAdmin ? (
                     <Textarea
-                      id="vendorList"
+                      id="vendorListEdit" // Changed id to avoid conflict
                       value={eventData.vendorList}
                       onChange={(e) => setEventData({ ...eventData, vendorList: e.target.value })}
                       rows={4}
                       className="resize-none"
                     />
                   ) : (
-                    <p className="text-sm">{eventData.vendorList}</p>
+                    <p id="vendorListDisplay" className="text-sm">
+                      {eventData.vendorList}
+                    </p>
                   )}
                 </div>
               </div>
@@ -345,9 +452,9 @@ export default function AdminEventView() {
                   </ul>
                 ) : (
                   <ul className="space-y-4">
-                    <li>{eventData.adminName || "N/A"}</li>
-                    <li>{eventData.email}</li>
-                    <li>{eventData.phone}</li>
+                    <li>Admin: {eventData.adminName || "N/A"}</li>
+                    <li>Email: {eventData.email}</li>
+                    <li>Phone: {eventData.phone}</li>
                   </ul>
                 )}
 
@@ -387,7 +494,6 @@ export default function AdminEventView() {
           <TabsContent value="documents" className="mt-0 pt-4">
             <div className="p-4 bg-gray-200 rounded-lg shadow-md border border-gray-300">
               {" "}
-              {/* Added styling */}
               <p>Not implemented</p>
             </div>
           </TabsContent>
