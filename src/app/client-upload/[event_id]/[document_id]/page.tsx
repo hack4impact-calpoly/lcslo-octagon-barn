@@ -41,7 +41,7 @@ async function uploadDocument(
 
       // Check if the document has an s3DocIdClient
       // If it does not, it means the admin requested a document and the client has not uploaded it yet
-      if (!(typeof document.s3DocIdClient === "undefined")) {
+      if (!(typeof document.s3DocIdClient === "undefined" || document.s3DocIdClient === null)) {
         s3RetrievedDocIdClient = document.s3DocIdClient;
         docToDelete = true;
       }
