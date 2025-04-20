@@ -23,7 +23,6 @@ async function downloadDocument(s3DocIdClient: string) {
   }
 }
 
-// TODO: upload document to s3 then upload to mongodb
 async function uploadDocument(file: File, user: UserResource | null | undefined, eventId: string) {
   try {
     // 1. Create document object in MongoDB
@@ -47,8 +46,7 @@ async function uploadDocument(file: File, user: UserResource | null | undefined,
 
     // 2. Get the upload URL for the file
     console.log("Document ID:", documentId);
-    const url_string = `/api/upload-url?file=${encodeURIComponent(file.name)}&userId=${encodeURIComponent(user?.id || "")}
-                        &eventId=${encodeURIComponent(eventId)}&documentId=${encodeURIComponent(documentId)}`;
+    const url_string = `/api/upload-url?file=${encodeURIComponent(file.name)}&userId=${encodeURIComponent(user?.id || "")}&eventId=${encodeURIComponent(eventId)}&documentId=${encodeURIComponent(documentId)}`;
     const uploadUrlResponse = await fetch(url_string);
     if (!uploadUrlResponse.ok) throw new Error("Failed to get upload URL");
     const { uploadUrl, s3Key } = await uploadUrlResponse.json();
@@ -98,8 +96,7 @@ async function reuploadDocument(
   try {
     // 1. Get the upload URL for the file
     console.log("Reuploading document with ID:", documentId);
-    const url_string = `/api/upload-url?file=${encodeURIComponent(file.name)}&userId=${encodeURIComponent(user?.id || "")}
-                          &eventId=${encodeURIComponent(eventId)}&documentId=${encodeURIComponent(documentId)}`;
+    const url_string = `/api/upload-url?file=${encodeURIComponent(file.name)}&userId=${encodeURIComponent(user?.id || "")}&eventId=${encodeURIComponent(eventId)}&documentId=${encodeURIComponent(documentId)}`;
     const uploadUrlResponse = await fetch(url_string);
     if (!uploadUrlResponse.ok) throw new Error("Failed to get upload URL");
     const { uploadUrl, s3Key } = await uploadUrlResponse.json();
