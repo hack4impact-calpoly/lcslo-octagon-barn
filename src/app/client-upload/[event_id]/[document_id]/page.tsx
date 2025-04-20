@@ -32,12 +32,19 @@ async function uploadDocument(
 ) {
   try {
     // 1. Get the s3docIdClient
-    var s3RetrievedDocIdClient: string;
+    var docToDelete: boolean = false;
+    var s3RetrievedDocIdClient: string = "";
     if (!s3DocIdClient) {
       const getDocumentResponse = await fetch(`/api/document/${documentId}`);
       if (!getDocumentResponse.ok) throw new Error("Failed to get document record");
       const document = await getDocumentResponse.json();
-      s3RetrievedDocIdClient = document.s3DocIdClient;
+
+      // Check if the document has an s3DocIdClient
+      // If it does not, it means the admin requested a document and the client has not uploaded it yet
+      if (!(typeof document.s3DocIdClient === "undefined")) {
+        s3RetrievedDocIdClient = document.s3DocIdClient;
+        docToDelete = true;
+      }
     } else {
       s3RetrievedDocIdClient = s3DocIdClient;
     }
@@ -61,16 +68,18 @@ async function uploadDocument(
     if (!uploadDocResponse.ok) throw new Error("Failed to upload document");
 
     // 4. Delete the old document in S3
-    const deleteS3DocumentResponse = await fetch("/api/delete-document", {
-      method: "DELETE",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        s3Key: s3RetrievedDocIdClient,
-      }),
-    });
-    if (!deleteS3DocumentResponse.ok) throw new Error("Failed to delete document record in S3");
+    if (docToDelete) {
+      const deleteS3DocumentResponse = await fetch("/api/delete-document", {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          s3Key: s3RetrievedDocIdClient,
+        }),
+      });
+      if (!deleteS3DocumentResponse.ok) throw new Error("Failed to delete document record in S3");
+    }
 
     // 5. Update document object in MongoDB
     const updateDocResponse = await fetch(`/api/document/${documentId}`, {
