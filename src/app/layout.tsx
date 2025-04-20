@@ -20,9 +20,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <Navbar />
           </SignedIn>
           <div className={`${eb_garamond.className}`}>{children}</div>
-          <SignedIn>
+          {/* <SignedIn>
             <Footer />
-          </SignedIn>
+          </SignedIn> */}
         </body>
       </html>
     </ClerkProvider>
