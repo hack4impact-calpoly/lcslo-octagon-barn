@@ -13,11 +13,7 @@
     "prepare": "husky"
   },
   "dependencies": {
-<<<<<<< HEAD
-    "@aws-sdk/client-s3": "^3.787.0",
-=======
     "@aws-sdk/client-s3": "^3.750.0",
->>>>>>> 1251536 (feat: email route create)
     "@aws-sdk/s3-request-presigner": "^3.750.0",
     "@clerk/clerk-sdk-node": "^4.13.22",
     "@clerk/elements": "^0.22.23",
@@ -46,13 +42,9 @@
     "lucide-react": "^0.471.1",
     "mime": ">=1.4.1",
     "mongoose": "^8.9.5",
-<<<<<<< HEAD
     "next": "^14.2.26",
     "qs": ">=6.2.4",
-=======
-    "next": "^14.2.21",
     "nodemailer": "^6.10.1",
->>>>>>> 1251536 (feat: email route create)
     "radix-ui": "^1.0.1",
     "react": "^18",
     "react-day-picker": "^8.10.1",
@@ -66,11 +58,8 @@
     "tunnel-agent": ">=0.6.0"
   },
   "devDependencies": {
-<<<<<<< HEAD
     "@types/formidable": "^3.4.5",
-=======
     "@types/jest": "^29.5.14",
->>>>>>> 1251536 (feat: email route create)
     "@types/node": "^20",
     "@types/nodemailer": "^6.4.17",
     "@types/react": "^18",
@@ -88,22 +77,16 @@
     "husky": "^9",
     "jest": "^29.7.0",
     "lint-staged": "^15",
-<<<<<<< HEAD
     "mime": ">=1.4.1",
-=======
     "node-mocks-http": "^1.16.2",
->>>>>>> 1251536 (feat: email route create)
     "postcss": "^8.5.1",
     "prettier": "^3",
     "qs": ">=6.2.4",
     "request": ">=2.68.0",
     "superagent": ">=3.7.0",
     "tailwindcss": "^3.4.17",
-<<<<<<< HEAD
     "tunnel-agent": ">=0.6.0",
-=======
     "ts-jest": "^29.3.2",
->>>>>>> 1251536 (feat: email route create)
     "typescript": "^5"
   }
 }
