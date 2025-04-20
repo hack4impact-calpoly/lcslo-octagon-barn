@@ -1,9 +1,10 @@
 ---
 name: New Issue
 about: Create a new issue
-title: ""
-labels: ""
-assignees: ""
+title: ''
+labels: ''
+assignees: ''
+
 ---
 
 **Description**
