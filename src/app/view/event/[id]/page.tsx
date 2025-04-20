@@ -96,9 +96,8 @@ export default function AdminEventView() {
     eventDateStart: new Date("2025-03-13T08:00:00"),
     eventDateEnd: new Date("2025-03-13T14:30:00"),
     status: "Upcoming",
-    eventDetails: "description placeholder",
-    vendorList:
-      "The following is a temporary placeholder for what eventually will be filled in with text that will contain information about the venue and its features",
+    eventDetails: "Event Details Placeholder",
+    vendorList: "Vendor List Placeholder",
     createdAt: new Date(),
     docsTotal: 8,
     docsCompleted: 2,
