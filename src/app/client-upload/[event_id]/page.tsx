@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 import DocumentUpload from "@/components/DocumentUpload";
 import { Button } from "@/components/ui/button";
-import { Trash, Download, Upload } from "lucide-react";
+import { Upload } from "lucide-react";
 import { useUser } from "@clerk/nextjs";
 import { UserResource } from "@clerk/types";
 import { useParams, useRouter } from "next/navigation";
@@ -43,7 +43,7 @@ async function uploadDocument(
       body: JSON.stringify({
         clerkId: user?.id,
         eventId: eventId,
-        documentName: documentName,
+        documentName: documentName || file.name,
         documentType: documentType,
         uploadedAt: new Date(),
         status: "Pending",
@@ -265,8 +265,8 @@ const ClientUploadPage: React.FC = () => {
   return (
     <div className="flex flex-col items-center p-8 w-full min-h-[calc(100vh-105px-40px)] bg-white">
       {/* Main Layout */}
-      {/* Document Name and Select box for type*/}
 
+      {/* Document Name and Select box for type*/}
       <div className="flex w-full max-w-5xl gap-5 mb-6">
         <div className="w-2/3">
           <Input
@@ -333,7 +333,7 @@ const ClientUploadPage: React.FC = () => {
       <div className="flex justify-center gap-4 mt-6">
         <Button
           className="bg-[ bg-basic-blue ] text-white hover:bg-[#305a73] px-6 py-3 text-lg"
-          disabled={!allChecked || !file}
+          disabled={(!allChecked && documentType == "Insurance/COI") || !file}
           size={"sm"}
           onClick={async () => {
             if (file) {
