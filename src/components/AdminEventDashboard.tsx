@@ -4,9 +4,9 @@ import { useUser } from "@clerk/nextjs";
 import { useEffect, useState, useMemo } from "react";
 import { useState as useReactState } from "react";
 import Link from "next/link";
-import { Table, TableHeader, TableHead, TableBody, TableRow, TableCell } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Table, TableHeader, TableHead, TableBody, TableRow, TableCell } from "@/components/ui/table";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 
 interface EventRow {
@@ -59,8 +59,6 @@ export default function AdminEventDashboard() {
           const bTime = new Date(bVal).getTime();
           return direction === "asc" ? aTime - bTime : bTime - aTime;
         }
-
-        // treat as string
         const aStr = String(aVal);
         const bStr = String(bVal);
         return direction === "asc" ? aStr.localeCompare(bStr) : bStr.localeCompare(aStr);
@@ -106,20 +104,20 @@ export default function AdminEventDashboard() {
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead className="cursor-pointer" onClick={() => requestSort("eventName")}>
+            <TableHead className="cursor-pointer text-center" onClick={() => requestSort("eventName")}>
               Event Name {sortConfig?.key === "eventName" ? (sortConfig.direction === "asc" ? "▲" : "▼") : ""}
             </TableHead>
-            <TableHead className="cursor-pointer" onClick={() => requestSort("eventDateStart")}>
+            <TableHead className="cursor-pointer text-center" onClick={() => requestSort("eventDateStart")}>
               Start Date {sortConfig?.key === "eventDateStart" ? (sortConfig.direction === "asc" ? "▲" : "▼") : ""}
             </TableHead>
-            <TableHead className="cursor-pointer" onClick={() => requestSort("eventDateEnd")}>
+            <TableHead className="cursor-pointer text-center" onClick={() => requestSort("eventDateEnd")}>
               End Date {sortConfig?.key === "eventDateEnd" ? (sortConfig.direction === "asc" ? "▲" : "▼") : ""}
             </TableHead>
             <TableHead className="text-center cursor-pointer" onClick={() => requestSort("status")}>
               Status {sortConfig?.key === "status" ? (sortConfig.direction === "asc" ? "▲" : "▼") : ""}
             </TableHead>
-            <TableHead>View</TableHead>
-            <TableHead>Delete</TableHead>
+            <TableHead className="text-center">View</TableHead>
+            <TableHead className="text-center">Delete</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -134,10 +132,10 @@ export default function AdminEventDashboard() {
           ) : (
             filtered.map((e) => (
               <TableRow key={e.id}>
-                <TableCell>{e.eventName}</TableCell>
-                <TableCell>{new Date(e.eventDateStart).toLocaleString()}</TableCell>
-                <TableCell>{new Date(e.eventDateEnd).toLocaleString()}</TableCell>
-                <TableCell className="text-center">
+                <TableCell className="!text-center">{e.eventName}</TableCell>
+                <TableCell className="!text-center">{new Date(e.eventDateStart).toLocaleString()}</TableCell>
+                <TableCell className="!text-center">{new Date(e.eventDateEnd).toLocaleString()}</TableCell>
+                <TableCell className="!text-center">
                   <Select value={e.status} onValueChange={(val) => updateStatus(e.id, val as EventRow["status"])}>
                     <SelectTrigger className="mx-auto justify-center">
                       <SelectValue className="text-center" />
@@ -151,12 +149,12 @@ export default function AdminEventDashboard() {
                     </SelectContent>
                   </Select>
                 </TableCell>
-                <TableCell>
+                <TableCell className="!text-center">
                   <Link href={`/view/event/${e.id}`} className="text-basic-blue">
                     View Event
                   </Link>
                 </TableCell>
-                <TableCell>
+                <TableCell className="!text-center">
                   <Button variant="ghost" size="icon" onClick={() => deleteEvent(e.id)}>
                     <i className="icon-[ic--baseline-delete-forever] text-rose-500 h-6 w-6" aria-hidden="true"></i>
                   </Button>
