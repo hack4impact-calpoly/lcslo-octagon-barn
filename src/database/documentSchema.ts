@@ -22,14 +22,14 @@ const DocumentSchema = new Schema<IDocument>({
     required: true,
     enum: ["Insurance/COI", "Timeline", "Layout", "Other"],
   },
-  s3DocIdAdmin: { type: String, required: true },
+  s3DocIdAdmin: { type: String },
   s3DocIdClient: { type: String },
   createdAt: { type: Date, default: Date.now },
   uploadedAt: { type: Date },
   status: {
     type: String,
-    enum: ["Completed", "Pending", "Not Submitted"],
-    default: "Not Submitted",
+    enum: ["Accepted", "Rejected", "Pending", "Not Submitted"],
+    default: "Pending",
   },
   checkList: { type: [String], default: [] },
 });
