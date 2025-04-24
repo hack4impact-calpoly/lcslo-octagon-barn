@@ -9,6 +9,7 @@ import { UserResource } from "@clerk/types";
 import { useParams, useRouter } from "next/navigation";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
+import { Spinner } from "@/components/ui/spinner";
 
 // Deprecated function to download document
 // async function downloadDocument(s3DocIdClient: string) {
@@ -204,9 +205,18 @@ const ClientUploadPage: React.FC = () => {
   const [eventClerkId, setEventClerkId] = useState<string | null>(null);
   const [documentType, setDocumentType] = useState<string>("");
   const [documentName, setDocumentName] = useState<string>("");
+  const [uploading, setUploading] = useState<boolean>(false);
 
   const [file, setFile] = useState<File | null>(null);
   const [checklist, setChecklist] = useState<boolean[]>(new Array(8).fill(false));
+
+  const SpinnerWithText = () => {
+    return (
+      <div className="flex items-center gap-3">
+        <Spinner>Uploading...</Spinner>
+      </div>
+    );
+  };
 
   useEffect(() => {
     if (!userIsLoaded) return;
@@ -341,22 +351,33 @@ const ClientUploadPage: React.FC = () => {
       {/* Buttons */}
       <div className="flex justify-center gap-4 mt-6">
         <Button
-          className="bg-[ bg-basic-blue ] text-white hover:bg-[#305a73] px-6 py-3 text-lg"
+          className="h-14 bg-[ bg-basic-blue ] text-white hover:bg-[#305a73] px-10 text-lg"
           disabled={!documentType || (!allChecked && documentType == "Insurance/COI") || !file}
           size={"sm"}
           onClick={async () => {
             if (file) {
               try {
+                setUploading(true);
                 await uploadDocument(file, user, eventId as string, documentType, documentName);
                 // TODO: Route to event page once completed
                 router.push(`/`);
               } catch (err) {
                 console.error("Upload failed:", err);
+              } finally {
+                setUploading(false);
               }
             }
           }}
         >
-          <Upload /> Upload
+          {uploading ? (
+            <>
+              <SpinnerWithText />
+            </>
+          ) : (
+            <>
+              <Upload /> Upload
+            </>
+          )}
         </Button>
       </div>
     </div>
