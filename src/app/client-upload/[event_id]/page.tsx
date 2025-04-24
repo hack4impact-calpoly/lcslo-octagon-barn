@@ -202,7 +202,7 @@ const ClientUploadPage: React.FC = () => {
   const { isLoaded: userIsLoaded, user } = useUser();
   const [loading, setLoading] = useState<boolean>(true);
   const [eventClerkId, setEventClerkId] = useState<string | null>(null);
-  const [documentType, setDocumentType] = useState<string>("Insurance/COI");
+  const [documentType, setDocumentType] = useState<string>("");
   const [documentName, setDocumentName] = useState<string>("");
 
   const [file, setFile] = useState<File | null>(null);
@@ -270,21 +270,30 @@ const ClientUploadPage: React.FC = () => {
       <div className="flex w-full max-w-5xl gap-5 mb-6">
         <div className="w-2/3">
           <Input
-            placeholder={file ? file.name : "Document Name"}
+            className="h-14 px-4 placeholder:text-lg md:text-lg"
+            placeholder={file ? file.name : "Enter Document Name"}
             value={documentName}
             onChange={(e) => setDocumentName(e.target.value)}
           />
         </div>
         <div className="w-1/3">
-          <Select defaultValue={documentType} onValueChange={setDocumentType}>
-            <SelectTrigger>
-              <SelectValue placeholder="Select type" />
+          <Select value={documentType} onValueChange={setDocumentType}>
+            <SelectTrigger className="h-14 text-lg px-4">
+              <SelectValue placeholder="Select Document Type" />
             </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="Insurance/COI">Insurance/COI</SelectItem>
-              <SelectItem value="Timeline">Timeline</SelectItem>
-              <SelectItem value="Layout">Layout</SelectItem>
-              <SelectItem value="Other">Other</SelectItem>
+            <SelectContent className="text-base">
+              <SelectItem className="text-base" value="Insurance/COI">
+                Insurance/COI
+              </SelectItem>
+              <SelectItem className="text-base" value="Timeline">
+                Timeline
+              </SelectItem>
+              <SelectItem className="text-base" value="Layout">
+                Layout
+              </SelectItem>
+              <SelectItem className="text-base" value="Other">
+                Other
+              </SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -333,7 +342,7 @@ const ClientUploadPage: React.FC = () => {
       <div className="flex justify-center gap-4 mt-6">
         <Button
           className="bg-[ bg-basic-blue ] text-white hover:bg-[#305a73] px-6 py-3 text-lg"
-          disabled={(!allChecked && documentType == "Insurance/COI") || !file}
+          disabled={!documentType || (!allChecked && documentType == "Insurance/COI") || !file}
           size={"sm"}
           onClick={async () => {
             if (file) {
