@@ -97,29 +97,39 @@ export default function AdminEventDashboard() {
           placeholder="Search for an event"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.currentTarget.value)}
-          className="max-w-sm"
+          className="max-w-sm py-2 md:text-base placeholder:text-base ml-auto"
         />
       </div>
 
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead className="cursor-pointer text-center" onClick={() => requestSort("eventName")}>
+            <TableHead
+              className="cursor-pointer text-center text-lg text-black"
+              onClick={() => requestSort("eventName")}
+            >
               Event Name {sortConfig?.key === "eventName" ? (sortConfig.direction === "asc" ? "▲" : "▼") : ""}
             </TableHead>
-            <TableHead className="cursor-pointer text-center" onClick={() => requestSort("eventDateStart")}>
+            <TableHead
+              className="cursor-pointer text-center text-lg text-black"
+              onClick={() => requestSort("eventDateStart")}
+            >
               Start Date {sortConfig?.key === "eventDateStart" ? (sortConfig.direction === "asc" ? "▲" : "▼") : ""}
             </TableHead>
-            <TableHead className="cursor-pointer text-center" onClick={() => requestSort("eventDateEnd")}>
+            <TableHead
+              className="cursor-pointer text-center text-lg text-black"
+              onClick={() => requestSort("eventDateEnd")}
+            >
               End Date {sortConfig?.key === "eventDateEnd" ? (sortConfig.direction === "asc" ? "▲" : "▼") : ""}
             </TableHead>
-            <TableHead className="text-center cursor-pointer" onClick={() => requestSort("status")}>
+            <TableHead className="text-center cursor-pointer text-lg text-black" onClick={() => requestSort("status")}>
               Status {sortConfig?.key === "status" ? (sortConfig.direction === "asc" ? "▲" : "▼") : ""}
             </TableHead>
-            <TableHead className="text-center">View</TableHead>
-            <TableHead className="text-center">Delete</TableHead>
+            <TableHead className="text-center text-lg text-black">View</TableHead>
+            <TableHead className="text-center text-lg text-black">Delete</TableHead>
           </TableRow>
         </TableHeader>
+        {/* TODO: Fix styling of loading and no events found*/}
         <TableBody>
           {loading ? (
             <TableRow>
@@ -132,17 +142,17 @@ export default function AdminEventDashboard() {
           ) : (
             filtered.map((e) => (
               <TableRow key={e.id}>
-                <TableCell className="!text-center">{e.eventName}</TableCell>
-                <TableCell className="!text-center">{new Date(e.eventDateStart).toLocaleString()}</TableCell>
-                <TableCell className="!text-center">{new Date(e.eventDateEnd).toLocaleString()}</TableCell>
+                <TableCell className="!text-center text-base">{e.eventName}</TableCell>
+                <TableCell className="!text-center text-base">{new Date(e.eventDateStart).toLocaleString()}</TableCell>
+                <TableCell className="!text-center text-base">{new Date(e.eventDateEnd).toLocaleString()}</TableCell>
                 <TableCell className="!text-center">
                   <Select value={e.status} onValueChange={(val) => updateStatus(e.id, val as EventRow["status"])}>
-                    <SelectTrigger className="mx-auto justify-center">
+                    <SelectTrigger className="mx-auto justify-center text-base">
                       <SelectValue className="text-center" />
                     </SelectTrigger>
                     <SelectContent>
                       {["Upcoming", "Ongoing", "Completed", "Cancelled"].map((s) => (
-                        <SelectItem key={s} value={s}>
+                        <SelectItem key={s} value={s} className="text-base">
                           {s}
                         </SelectItem>
                       ))}
@@ -150,7 +160,10 @@ export default function AdminEventDashboard() {
                   </Select>
                 </TableCell>
                 <TableCell className="!text-center">
-                  <Link href={`/view/event/${e.id}`} className="text-basic-blue">
+                  <Link
+                    href={`/view/event/${e.id}`}
+                    className="bg-basic-blue text-white text-base hover:text-black px-6 py-3 rounded-full"
+                  >
                     View Event
                   </Link>
                 </TableCell>
