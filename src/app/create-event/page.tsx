@@ -207,7 +207,7 @@ export default function CreateEventPage() {
               <span className="text-sm text-gray-500">{user.email}</span>
             </div>
           ) : (
-            <span className="text-[var(--primary-blue)">User</span>
+            <span className="text-[var(--primary-blue)">No User Assigned</span>
           )}
         </div>
 

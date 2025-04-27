@@ -2,6 +2,7 @@
 
 import { ColumnDef } from "@tanstack/react-table";
 import { Button } from "@/components/ui/button";
+import { useRouter } from "next/navigation";
 
 export type User = {
   id: string;
@@ -42,7 +43,10 @@ export const columns: ColumnDef<User>[] = [
         <Button
           style={{ backgroundColor: "#3A6F8F" }}
           className="text-white w-full px-2 py-1 text-lg rounded"
-          onClick={() => HandleAssignUser(row.original)}
+          onClick={() => {
+            HandleAssignUser(row.original);
+            window.location.href = "/create-event";
+          }}
         >
           Assign
         </Button>
