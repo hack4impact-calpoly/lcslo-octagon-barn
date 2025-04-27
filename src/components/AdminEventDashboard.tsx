@@ -84,7 +84,7 @@ export default function AdminEventDashboard() {
   };
 
   if (!isLoaded) {
-    return <p>Loading...</p>;
+    return <p className="text-center text-gray-500 text-lg">Loading ...</p>;
   }
   if (!isAdmin) {
     return <p className="text-red-500">Unauthorized</p>;
@@ -97,7 +97,7 @@ export default function AdminEventDashboard() {
           placeholder="Search for an event"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.currentTarget.value)}
-          className="max-w-sm py-2 md:text-base placeholder:text-base ml-auto"
+          className="max-w-sm py-2 md:text-lg placeholder:text-lg ml-auto"
         />
       </div>
 
@@ -132,27 +132,23 @@ export default function AdminEventDashboard() {
         {/* TODO: Fix styling of loading and no events found*/}
         <TableBody>
           {loading ? (
-            <TableRow>
-              <TableCell colSpan={6}>Loading...</TableCell>
-            </TableRow>
+            <p></p>
           ) : filtered.length === 0 ? (
-            <TableRow>
-              <TableCell colSpan={6}>No events found</TableCell>
-            </TableRow>
+            <p className="text-center text-gray-500 text-lg">No events found</p>
           ) : (
             filtered.map((e) => (
               <TableRow key={e.id}>
-                <TableCell className="!text-center text-base">{e.eventName}</TableCell>
-                <TableCell className="!text-center text-base">{new Date(e.eventDateStart).toLocaleString()}</TableCell>
-                <TableCell className="!text-center text-base">{new Date(e.eventDateEnd).toLocaleString()}</TableCell>
+                <TableCell className="!text-center text-lg">{e.eventName}</TableCell>
+                <TableCell className="!text-center text-lg">{new Date(e.eventDateStart).toLocaleString()}</TableCell>
+                <TableCell className="!text-center text-lg">{new Date(e.eventDateEnd).toLocaleString()}</TableCell>
                 <TableCell className="!text-center">
                   <Select value={e.status} onValueChange={(val) => updateStatus(e.id, val as EventRow["status"])}>
-                    <SelectTrigger className="mx-auto justify-center text-base">
+                    <SelectTrigger className="mx-auto justify-center text-lg">
                       <SelectValue className="text-center" />
                     </SelectTrigger>
                     <SelectContent>
                       {["Upcoming", "Ongoing", "Completed", "Cancelled"].map((s) => (
-                        <SelectItem key={s} value={s} className="text-base">
+                        <SelectItem key={s} value={s} className="text-lg">
                           {s}
                         </SelectItem>
                       ))}
@@ -162,7 +158,7 @@ export default function AdminEventDashboard() {
                 <TableCell className="!text-center">
                   <Link
                     href={`/view/event/${e.id}`}
-                    className="bg-basic-blue text-white text-base hover:text-black px-6 py-3 rounded-full"
+                    className="bg-basic-blue text-white text-lg hover:text-black px-6 py-3 rounded-full"
                   >
                     View Event
                   </Link>
