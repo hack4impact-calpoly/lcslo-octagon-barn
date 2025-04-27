@@ -60,11 +60,11 @@ const EventTile: React.FC<EventTileProps> = ({
   // Conditional style based on the variant: list view vs. event details
   const containerClasses =
     variant === "list"
-      ? "relative flex items-center rounded-lg overflow-hidden shadow-md cursor-pointer border border-gray-300 hover:shadow-lg transition w-5/6 max-w-4xl mx-auto m-2"
+      ? "relative flex items-center rounded-lg overflow-hidden shadow-md cursor-pointer border border-gray-300 hover:shadow-lg hover:scale-105 transform transition w-5/6 max-w-4xl mx-auto m-2"
       : "relative flex items-center rounded-lg overflow-hidden shadow-md transition w-3/4 m-2"; // Banner on top of the Event details page (can modify style later when implementing the Event Details page)
 
   // Navigation click handler for the list view
-  const handleClick = variant === "list" ? () => router.push(`/event/${id}`) : undefined;
+  const handleClick = variant === "list" ? () => router.push(`/view/event/${id}`) : undefined;
 
   return (
     <div
