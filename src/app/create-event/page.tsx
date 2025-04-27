@@ -38,11 +38,12 @@ export default function CreateEventPage() {
   useEffect(() => {
     const savedForm = sessionStorage.getItem("eventForm");
     const assignedUser = sessionStorage.getItem("assignedUser");
-
+    console.log("Saved Form: " + savedForm);
     if (savedForm) {
       const parsedForm = JSON.parse(savedForm);
       setEventName(parsedForm.eventName || "");
       setVenue(parsedForm.venue || "");
+      console.log("New Venue: " + parsedForm.venue);
       setNumGuests(parsedForm.numGuests || "");
       setStartDate(parsedForm.startDate ? new Date(parsedForm.startDate) : undefined);
       setEndDate(parsedForm.endDate ? new Date(parsedForm.endDate) : undefined);
@@ -126,6 +127,8 @@ export default function CreateEventPage() {
       eventDetails,
       vendorList,
     };
+    console.log("Created Form: ");
+    console.log(form);
     sessionStorage.setItem("eventForm", JSON.stringify(form));
   };
 
@@ -141,18 +144,28 @@ export default function CreateEventPage() {
           onChange={(e) => setEventName(e.target.value)}
         />
         <div className="flex space-x-2">
-          <Select value={venue} onValueChange={(value) => setVenue(value)}>
+          <Select key={venue} value={venue} onValueChange={(value) => setVenue(value)}>
             <SelectTrigger
-              className={`w-1/2 bg-[var(--primary-fill)] data-[placeholder]:text-[var(--primary-blue)]  ${errors.venue ? "border-red-500" : ""}`}
+              className={`w-1/2 bg-[var(--primary-fill)] text-base data-[placeholder]:text-[var(--primary-blue)] data-[placeholder]:text-base ${errors.venue ? "border-red-500" : ""}`}
             >
               <SelectValue placeholder="Venue" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="Full Facility">Full Facility</SelectItem>
-              <SelectItem value="Octagon Barn & Plaza">Octagon Barn & Plaza</SelectItem>
-              <SelectItem value="Shed & Courtyard">Shed & Courtyard</SelectItem>
-              <SelectItem value="Milking Parlor">Milking Parlor</SelectItem>
-              <SelectItem value="Other">Other</SelectItem>
+              <SelectItem className="text-base" value="Full Facility">
+                Full Facility
+              </SelectItem>
+              <SelectItem className="text-base" value="Octagon Barn & Plaza">
+                Octagon Barn & Plaza
+              </SelectItem>
+              <SelectItem className="text-base" value="Shed & Courtyard">
+                Shed & Courtyard
+              </SelectItem>
+              <SelectItem className="text-base" value="Milking Parlor">
+                Milking Parlor
+              </SelectItem>
+              <SelectItem className="text-base" value="Other">
+                Other
+              </SelectItem>
             </SelectContent>
           </Select>
 
