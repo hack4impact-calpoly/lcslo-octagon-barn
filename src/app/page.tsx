@@ -35,7 +35,9 @@ export default function Home() {
     if (userId) {
       fetch(`/api/event/user_id/${userId}`)
         .then((res) => res.json())
-        .then((data) => setEvents(data.events || []))
+        .then((data) => {
+          setEvents(data || []);
+        })
         .catch((err) => console.error("Failed to load events", err));
     }
   }, [userId]);
@@ -56,7 +58,6 @@ export default function Home() {
         // Client Home Page with events
         <div className="flex flex-col items-center p-8 w-full min-h-screen bg-white">
           <h1 className="text-2xl font-bold mb-6">Your Events</h1>
-
           {/* Render event tiles */}
           <div className="flex flex-col gap-4 w-full max-w-5xl">
             {events.length > 0 ? (

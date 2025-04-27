@@ -23,7 +23,7 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
       createdAt: event.createdAt,
       docsTotal: event.docsTotal,
       docsCompleted: event.docsCompleted,
-      numGuests: event.numPeople,
+      numGuests: event.numGuests,
     }));
 
     if (!sanitizedEvents.length) {
