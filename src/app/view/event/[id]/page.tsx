@@ -362,7 +362,7 @@ export default function AdminEventView() {
             numGuests={eventData.numGuests}
             docsCompleted={eventData.docsCompleted}
             docsTotal={eventData.docsTotal}
-            imageSrc={eventData.headerImageUrl || "/octagon_barn_plaza.jpg"}
+            imageSrc={eventData.headerImageUrl || ""}
             variant="detail"
           />
         )}
