@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useState } from "react";
+// import React, { useState } from "react";
+import React, { useEffect, useState } from "react"; // useEffect to load sessionStorage assignedUser
 import { useRouter } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -18,7 +19,7 @@ export default function CreateEventPage() {
   const [startDate, setStartDate] = useState<Date | undefined>();
   const [endDate, setEndDate] = useState<Date | undefined>();
   const [eventDetails, setEventDetails] = useState("");
-  const [user, setUser] = useState("");
+  const [user, setUser] = useState(""); // auto filled now
 
   // Validation state
   const [errors, setErrors] = useState({
@@ -31,6 +32,16 @@ export default function CreateEventPage() {
     user: false,
     invalidDateRange: false,
   });
+
+  // useEffect to read assigned user from sessionStorage
+  useEffect(() => {
+    const assignedUser = sessionStorage.getItem("assignedUser");
+    if (assignedUser) {
+      const userData = JSON.parse(assignedUser);
+      setUser(`${userData.name} (${userData.email})`);
+      sessionStorage.removeItem("assignedUser");
+    }
+  }, []);
 
   // Handle form submission
   const handleSubmit = (e: React.FormEvent) => {
@@ -122,7 +133,11 @@ export default function CreateEventPage() {
           <Button type="button" className="w-1/2 bg-[var(--primary-blue)] text-lg">
             Assign User
           </Button>
-          <Button type="button" className="w-1/2 bg-[var(--primary-blue)] text-lg">
+          <Button
+            type="button"
+            className="w-1/2 bg-[var(--primary-blue)] text-lg"
+            onClick={() => router.push("/create-user")} // make create user button route
+          >
             Create User
           </Button>
         </div>
