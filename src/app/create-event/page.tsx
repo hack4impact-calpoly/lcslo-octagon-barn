@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -14,66 +14,37 @@ export default function CreateEventPage() {
   // State for form inputs
   const [eventName, setEventName] = useState("");
   const [venue, setVenue] = useState("");
-  const [numGuests, setNumGuests] = useState("");
+  const [numPeople, setNumPeople] = useState("");
   const [startDate, setStartDate] = useState<Date | undefined>();
   const [endDate, setEndDate] = useState<Date | undefined>();
   const [eventDetails, setEventDetails] = useState("");
-  const [vendorList, setVendorList] = useState("");
-  const [user, setUser] = useState<{ name: string; email: string; id: string } | null>(null);
+  const [user, setUser] = useState("");
 
   // Validation state
   const [errors, setErrors] = useState({
     eventName: false,
     venue: false,
-    numGuests: false,
+    numPeople: false,
     startDate: false,
     endDate: false,
     eventDetails: false,
-    vendorList: false,
     user: false,
     invalidDateRange: false,
   });
 
-  //preloads form data
-  useEffect(() => {
-    const savedForm = sessionStorage.getItem("eventForm");
-    const assignedUser = sessionStorage.getItem("assignedUser");
-
-    if (savedForm) {
-      const parsedForm = JSON.parse(savedForm);
-      setEventName(parsedForm.eventName || "");
-      setVenue(parsedForm.venue || "");
-      setNumGuests(parsedForm.numGuests || "");
-      setStartDate(parsedForm.startDate ? new Date(parsedForm.startDate) : undefined);
-      setEndDate(parsedForm.endDate ? new Date(parsedForm.endDate) : undefined);
-      setEventDetails(parsedForm.eventDetails || "");
-      setVendorList(parsedForm.vendorList || "");
-    }
-
-    if (assignedUser) {
-      const parsedUser = JSON.parse(assignedUser);
-      setUser({
-        name: parsedUser.name || "",
-        email: parsedUser.email || "",
-        id: parsedUser.id || "",
-      });
-    }
-  }, []);
-
   // Handle form submission
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
     // Check for missing fields
     const newErrors = {
       eventName: eventName.trim() === "",
       venue: venue.trim() === "",
-      numGuests: numGuests.trim() === "",
+      numPeople: numPeople.trim() === "",
       startDate: !startDate,
       endDate: !endDate,
       eventDetails: eventDetails.trim() === "",
-      vendorList: vendorList.trim() === "",
-      user: !user || user.id.trim() === "",
+      user: user.trim() === "",
       invalidDateRange: !!(startDate && endDate && startDate >= endDate),
     };
 
@@ -85,48 +56,7 @@ export default function CreateEventPage() {
     }
 
     // Submit the form if no errors
-    try {
-      const response = await fetch("/api/event", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          eventName,
-          venue,
-          eventDateStart: startDate,
-          eventDateEnd: endDate,
-          status: "Upcoming",
-          numGuests: parseInt(numGuests),
-          clerkId: user?.id,
-          vendorList,
-        }),
-      });
-
-      if (!response.ok) {
-        console.error("Event creation failed:", await response.json());
-        return;
-      }
-
-      const data = await response.json();
-      console.log("Event created:", data);
-
-      sessionStorage.removeItem("eventFormData");
-      router.push("/");
-    } catch (err) {
-      console.error("Unexpected error:", err);
-    }
-  };
-
-  const saveFormToSession = () => {
-    const form = {
-      eventName,
-      venue,
-      numGuests,
-      startDate,
-      endDate,
-      eventDetails,
-      vendorList,
-    };
-    sessionStorage.setItem("eventForm", JSON.stringify(form));
+    console.log("Event Created:", { eventName, venue, numPeople, startDate, endDate, eventDetails, user });
   };
 
   return (
@@ -140,29 +70,28 @@ export default function CreateEventPage() {
           value={eventName}
           onChange={(e) => setEventName(e.target.value)}
         />
+
         <div className="flex space-x-2">
-          <Select value={venue} onValueChange={(value) => setVenue(value)}>
+          <Select onValueChange={(value) => setVenue(value)}>
             <SelectTrigger
               className={`w-1/2 bg-[var(--primary-fill)] data-[placeholder]:text-[var(--primary-blue)]  ${errors.venue ? "border-red-500" : ""}`}
             >
               <SelectValue placeholder="Venue" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="Full Facility">Full Facility</SelectItem>
-              <SelectItem value="Octagon Barn & Plaza">Octagon Barn & Plaza</SelectItem>
-              <SelectItem value="Shed & Courtyard">Shed & Courtyard</SelectItem>
-              <SelectItem value="Milking Parlor">Milking Parlor</SelectItem>
-              <SelectItem value="Other">Other</SelectItem>
+              <SelectItem value="venue1">Venue 1</SelectItem>
+              <SelectItem value="venue2">Venue 2</SelectItem>
+              <SelectItem value="venue3">Venue 3</SelectItem>
             </SelectContent>
           </Select>
 
           <Input
             type="number"
-            name="numGuests"
-            placeholder="Number of Guests"
-            value={numGuests}
-            onChange={(e) => setNumGuests(e.target.value)}
-            className={`w-1/2 bg-[var(--primary-fill)] !text-lg placeholder:text-lg placeholder:text-[var(--primary-blue)] ${errors.numGuests ? "border-red-500" : ""}`}
+            name="numPeople"
+            placeholder="Number of People"
+            value={numPeople}
+            onChange={(e) => setNumPeople(e.target.value)}
+            className={`w-1/2 bg-[var(--primary-fill)] !text-lg placeholder:text-lg placeholder:text-[var(--primary-blue)] ${errors.numPeople ? "border-red-500" : ""}`}
           />
         </div>
 
@@ -172,6 +101,7 @@ export default function CreateEventPage() {
         </div>
 
         {errors.invalidDateRange && <p className="text-red-500">End time must be after the start time.</p>}
+
         <Textarea
           name="eventDetails"
           placeholder="Event Details"
@@ -180,61 +110,25 @@ export default function CreateEventPage() {
           className={`h-24 bg-[var(--primary-fill)] !text-lg placeholder:text-lg placeholder:text-[var(--primary-blue)] ${errors.eventDetails ? "border-red-500" : ""}`}
         />
 
-        <Textarea
-          name="vendorList"
-          placeholder="Vendor list"
-          value={vendorList}
-          onChange={(e) => setVendorList(e.target.value)}
-          className={`h-24 bg-[var(--primary-fill)] !text-lg placeholder:text-lg placeholder:text-[var(--primary-blue)] ${errors.vendorList ? "border-red-500" : ""}`}
+        <Input
+          name="user"
+          className={`bg-[var(--primary-fill)] placeholder:text-[var(--primary-blue)] !text-lg placeholder:text-lg ${errors.user ? "border-red-500" : ""}`}
+          placeholder="User"
+          value={user}
+          onChange={(e) => setUser(e.target.value)}
         />
 
-        <div
-          className={`bg-[var(--primary-fill)] text-[var(--primary-blue)] text-lg rounded-md px-3 py-2 h-12 flex items-center placeholder:text-lg placeholder:text-[var(--primary-blue)] ${errors.user ? "border border-red-500" : ""}`}
-        >
-          {user ? (
-            <div className="flex flex-col">
-              <span>{user.name}</span>
-              <span className="text-sm text-gray-500">{user.email}</span>
-            </div>
-          ) : (
-            <span className="text-[var(--primary-blue)">User</span>
-          )}
-        </div>
-
         <div className="flex space-x-2">
-          <Button
-            type="button"
-            className="w-1/2 bg-[var(--primary-blue)] text-lg"
-            onClick={() => {
-              saveFormToSession();
-              router.push("/users");
-            }}
-          >
+          <Button type="button" className="w-1/2 bg-[var(--primary-blue)] text-lg">
             Assign User
           </Button>
-          <Button
-            type="button"
-            className="w-1/2 bg-[var(--primary-blue)] text-lg"
-            onClick={() => {
-              saveFormToSession();
-              router.push("/signup");
-            }}
-          >
+          <Button type="button" className="w-1/2 bg-[var(--primary-blue)] text-lg">
             Create User
           </Button>
         </div>
         <div className="flex justify-end">
           <div className="flex  space-x-2 w-1/2 pl-1">
-            <Button
-              type="button"
-              variant="destructive"
-              className="w-1/2 text-lg"
-              onClick={() => {
-                sessionStorage.removeItem("eventForm");
-                sessionStorage.removeItem("assignedUser");
-                router.push("/");
-              }}
-            >
+            <Button type="button" variant="destructive" className="w-1/2 text-lg" onClick={() => router.push("/")}>
               Cancel
             </Button>
             <Button type="submit" className="w-1/2 bg-[var(--primary-blue)] text-lg">
