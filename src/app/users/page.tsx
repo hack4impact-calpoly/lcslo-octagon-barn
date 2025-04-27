@@ -1,51 +1,57 @@
+"use client";
 import { User, columns } from "./columns";
 import { DataTable } from "./data-table";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { useEffect, useState } from "react";
 
 async function getData(): Promise<User[]> {
-  // Fetch data from your API here.
-  return [
-    {
-      id: "728ed52f",
-      name: "John doe",
-      email: "pending",
-      date: "3/8/2025",
-    },
-    {
-      id: "728ed52f",
-      name: "John doe",
-      email: "pending",
-      date: "3/8/2025",
-    },
-    {
-      id: "728ed52f",
-      name: "John doe",
-      email: "pending",
-      date: "3/8/2025",
-    },
-    {
-      id: "728ed52f",
-      name: "John doe",
-      email: "pending",
-      date: "3/8/2025",
-    },
-    {
-      id: "728ed52f",
-      name: "John doe",
-      email: "pending",
-      date: "3/8/2025",
-    },
-  ];
+  const res = await fetch("/api/user", {
+    method: "GET",
+    cache: "no-store",
+  });
+  if (!res.ok) {
+    throw new Error("Failed to fetch data");
+  }
+  const userData = await res.json();
+  return userData.map((user: any) => ({
+    id: user.id,
+    name: user.firstName + " " + user.lastName,
+    email: user.emailAddresses[0].emailAddress,
+    date: new Date(user.createdAt).toLocaleDateString(),
+  }));
 }
 
-export default async function Page() {
-  const data = await getData();
+export default function Page() {
+  const [unfilteredData, setUnfilteredData] = useState<User[]>([]);
+  const [data, setData] = useState<User[]>([]);
+  const [searchItem, setSearchItem] = useState("");
+
+  useEffect(() => {
+    getData()
+      .then((data) => {
+        setUnfilteredData(data);
+      })
+      .catch((error) => {
+        console.error("Error fetching data:", error);
+      });
+  }, []);
+
+  useEffect(() => {
+    const filteredData = unfilteredData.filter((item) => item.name.toLowerCase().startsWith(searchItem.toLowerCase()));
+    setData(filteredData);
+  }, [searchItem, unfilteredData]);
 
   return (
     <div className="container mx-auto py-10">
       <div className="flex items-center justify-between py-5">
-        <Input type="text" placeholder="Search users..." className="w-[500px] text-2xl placeholder:text-xl pxd" />
+        <Input
+          type="text"
+          placeholder="Search users..."
+          value={searchItem}
+          onChange={(e) => setSearchItem(e.target.value)}
+          className="w-[500px] text-2xl placeholder:text-xl pxd"
+        />
       </div>
       <DataTable columns={columns} data={data} />
       <div className="flex justify-end py-8 space-x-6">
