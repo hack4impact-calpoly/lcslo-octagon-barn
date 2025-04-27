@@ -4,16 +4,17 @@ import { DataTable } from "./data-table";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 
 async function getData(): Promise<User[]> {
-  const res = await fetch("/api/user", {
+  const response = await fetch("/api/user", {
     method: "GET",
     cache: "no-store",
   });
-  if (!res.ok) {
+  if (!response.ok) {
     throw new Error("Failed to fetch data");
   }
-  const userData = await res.json();
+  const userData = await response.json();
   return userData.map((user: any) => ({
     id: user.id,
     name: user.firstName + " " + user.lastName,
@@ -26,6 +27,7 @@ export default function Page() {
   const [unfilteredData, setUnfilteredData] = useState<User[]>([]);
   const [data, setData] = useState<User[]>([]);
   const [searchItem, setSearchItem] = useState("");
+  const router = useRouter();
 
   useEffect(() => {
     getData()
@@ -38,7 +40,7 @@ export default function Page() {
   }, []);
 
   useEffect(() => {
-    const filteredData = unfilteredData.filter((item) => item.name.toLowerCase().startsWith(searchItem.toLowerCase()));
+    const filteredData = unfilteredData.filter((item) => item.email.toLowerCase().startsWith(searchItem.toLowerCase()));
     setData(filteredData);
   }, [searchItem, unfilteredData]);
 
@@ -55,7 +57,12 @@ export default function Page() {
       </div>
       <DataTable columns={columns} data={data} />
       <div className="flex justify-end py-8 space-x-6">
-        <Button className="bg-red-500 text-white px-4 py-2 text-lg w-[250px]">Cancel</Button>
+        <Button
+          className="bg-red-500 text-white px-4 py-2 text-lg w-[250px]"
+          onClick={() => router.push("/create-event")}
+        >
+          Cancel
+        </Button>
         <Button className="bg-[#3A6F8F] text-white px-4 py-2 text-lg w-[250px]">Create User</Button>
       </div>
     </div>
