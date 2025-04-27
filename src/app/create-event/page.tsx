@@ -17,6 +17,7 @@ export default function CreateEventPage() {
   const [numGuests, setNumGuests] = useState("");
   const [startDate, setStartDate] = useState<Date | undefined>();
   const [endDate, setEndDate] = useState<Date | undefined>();
+  const [eventDetails, setEventDetails] = useState("");
   const [vendorList, setVendorList] = useState("");
   const [user, setUser] = useState<{ name: string; email: string; id: string } | null>(null);
 
@@ -27,6 +28,7 @@ export default function CreateEventPage() {
     numGuests: false,
     startDate: false,
     endDate: false,
+    eventDetails: false,
     vendorList: false,
     user: false,
     invalidDateRange: false,
@@ -44,6 +46,7 @@ export default function CreateEventPage() {
       setNumGuests(parsedForm.numGuests || "");
       setStartDate(parsedForm.startDate ? new Date(parsedForm.startDate) : undefined);
       setEndDate(parsedForm.endDate ? new Date(parsedForm.endDate) : undefined);
+      setEventDetails(parsedForm.eventDetails || "");
       setVendorList(parsedForm.vendorList || "");
     }
 
@@ -68,6 +71,7 @@ export default function CreateEventPage() {
       numGuests: numGuests.trim() === "",
       startDate: !startDate,
       endDate: !endDate,
+      eventDetails: eventDetails.trim() === "",
       vendorList: vendorList.trim() === "",
       user: !user || user.id.trim() === "",
       invalidDateRange: !!(startDate && endDate && startDate >= endDate),
@@ -119,6 +123,7 @@ export default function CreateEventPage() {
       numGuests,
       startDate,
       endDate,
+      eventDetails,
       vendorList,
     };
     sessionStorage.setItem("eventForm", JSON.stringify(form));
@@ -135,9 +140,8 @@ export default function CreateEventPage() {
           value={eventName}
           onChange={(e) => setEventName(e.target.value)}
         />
-
         <div className="flex space-x-2">
-          <Select onValueChange={(value) => setVenue(value)}>
+          <Select value={venue} onValueChange={(value) => setVenue(value)}>
             <SelectTrigger
               className={`w-1/2 bg-[var(--primary-fill)] data-[placeholder]:text-[var(--primary-blue)]  ${errors.venue ? "border-red-500" : ""}`}
             >
@@ -168,6 +172,13 @@ export default function CreateEventPage() {
         </div>
 
         {errors.invalidDateRange && <p className="text-red-500">End time must be after the start time.</p>}
+        <Textarea
+          name="eventDetails"
+          placeholder="Event Details"
+          value={eventDetails}
+          onChange={(e) => setEventDetails(e.target.value)}
+          className={`h-24 bg-[var(--primary-fill)] !text-lg placeholder:text-lg placeholder:text-[var(--primary-blue)] ${errors.eventDetails ? "border-red-500" : ""}`}
+        />
 
         <Textarea
           name="vendorList"
