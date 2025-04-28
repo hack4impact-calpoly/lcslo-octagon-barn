@@ -8,6 +8,7 @@ interface IDocument {
   url: string;
 }
 
+// this is completely temporary right now it will need to be overhauled when we connect documents to backend
 interface DocumentListProps {
   documents: IDocument[];
   isEditing: boolean;
