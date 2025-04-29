@@ -66,7 +66,6 @@ export default function AdminEventDashboard() {
       result = [...result].sort((a, b) => {
         const statusDiff = statusOrder.indexOf(a.status) - statusOrder.indexOf(b.status);
         if (statusDiff !== 0) return statusDiff;
-        // tie-break by start date ascending
         return new Date(a.eventDateStart).getTime() - new Date(b.eventDateStart).getTime();
       });
       return result;
@@ -151,7 +150,6 @@ export default function AdminEventDashboard() {
             <TableHead className="text-center text-sm text-black">Delete</TableHead>
           </TableRow>
         </TableHeader>
-        {/* TODO: Fix styling of loading and no events found*/}
         <TableBody>
           {loading ? (
             <p></p>
