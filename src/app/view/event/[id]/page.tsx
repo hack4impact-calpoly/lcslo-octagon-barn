@@ -5,7 +5,7 @@ import { useUser } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
 import { useParams } from "next/navigation";
 import EventTile from "@/components/EventTile";
-import { LoadingSpinner, UnauthorizedState, ErrorState } from "./components/loadingStates";
+import { LoadingSpinner, UnauthorizedState, ErrorState } from "@/components/loadingStates";
 import EventDetailsForm from "./components/eventDetailsForm";
 import EventTabContent from "./components/eventTabContent";
 
@@ -40,7 +40,7 @@ interface IDocument {
   url: string;
 }
 
-export default function AdminEventView() {
+export default function EventDetailsView() {
   const { user, isLoaded } = useUser();
   const [authorized, setAuthorized] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
@@ -268,14 +268,14 @@ export default function AdminEventView() {
             <Button
               variant="ghost"
               onClick={() => setActiveTab("details")}
-              className={`pb-1 px-4 rounded-b-none text-md border-b-2 ${activeTab === "details" ? "border-black text-black" : "border-transparent text-gray-500 hover:text-black hover:border-gray-300"}`}
+              className={`pb-1 px-4 rounded-b-none text-md border-b-2 text-lg ${activeTab === "details" ? "border-black text-black" : "border-transparent text-gray-500 hover:text-black hover:border-gray-300"}`}
             >
               Event Details
             </Button>
             <Button
               variant="ghost"
               onClick={() => setActiveTab("documents")}
-              className={`pb-1 px-4 rounded-b-none text-md border-b-2 ${activeTab === "documents" ? "border-black text-black" : "border-transparent text-gray-500 hover:text-black hover:border-gray-300"}`}
+              className={`pb-1 px-4 rounded-b-none text-md border-b-2 text-lg ${activeTab === "documents" ? "border-black text-black" : "border-transparent text-gray-500 hover:text-black hover:border-gray-300"}`}
             >
               Documents
             </Button>
@@ -285,21 +285,21 @@ export default function AdminEventView() {
             <div className="space-x-2 flex-shrink-0">
               {isEditing ? (
                 <>
-                  <Button className="w-[5rem] lg:w-[7rem]" variant="outline" onClick={handleSave}>
+                  <Button className="w-[5rem] lg:w-[7rem] text-lg" variant="outline" onClick={handleSave}>
                     Save
                   </Button>
-                  <Button className="w-[5rem] lg:w-[7rem]" variant="outline" onClick={handleCancel}>
+                  <Button className="w-[5rem] lg:w-[7rem] text-lg" variant="outline" onClick={handleCancel}>
                     Cancel
                   </Button>
+                  {/* <Button className="w-[5rem] lg:w-[7rem]" variant="outline">
+                    Upload
+                  </Button> */}
                 </>
               ) : (
-                <Button className="w-[5rem] lg:w-[7rem]" variant="outline" onClick={handleEditClick}>
+                <Button className="w-[5rem] lg:w-[7rem] text-lg" variant="outline" onClick={handleEditClick}>
                   Edit
                 </Button>
               )}
-              <Button className="w-[5rem] lg:w-[7rem]" variant="outline">
-                Upload
-              </Button>
             </div>
           )}
         </div>

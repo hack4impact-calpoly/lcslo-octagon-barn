@@ -26,30 +26,31 @@ export default function EventDetailsForm({ eventData, onUpdateField, venueOption
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* Event Name */}
         <div>
-          <label htmlFor="eventName" className="block text-sm font-medium mb-1">
+          <label htmlFor="eventName" className="block text-base font-medium mb-1">
             Event Name
           </label>
           <Input
             id="eventName"
             value={eventData.eventName}
             onChange={(e) => onUpdateField("eventName", e.target.value)}
+            className="md:text-base"
           />
         </div>
         {/* Venue */}
         <div>
-          <label htmlFor="venue" className="block text-sm font-medium mb-1">
+          <label htmlFor="venue" className="block text-base font-medium mb-1">
             Venue
           </label>
           <Select
             value={eventData.venue}
             onValueChange={(value) => onUpdateField("venue", value as IEventFrontend["venue"])}
           >
-            <SelectTrigger id="venue">
+            <SelectTrigger id="venue" className="text-base">
               <SelectValue placeholder="Select venue" />
             </SelectTrigger>
             <SelectContent>
               {venueOptions.map((option) => (
-                <SelectItem key={option} value={option}>
+                <SelectItem key={option} value={option} className="text-base">
                   {option}
                 </SelectItem>
               ))}
@@ -58,7 +59,7 @@ export default function EventDetailsForm({ eventData, onUpdateField, venueOption
         </div>
         {/* Start Date */}
         <div>
-          <label htmlFor="eventDateStart" className="block text-sm font-medium mb-1">
+          <label htmlFor="eventDateStart" className="block text-base font-medium mb-1">
             Start Date
           </label>
           <Input
@@ -66,11 +67,12 @@ export default function EventDetailsForm({ eventData, onUpdateField, venueOption
             type="date"
             value={formatDateForInput(eventData.eventDateStart)}
             onChange={(e) => onUpdateField("eventDateStart", updateDatePart(eventData.eventDateStart, e.target.value))}
+            className="md:text-base"
           />
         </div>
         {/* End Date */}
         <div>
-          <label htmlFor="eventDateEnd" className="block text-sm font-medium mb-1">
+          <label htmlFor="eventDateEnd" className="block text-base font-medium mb-1">
             End Date
           </label>
           <Input
@@ -78,11 +80,12 @@ export default function EventDetailsForm({ eventData, onUpdateField, venueOption
             type="date"
             value={formatDateForInput(eventData.eventDateEnd)}
             onChange={(e) => onUpdateField("eventDateEnd", updateDatePart(eventData.eventDateEnd, e.target.value))}
+            className="md:text-base"
           />
         </div>
         {/* Start Time */}
         <div>
-          <label htmlFor="eventStartTime" className="block text-sm font-medium mb-1">
+          <label htmlFor="eventStartTime" className="block text-base font-medium mb-1">
             Start Time
           </label>
           <Input
@@ -90,11 +93,12 @@ export default function EventDetailsForm({ eventData, onUpdateField, venueOption
             type="time"
             value={formatTimeForInput(eventData.eventDateStart)}
             onChange={(e) => onUpdateField("eventDateStart", updateTimePart(eventData.eventDateStart, e.target.value))}
+            className="md:text-base"
           />
         </div>
         {/* End Time */}
         <div>
-          <label htmlFor="eventEndTime" className="block text-sm font-medium mb-1">
+          <label htmlFor="eventEndTime" className="block text-base font-medium mb-1">
             End Time
           </label>
           <Input
@@ -102,29 +106,32 @@ export default function EventDetailsForm({ eventData, onUpdateField, venueOption
             type="time"
             value={formatTimeForInput(eventData.eventDateEnd)}
             onChange={(e) => onUpdateField("eventDateEnd", updateTimePart(eventData.eventDateEnd, e.target.value))}
+            className="md:text-base"
           />
         </div>
         {/* Number of Guests */}
         <div>
-          <label htmlFor="numGuests" className="block text-sm font-medium mb-1">
+          <label htmlFor="numGuests" className="block text-base font-medium mb-1">
             Number of Guests
           </label>
           <Input
             id="numGuests"
             type="number"
             value={eventData.numGuests}
-            onChange={(e) => onUpdateField("numGuests", parseInt(e.target.value, 10) || 0)}
+            onChange={(e) => onUpdateField("numGuests", parseInt(e.target.value, 10))}
+            className="md:text-base"
           />
         </div>
         {/* Header Image URL */}
         <div>
-          <label htmlFor="headerImageUrl" className="block text-sm font-medium mb-1">
+          <label htmlFor="headerImageUrl" className="block text-base font-medium mb-1">
             Header Image URL
           </label>
           <Input
             id="headerImageUrl"
             value={eventData.headerImageUrl || ""}
             onChange={(e) => onUpdateField("headerImageUrl", e.target.value)}
+            className="md:text-base"
           />
         </div>
       </div>

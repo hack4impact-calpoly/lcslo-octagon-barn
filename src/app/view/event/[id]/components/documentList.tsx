@@ -19,7 +19,7 @@ interface DocumentListProps {
 export default function DocumentList({ documents, isEditing, isAdmin, onRemoveDocument }: DocumentListProps) {
   return (
     <div className="space-y-3">
-      <h4 className="text-sm font-medium">Documents:</h4>
+      <h4 className="text-base font-medium">Additional Documents:</h4>
       {documents.map((doc, index) => (
         <div key={index} className="flex items-center">
           <FontAwesomeIcon icon={faFile} className="mr-3 text-gray-600" />

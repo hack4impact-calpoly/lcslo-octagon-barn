@@ -18,7 +18,7 @@ export default function EventDisplay({
   return (
     <div className="space-y-4 bg-gray-200 p-4 rounded-lg shadow-md border border-gray-300">
       <div>
-        <label htmlFor="eventDetailsDisplay" className="block text-sm font-medium mb-1">
+        <label htmlFor="eventDetailsDisplay" className="block text-base font-medium mb-1">
           Event Details:
         </label>
         {isEditing && isAdmin ? (
@@ -27,16 +27,16 @@ export default function EventDisplay({
             value={eventDetails}
             onChange={(e) => onUpdateField("eventDetails", e.target.value)}
             rows={4}
-            className="resize-none"
+            className="resize-none md:text-base"
           />
         ) : (
-          <p id="eventDetailsDisplay" className="text-sm">
+          <p id="eventDetailsDisplay" className="text-base whitespace-pre-line">
             {eventDetails}
           </p>
         )}
       </div>
       <div>
-        <label htmlFor="vendorListDisplay" className="block text-sm font-medium mb-1">
+        <label htmlFor="vendorListDisplay" className="block text-base font-medium mb-1">
           Vendor List:
         </label>
         {isEditing && isAdmin ? (
@@ -45,10 +45,10 @@ export default function EventDisplay({
             value={vendorList}
             onChange={(e) => onUpdateField("vendorList", e.target.value)}
             rows={4}
-            className="resize-none"
+            className="resize-none md:text-base"
           />
         ) : (
-          <p id="vendorListDisplay" className="text-sm">
+          <p id="vendorListDisplay" className="text-base whitespace-pre-line">
             {vendorList}
           </p>
         )}
