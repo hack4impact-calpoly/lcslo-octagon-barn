@@ -353,16 +353,16 @@ export default function AdminEventView() {
             </div>
           </div>
         ) : (
-          // Display Event Tile using updated field names
           <EventTile
             id={eventId}
             eventName={eventData.eventName}
-            eventDate={eventData.eventDateStart}
+            eventDateStart={eventData.eventDateStart}
+            eventDateEnd={eventData.eventDateEnd}
             venue={eventData.venue}
-            attendees={eventData.numGuests}
-            documentsCompleted={eventData.docsCompleted}
-            totalDocuments={eventData.docsTotal}
-            imageSrc={eventData.headerImageUrl || "/octagon_barn_plaza.jpg"}
+            numGuests={eventData.numGuests}
+            docsCompleted={eventData.docsCompleted}
+            docsTotal={eventData.docsTotal}
+            imageSrc={eventData.headerImageUrl || ""}
             variant="detail"
           />
         )}

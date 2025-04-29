@@ -21,7 +21,7 @@ export async function GET() {
       createdAt: event.createdAt,
       docsTotal: event.docsTotal,
       docsCompleted: event.docsCompleted,
-      numGuests: event.numPeople,
+      numGuests: event.numGuests,
     }));
     return createSuccessResponse(sanitizedEvents, 200);
   } catch {
