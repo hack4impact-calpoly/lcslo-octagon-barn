@@ -12,6 +12,7 @@ module.exports = {
       },
       colors: {
         "basic-blue": "#3A6F8F",
+        "hover-blue": "#338cc2",
       },
     },
   },

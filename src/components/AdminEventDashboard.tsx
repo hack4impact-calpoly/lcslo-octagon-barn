@@ -8,8 +8,19 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Table, TableHeader, TableHead, TableBody, TableRow, TableCell } from "@/components/ui/table";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
+import {
+  Pagination as Pager,
+  PaginationPrevious,
+  PaginationNext,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationEllipsis,
+} from "@/components/ui/pagination";
+import { cn } from "@/lib/utils";
 
 interface EventRow {
+  clerkId: string;
   id: string;
   eventName: string;
   eventDateStart: string;
@@ -24,6 +35,8 @@ export default function AdminEventDashboard() {
   const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(false);
   const [sortConfig, setSortConfig] = useState<{ key: keyof EventRow; direction: "asc" | "desc" } | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 10;
 
   const requestSort = (key: keyof EventRow) => {
     let direction: "asc" | "desc" = "asc";
@@ -45,8 +58,19 @@ export default function AdminEventDashboard() {
       .finally(() => setLoading(false));
   }, [isLoaded, isAdmin]);
 
-  const filtered = useMemo(() => {
+  const filtered = useMemo<EventRow[]>(() => {
     let result = events.filter((e) => e.eventName.toLowerCase().includes(searchTerm.toLowerCase()));
+
+    const statusOrder = ["Upcoming", "Ongoing", "Completed", "Cancelled"];
+    if (!sortConfig) {
+      result = [...result].sort((a, b) => {
+        const statusDiff = statusOrder.indexOf(a.status) - statusOrder.indexOf(b.status);
+        if (statusDiff !== 0) return statusDiff;
+        // tie-break by start date ascending
+        return new Date(a.eventDateStart).getTime() - new Date(b.eventDateStart).getTime();
+      });
+      return result;
+    }
 
     if (sortConfig) {
       result = [...result].sort((a, b) => {
@@ -63,10 +87,13 @@ export default function AdminEventDashboard() {
         const bStr = String(bVal);
         return direction === "asc" ? aStr.localeCompare(bStr) : bStr.localeCompare(aStr);
       });
+      return result;
     }
-
     return result;
   }, [events, searchTerm, sortConfig]);
+
+  const totalPages = Math.ceil(filtered.length / pageSize);
+  const paginated = filtered.slice((currentPage - 1) * pageSize, currentPage * pageSize);
 
   const updateStatus = async (id: string, status: EventRow["status"]) => {
     await fetch(`/api/event/${id}`, {
@@ -84,7 +111,7 @@ export default function AdminEventDashboard() {
   };
 
   if (!isLoaded) {
-    return <p className="text-center text-gray-500 text-lg">Loading ...</p>;
+    return <p className="text-center text-gray-500 text-sm">Loading ...</p>;
   }
   if (!isAdmin) {
     return <p className="text-red-500">Unauthorized</p>;
@@ -97,7 +124,7 @@ export default function AdminEventDashboard() {
           placeholder="Search for an event"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.currentTarget.value)}
-          className="max-w-sm py-2 md:text-lg placeholder:text-lg ml-auto"
+          className="max-w-sm py-2 md:text-sm placeholder:text-sm ml-auto"
         />
       </div>
 
@@ -105,50 +132,45 @@ export default function AdminEventDashboard() {
         <TableHeader>
           <TableRow>
             <TableHead
-              className="cursor-pointer text-center text-lg text-black"
+              className="cursor-pointer text-center text-sm text-black"
               onClick={() => requestSort("eventName")}
             >
               Event Name {sortConfig?.key === "eventName" ? (sortConfig.direction === "asc" ? "▲" : "▼") : ""}
             </TableHead>
+            <TableHead className="cursor-pointer text-center text-sm text-black">Client Name</TableHead>
             <TableHead
-              className="cursor-pointer text-center text-lg text-black"
+              className="cursor-pointer text-center text-sm text-black"
               onClick={() => requestSort("eventDateStart")}
             >
               Start Date {sortConfig?.key === "eventDateStart" ? (sortConfig.direction === "asc" ? "▲" : "▼") : ""}
             </TableHead>
-            <TableHead
-              className="cursor-pointer text-center text-lg text-black"
-              onClick={() => requestSort("eventDateEnd")}
-            >
-              End Date {sortConfig?.key === "eventDateEnd" ? (sortConfig.direction === "asc" ? "▲" : "▼") : ""}
-            </TableHead>
-            <TableHead className="text-center cursor-pointer text-lg text-black" onClick={() => requestSort("status")}>
+            <TableHead className="text-center cursor-pointer text-sm text-black" onClick={() => requestSort("status")}>
               Status {sortConfig?.key === "status" ? (sortConfig.direction === "asc" ? "▲" : "▼") : ""}
             </TableHead>
-            <TableHead className="text-center text-lg text-black">View</TableHead>
-            <TableHead className="text-center text-lg text-black">Delete</TableHead>
+            <TableHead className="text-center text-sm text-black">View</TableHead>
+            <TableHead className="text-center text-sm text-black">Delete</TableHead>
           </TableRow>
         </TableHeader>
         {/* TODO: Fix styling of loading and no events found*/}
         <TableBody>
           {loading ? (
             <p></p>
-          ) : filtered.length === 0 ? (
-            <p className="text-center text-gray-500 text-lg">No events found</p>
+          ) : paginated.length === 0 ? (
+            <p className="text-center text-gray-500 text-sm">No events found</p>
           ) : (
-            filtered.map((e) => (
+            paginated.map((e) => (
               <TableRow key={e.id}>
-                <TableCell className="!text-center text-lg">{e.eventName}</TableCell>
-                <TableCell className="!text-center text-lg">{new Date(e.eventDateStart).toLocaleString()}</TableCell>
-                <TableCell className="!text-center text-lg">{new Date(e.eventDateEnd).toLocaleString()}</TableCell>
+                <TableCell className="!text-center text-sm">{e.eventName}</TableCell>
+                <TableCell className="!text-center text-sm">{e.clerkId}</TableCell>
+                <TableCell className="!text-center text-sm">{new Date(e.eventDateStart).toLocaleString()}</TableCell>
                 <TableCell className="!text-center">
                   <Select value={e.status} onValueChange={(val) => updateStatus(e.id, val as EventRow["status"])}>
-                    <SelectTrigger className="mx-auto justify-center text-lg">
+                    <SelectTrigger className="mx-auto justify-center text-sm">
                       <SelectValue className="text-center" />
                     </SelectTrigger>
                     <SelectContent>
                       {["Upcoming", "Ongoing", "Completed", "Cancelled"].map((s) => (
-                        <SelectItem key={s} value={s} className="text-lg">
+                        <SelectItem key={s} value={s} className="text-sm">
                           {s}
                         </SelectItem>
                       ))}
@@ -158,7 +180,7 @@ export default function AdminEventDashboard() {
                 <TableCell className="!text-center">
                   <Link
                     href={`/view/event/${e.id}`}
-                    className="bg-basic-blue text-white text-lg hover:text-black px-6 py-3 rounded-full"
+                    className="bg-basic-blue text-white text-sm hover:bg-hover-blue px-6 py-3 rounded-full"
                   >
                     View Event
                   </Link>
@@ -175,8 +197,39 @@ export default function AdminEventDashboard() {
       </Table>
       <div className="flex justify-end mt-4">
         <Link href="/create-event">
-          <Button className="w-48 bg-basic-blue text-white hover:bg-basic-blue">Create Event</Button>
+          <Button className="px-10 py-6 text-base bg-basic-blue text-white hover:bg-hover-blue rounded-full">
+            Create Event
+          </Button>
         </Link>
+      </div>
+      <div className="flex justify-center mt-4">
+        <Pager>
+          <PaginationPrevious
+            onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+            aria-disabled={currentPage === 1}
+            className={cn(currentPage === 1 && "pointer-events-none opacity-50")}
+          >
+            Previous
+          </PaginationPrevious>
+          <PaginationContent>
+            {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+              <PaginationItem key={page}>
+                {page === currentPage ? (
+                  <PaginationLink isActive>{page}</PaginationLink>
+                ) : page === 1 || page === totalPages || Math.abs(page - currentPage) <= 1 ? (
+                  <PaginationLink onClick={() => setCurrentPage(page)}>{page}</PaginationLink>
+                ) : page === currentPage - 2 || page === currentPage + 2 ? (
+                  <PaginationEllipsis />
+                ) : null}
+              </PaginationItem>
+            ))}
+          </PaginationContent>
+          <PaginationNext
+            onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+            aria-disabled={currentPage === totalPages}
+            className={cn(currentPage === totalPages && "pointer-events-none opacity-50")}
+          />
+        </Pager>
       </div>
     </div>
   );
