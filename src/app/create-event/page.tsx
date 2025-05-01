@@ -106,10 +106,8 @@ export default function CreateEventPage() {
         return;
       }
 
-      const data = await response.json();
-      console.log("Event created:", data);
-
-      sessionStorage.removeItem("eventFormData");
+      sessionStorage.removeItem("eventForm");
+      sessionStorage.removeItem("assignedUser");
       router.push("/");
     } catch (err) {
       console.error("Unexpected error:", err);
@@ -143,7 +141,7 @@ export default function CreateEventPage() {
         <div className="flex space-x-2">
           <Select key={venue} value={venue} onValueChange={(value) => setVenue(value)}>
             <SelectTrigger
-              className={`w-1/2 bg-[var(--primary-fill)] text-base data-[placeholder]:text-[var(--primary-blue)] data-[placeholder]:text-base ${errors.venue ? "border-red-500" : ""}`}
+              className={`w-1/2 bg-[var(--primary-fill)] text-lg data-[placeholder]:text-[var(--primary-blue)] data-[placeholder]:text-lg ${errors.venue ? "border-red-500" : ""}`}
             >
               <SelectValue placeholder="Venue" />
             </SelectTrigger>
@@ -207,7 +205,7 @@ export default function CreateEventPage() {
               <span className="text-sm text-gray-500">{user.email}</span>
             </div>
           ) : (
-            <span className="text-[var(--primary-blue)">User</span>
+            <span className="text-[var(--primary-blue)">No User Assigned</span>
           )}
         </div>
 
