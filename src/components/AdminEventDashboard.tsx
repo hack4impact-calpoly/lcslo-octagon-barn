@@ -118,6 +118,9 @@ export default function AdminEventDashboard() {
 
   return (
     <div className="space-y-6">
+      <div className="flex justify-center items-center text-3xl text-[var(--primary-blue)] rounded-l font-bold mb-4">
+        Events
+      </div>
       <div className="flex items-center">
         <Input
           placeholder="Search for an event"
