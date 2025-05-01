@@ -34,11 +34,13 @@ const EventTile: React.FC<EventTileProps> = ({
 
   // Format the event date (e.g., "2025-02-28") and time (e.g., "11:00")
   const formatDate = (date: Date) =>
-    date.toLocaleDateString("en-CA", { year: "numeric", month: "2-digit", day: "2-digit" });
-  const formatTime = (date: Date) => date.toLocaleTimeString("en-IE", { hour: "2-digit", minute: "2-digit" });
+    date.toLocaleDateString("en-US", { month: "2-digit", day: "2-digit", year: "numeric" });
+  const formatTime = (date: Date) =>
+    date.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", hour12: true });
 
   // Combine date and time for display.
-  const formattedDateRange = `${formatDate(eventDateStart)} ${formatTime(eventDateStart)} - ${formatTime(eventDateEnd)}`;
+  const formattedDateStart = `${formatDate(eventDateStart)} ${formatTime(eventDateStart)}`;
+  const formattedDateEnd = `${formatDate(eventDateEnd)} ${formatTime(eventDateEnd)}`;
 
   // Logic for determining the image source based on the venue or user-provided image
   const getImageSrc = () => {
@@ -70,7 +72,7 @@ const EventTile: React.FC<EventTileProps> = ({
     <div
       className={containerClasses}
       onClick={handleClick}
-      aria-label={variant === "list" ? `View details for ${eventName} on ${formattedDateRange}` : undefined}
+      aria-label={variant === "list" ? `View details for ${eventName}` : undefined}
     >
       {/* Background Image */}
       <Image
@@ -90,7 +92,10 @@ const EventTile: React.FC<EventTileProps> = ({
           <h3 className="text-2xl font-bold px-1 py-1">{eventName}</h3>
           <div className="flex flex-col items-start gap-1 px-1 py-1">
             <p className="text-lg flex items-center gap-2">
-              <Calendar size={18} /> {formattedDateRange}
+              <Calendar size={18} /> Start: {formattedDateStart}
+            </p>
+            <p className="text-lg flex items-center gap-2">
+              <Calendar size={18} /> End: {formattedDateEnd}
             </p>
             <p className="text-lg flex items-center gap-2">
               <MapPin size={18} /> {venue || "Not Available"}
