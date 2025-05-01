@@ -25,7 +25,7 @@ const HandleAssignUser = (row: User) => {
 export const columns: ColumnDef<User>[] = [
   {
     accessorKey: "name",
-    header: "Client name",
+    header: "Client Name",
   },
   {
     accessorKey: "email",
@@ -37,12 +37,11 @@ export const columns: ColumnDef<User>[] = [
   },
   {
     id: "actions",
-    header: "Action",
     cell: ({ row }) => {
       return (
         <Button
           style={{ backgroundColor: "#3A6F8F" }}
-          className="text-white w-full px-2 py-1 text-lg rounded"
+          className="text-white w-full px-2 py-1 text-lg rounded flex justify-center items-center"
           onClick={() => {
             HandleAssignUser(row.original);
             window.location.href = "/create-event";

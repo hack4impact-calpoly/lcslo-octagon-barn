@@ -46,13 +46,16 @@ export default function Page() {
 
   return (
     <div className="container mx-auto py-10">
+      <div className="flex justify-center items-center text-3xl text-[var(--primary-blue)] rounded-l font-bold mb-4">
+        Clients
+      </div>
       <div className="flex items-center justify-between py-5">
         <Input
           type="text"
-          placeholder="Search users..."
+          placeholder="Search for clients"
           value={searchItem}
           onChange={(e) => setSearchItem(e.target.value)}
-          className="w-[500px] text-2xl placeholder:text-xl pxd"
+          className="w-[500px] md:text-lg placeholder:text-lg pxd"
         />
       </div>
       <DataTable columns={columns} data={data} />
