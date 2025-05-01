@@ -285,10 +285,10 @@ export default function EventDetailsView() {
             <div className="space-x-2 flex-shrink-0">
               {isEditing ? (
                 <>
-                  <Button className="w-[5rem] lg:w-[7rem] text-lg" variant="outline" onClick={handleSave}>
+                  <Button className="w-[5rem] lg:w-[7rem] text-base" variant="outline" onClick={handleSave}>
                     Save
                   </Button>
-                  <Button className="w-[5rem] lg:w-[7rem] text-lg" variant="outline" onClick={handleCancel}>
+                  <Button className="w-[5rem] lg:w-[7rem] text-base" variant="outline" onClick={handleCancel}>
                     Cancel
                   </Button>
                   {/* <Button className="w-[5rem] lg:w-[7rem]" variant="outline">
@@ -296,7 +296,7 @@ export default function EventDetailsView() {
                   </Button> */}
                 </>
               ) : (
-                <Button className="w-[5rem] lg:w-[7rem] text-lg" variant="outline" onClick={handleEditClick}>
+                <Button className="w-[5rem] lg:w-[7rem] text-base" variant="outline" onClick={handleEditClick}>
                   Edit
                 </Button>
               )}

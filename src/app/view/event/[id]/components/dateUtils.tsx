@@ -1,3 +1,5 @@
+import { time } from "node:console";
+
 // date formatting
 export const formatDateForInput = (date: Date): string => {
   if (!date || !(date instanceof Date) || isNaN(date.getTime())) {
@@ -24,10 +26,8 @@ export const updateDatePart = (currentDate: Date, newDateString: string): Date =
   if (!currentDate || !(currentDate instanceof Date) || isNaN(currentDate.getTime()) || !newDateString) {
     return currentDate;
   }
-  const timePart = currentDate.toTimeString().split(" ")[0]; // HH:MM:SS
-  const [hours, minutes, seconds] = (timePart + ":00").split(":");
-  const formattedTime = `${hours}:${minutes}:${seconds}`;
-  return new Date(`${newDateString}T${formattedTime}`);
+  const [year, month, day] = newDateString.split("-").map(Number);
+  return new Date(year, month - 1, day, currentDate.getHours(), currentDate.getMinutes(), currentDate.getSeconds());
 };
 
 // just ensure the time is good
@@ -35,7 +35,6 @@ export const updateTimePart = (currentDate: Date, newTimeString: string): Date =
   if (!currentDate || !(currentDate instanceof Date) || isNaN(currentDate.getTime()) || !newTimeString) {
     return currentDate;
   }
-  const datePart = currentDate.toISOString().split("T")[0];
-  const timeWithSeconds = newTimeString.split(":").length === 2 ? `${newTimeString}:00` : newTimeString;
-  return new Date(`${datePart}T${timeWithSeconds}`);
+  const [hour, minutes, seconds = 0] = newTimeString.split(":").map(Number);
+  return new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate(), hour, minutes, seconds);
 };
