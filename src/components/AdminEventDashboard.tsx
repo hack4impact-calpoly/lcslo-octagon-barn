@@ -32,6 +32,7 @@ export default function AdminEventDashboard() {
   const { user, isLoaded } = useUser();
   const isAdmin = user?.publicMetadata?.isAdmin === true;
   const [events, setEvents] = useState<EventRow[]>([]);
+  const [clientNames, setClientNames] = useState<Record<string, string>>({});
   const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(false);
   const [sortConfig, setSortConfig] = useState<{ key: keyof EventRow; direction: "asc" | "desc" } | null>(null);
@@ -49,13 +50,35 @@ export default function AdminEventDashboard() {
   useEffect(() => {
     if (!isLoaded || !isAdmin) return;
     setLoading(true);
-    fetch("/api/event")
-      .then((res) => res.json())
-      .then((json) => {
-        const list = Array.isArray(json) ? json : json.data;
-        setEvents(list ?? []);
-      })
-      .finally(() => setLoading(false));
+
+    async function fetchEventsAndNames() {
+      const res = await fetch("/api/event");
+      const json = (await res.json()) as { data: EventRow[] } | EventRow[];
+      const list: EventRow[] = Array.isArray(json) ? json : json.data;
+      setEvents(list);
+
+      const ids = Array.from(new Set(list.map((e) => e.clerkId)));
+      const pairs = await Promise.all(
+        ids.map(async (id: string) => {
+          const r = await fetch(`/api/user/${id}`);
+          const userRes = await r.json();
+          const first = userRes.firstName ?? "";
+          const last = userRes.lastName ?? "";
+          const name = [first, last].filter(Boolean).join(" ").trim() || "Name Not Found";
+          return { id, name };
+        }),
+      );
+
+      const map: Record<string, string> = {};
+      pairs.forEach(({ id, name }) => {
+        map[id] = name;
+      });
+      setClientNames(map);
+
+      setLoading(false);
+    }
+
+    fetchEventsAndNames();
   }, [isLoaded, isAdmin]);
 
   const filtered = useMemo<EventRow[]>(() => {
@@ -162,7 +185,7 @@ export default function AdminEventDashboard() {
             paginated.map((e) => (
               <TableRow key={e.id}>
                 <TableCell className="!text-center text-sm">{e.eventName}</TableCell>
-                <TableCell className="!text-center text-sm">{e.clerkId}</TableCell>
+                <TableCell className="!text-center text-sm">{clientNames[e.clerkId] ?? e.clerkId}</TableCell>
                 <TableCell className="!text-center text-sm">{new Date(e.eventDateStart).toLocaleString()}</TableCell>
                 <TableCell className="!text-center">
                   <Select value={e.status} onValueChange={(val) => updateStatus(e.id, val as EventRow["status"])}>
