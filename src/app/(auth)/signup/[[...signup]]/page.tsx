@@ -7,7 +7,6 @@ import { useRouter } from "next/navigation";
 interface FormValues {
   firstName: string;
   lastName: string;
-  organization: string;
   email: string;
   password: string;
 }
@@ -18,7 +17,6 @@ const SignUpPage: React.FC = () => {
   const [formValues, setFormValues] = useState<FormValues>({
     firstName: "",
     lastName: "",
-    organization: "",
     email: "",
     password: "",
   });
@@ -39,7 +37,6 @@ const SignUpPage: React.FC = () => {
 
     if (!formValues.firstName.trim()) newErrors.firstName = "First name is required";
     if (!formValues.lastName.trim()) newErrors.lastName = "Last name is required";
-    if (!formValues.organization.trim()) newErrors.organization = "Organization is required";
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!formValues.email.trim()) {
@@ -96,16 +93,24 @@ const SignUpPage: React.FC = () => {
   return (
     <div className="relative w-full min-h-screen overflow-hidden">
       <div className="absolute inset-0">
-        <Image src="/auth_background.png" alt="Background" fill className="object-cover filter blur-sm" />
+        <Image
+          src="/auth_background.png"
+          alt="Background"
+          fill
+          className="object-cover filter blur-sm"
+        />
       </div>
 
       <div className="relative flex items-center justify-center min-h-[85vh]">
         <div className="bg-white/80 shadow-lg rounded-lg p-8 w-full max-w-4xl">
-          <h2 className="text-2xl font-bold text-center mb-6 text-basic-blue">Create Account</h2>
+          <h2 className="text-2xl font-bold text-center mb-6 text-basic-blue">
+            Create Account
+          </h2>
 
           {apiError && <p className="text-red-500 text-center">{apiError}</p>}
 
           <form onSubmit={handleSubmit} className="grid grid-cols-2 gap-4" noValidate>
+            {/* First Name */}
             <div className="col-span-1">
               <label className="block mb-1 font-medium text-basic-blue">First Name</label>
               <input
@@ -117,9 +122,12 @@ const SignUpPage: React.FC = () => {
                   errors.firstName ? "border-red-500" : "border-sky-600"
                 } focus:outline-none focus:border-sky-500`}
               />
-              {errors.firstName && <p className="text-red-500 text-sm mt-1">{errors.firstName}</p>}
+              {errors.firstName && (
+                <p className="text-red-500 text-sm mt-1">{errors.firstName}</p>
+              )}
             </div>
 
+            {/* Last Name */}
             <div className="col-span-1">
               <label className="block mb-1 font-medium text-basic-blue">Last Name</label>
               <input
@@ -131,23 +139,12 @@ const SignUpPage: React.FC = () => {
                   errors.lastName ? "border-red-500" : "border-sky-600"
                 } focus:outline-none focus:border-sky-500`}
               />
-              {errors.lastName && <p className="text-red-500 text-sm mt-1">{errors.lastName}</p>}
+              {errors.lastName && (
+                <p className="text-red-500 text-sm mt-1">{errors.lastName}</p>
+              )}
             </div>
 
-            <div className="col-span-2">
-              <label className="block mb-1 font-medium text-basic-blue">Organization</label>
-              <input
-                type="text"
-                name="organization"
-                value={formValues.organization}
-                onChange={handleChange}
-                className={`w-full px-3 py-2 border rounded ${
-                  errors.organization ? "border-red-500" : "border-sky-600"
-                } focus:outline-none focus:border-sky-500`}
-              />
-              {errors.organization && <p className="text-red-500 text-sm mt-1">{errors.organization}</p>}
-            </div>
-
+            {/* Email */}
             <div className="col-span-2">
               <label className="block mb-1 font-medium text-basic-blue">Email Address</label>
               <input
@@ -162,6 +159,7 @@ const SignUpPage: React.FC = () => {
               {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email}</p>}
             </div>
 
+            {/* Password */}
             <div className="col-span-2">
               <label className="block mb-1 font-medium text-basic-blue">Password</label>
               <div className="relative">
@@ -182,9 +180,12 @@ const SignUpPage: React.FC = () => {
                   {showPassword ? "Hide" : "Show"}
                 </button>
               </div>
-              {errors.password && <p className="text-red-500 text-sm mt-1">{errors.password}</p>}
+              {errors.password && (
+                <p className="text-red-500 text-sm mt-1">{errors.password}</p>
+              )}
             </div>
 
+            {/* Submit */}
             <div className="col-span-2 mt-2 text-center">
               <button
                 type="submit"
