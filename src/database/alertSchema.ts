@@ -13,7 +13,11 @@ type IAlert = Document & {
 const AlertSchema = new Schema<IAlert>({
   eventId: { type: Schema.Types.ObjectId, ref: "Event", required: true },
   alertDateTime: { type: Date, required: true },
-  updateType: { type: String, enum: ["Event", "DocReupload", "DocUpload", "DocApproval"], required: true },
+  updateType: {
+    type: String,
+    enum: ["Event", "DocUpload", "DocReupload", "DocApproval", "DocRejected"],
+    required: true,
+  },
   descriptor: { type: String, required: true },
   alertFrom: { type: String, required: true },
   alertTo: { type: String, required: true },
