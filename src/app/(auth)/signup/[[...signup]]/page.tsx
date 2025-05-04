@@ -72,20 +72,37 @@ const SignUpPage: React.FC = () => {
       const response = await fetch("/api/user/create", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formValues),
+        body: JSON.stringify({
+          firstName: formValues.firstName,
+          lastName: formValues.lastName,
+          email: formValues.email,
+          password: formValues.password,
+        }),
       });
 
       const result = await response.json();
+
       if (!response.ok) {
         if (response.status === 409) {
           setApiError("User already exists. Please sign in instead.");
         } else {
           setApiError(result.error || "Failed to create user");
         }
-        throw new Error(result.error);
+        throw new Error(result.error || "Unknown signup error");
       }
 
-      router.push("/");
+      // store user in session storage
+      sessionStorage.setItem(
+        "assignedUser",
+        JSON.stringify({
+          id: result.userId,
+          email: formValues.email,
+          name: `${formValues.firstName} ${formValues.lastName}`,
+        }),
+      );
+
+      //redirect back to create event page
+      router.push("/create-event");
     } catch (error: any) {
       console.error("Sign up error:", error.message);
     } finally {
@@ -192,6 +209,16 @@ const SignUpPage: React.FC = () => {
                 className="w-1/2 bg-basic-blue text-white py-2 rounded hover:bg-sky-800 transition-colors"
               >
                 {loading ? "Creating Account..." : "Create Account"}
+              </button>
+            </div>
+
+            <div className="col-span-2 mt-4 text-center">
+              <button
+                type="button"
+                onClick={() => router.push("/create-event")}
+                className="w-1/2 bg-red-500 text-white py-2 rounded hover:bg-red-700 transition-colors"
+              >
+                Cancel
               </button>
             </div>
           </form>
