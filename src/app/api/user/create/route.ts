@@ -27,6 +27,6 @@ export async function POST(req: Request) {
     return createSuccessResponse({ success: true, userId: user.id }, 200);
   } catch (error: any) {
     console.error("Clerk User Creation Error:", error);
-    return createErrorResponse("Error", error.message || "Unknown Clerk error", 400);
+    return createErrorResponse("Error", error.message || "Unknown error", 400);
   }
 }
