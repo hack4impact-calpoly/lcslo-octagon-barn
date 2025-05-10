@@ -7,10 +7,7 @@ export async function POST(req: Request) {
   try {
     const { firstName, lastName, email, password } = await req.json();
 
-    //const existingUsers = await clerk.users.getUserList({ emailAddress: email });
-    console.log("Incoming user data:", { firstName, lastName, email, password });
     const existingUsers = await clerk.users.getUserList({ emailAddress: email });
-    console.log("Existing users found:", existingUsers.length);
 
     if (existingUsers.length > 0) {
       return createErrorResponse("User exists", "User already exists. Please sign in instead.", 409);
