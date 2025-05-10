@@ -8,6 +8,7 @@ export async function POST(req: Request) {
     const { firstName, lastName, email, password } = await req.json();
 
     const existingUsers = await clerk.users.getUserList({ emailAddress: email });
+
     if (existingUsers.length > 0) {
       return createErrorResponse("User exists", "User already exists. Please sign in instead.", 409);
     }
@@ -23,6 +24,6 @@ export async function POST(req: Request) {
     return createSuccessResponse({ success: true, userId: user.id }, 200);
   } catch (error: any) {
     console.error("Clerk User Creation Error:", error);
-    return createErrorResponse("Error", error.message, 400);
+    return createErrorResponse("Error", error.message || "Unknown error", 400);
   }
 }
