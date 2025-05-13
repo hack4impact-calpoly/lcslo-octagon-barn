@@ -9,7 +9,7 @@ import { Bell, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Types } from "mongoose";
 
-// copy of AlertSchema
+// copy of alert Schema
 interface IAlert {
   _id?: string;
   eventId: Types.ObjectId;
@@ -22,14 +22,30 @@ interface IAlert {
 }
 
 export default function Navbar() {
-  const { user } = useUser();
+  const { user, isLoaded } = useUser();
+  const [authorized, setAuthorized] = useState(false);
   const [alerts, setAlerts] = useState<IAlert[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
+  const [isAdmin, setIsAdmin] = useState(false);
 
-  // Dummy data based on alert schema
   useEffect(() => {
-    // replace with fetch api
-    const dummyAlerts: IAlert[] = [
+    if (isLoaded && user) {
+      setAuthorized(true);
+      if (user.publicMetadata.isAdmin) {
+        setIsAdmin(true);
+      } else {
+        setIsAdmin(false);
+      }
+    } else if (isLoaded && !user) {
+      setAuthorized(false);
+      setIsAdmin(false);
+    }
+  }, [user, isLoaded]);
+
+  useEffect(() => {
+    if (!user?.id) return;
+    // replace with fetch (currently its dummy date hardcoded in)
+    const allDummyAlerts: IAlert[] = [
       {
         _id: new Types.ObjectId().toString(),
         eventId: new Types.ObjectId(),
@@ -37,34 +53,38 @@ export default function Navbar() {
         updateType: "DocUpload",
         descriptor: "New document uploaded for Wedding Event",
         alertFrom: "user1",
-        alertTo: user?.id || "",
+        alertTo: user.id, // User specific alert
         isRead: false,
       },
       {
         _id: new Types.ObjectId().toString(),
         eventId: new Types.ObjectId(),
-        alertDateTime: new Date(Date.now() - 24 * 60 * 60 * 1000), // 1 day ago
+        alertDateTime: new Date(Date.now() - 24 * 60 * 60 * 1000),
         updateType: "Event",
-        descriptor: "Your event is 30 days away",
+        descriptor: "Event is 30 days away",
         alertFrom: "system",
-        alertTo: user?.id || "",
+        alertTo: "user2", // Another user's alert - should only be visible to admins and user2
         isRead: false,
       },
       {
         _id: new Types.ObjectId().toString(),
         eventId: new Types.ObjectId(),
-        alertDateTime: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000), // 3 days ago
+        alertDateTime: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000),
         updateType: "DocApproval",
-        descriptor: "Your document has been approved",
-        alertFrom: "admin",
-        alertTo: user?.id || "",
+        descriptor: "Document needs approval",
+        alertFrom: "system",
+        alertTo: "user3", // Another user's alert - should only be visible to admins and user3
         isRead: true,
       },
     ];
 
-    setAlerts(dummyAlerts);
-    setUnreadCount(dummyAlerts.filter((alert) => !alert.isRead).length);
-  }, [user?.id]);
+    // If admin, show all alerts
+    // If regular user, only show alerts meant for them
+    const filteredAlerts = isAdmin ? allDummyAlerts : allDummyAlerts.filter((alert) => alert.alertTo === user.id);
+
+    setAlerts(filteredAlerts);
+    setUnreadCount(filteredAlerts.filter((alert) => !alert.isRead).length);
+  }, [user?.id, isAdmin]);
 
   const markAsRead = (alertId: string) => {
     setAlerts((prevAlerts) => prevAlerts.map((alert) => (alert._id === alertId ? { ...alert, isRead: true } : alert)));
