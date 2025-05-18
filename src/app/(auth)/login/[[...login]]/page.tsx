@@ -8,7 +8,7 @@ import React, { useState } from "react";
 export default function LoginPage() {
   const [rememberMe, setRememberMe] = useState(false);
 
-    return (
+  return (
     <div className="relative min-h-screen grid w-full flex-grow items-center bg-zinc-100 px-4 sm:justify-center">
       <Image
         src="/auth_background.png"
@@ -33,15 +33,13 @@ export default function LoginPage() {
           <SignIn.Step
             name="start"
             className="w-full space-y-8 rounded-2xl px-6 py-12 shadow-lg ring-1 ring-black/5 sm:w-[32rem] sm:px-10 backdrop-blur-md"
-            style={{ backgroundColor: "rgba(255,255,255,0.86)" }}  // big box at 86% white
+            style={{ backgroundColor: "rgba(255,255,255,0.86)" }} // big box at 86% white
           >
             <Clerk.GlobalError className="block text-sm text-red-400" />
 
             <div className="space-y-6">
               <Clerk.Field name="identifier" className="space-y-3">
-                <Clerk.Label className="text-lg font-medium text-[#3A6F8F]">
-                  Email address
-                </Clerk.Label>
+                <Clerk.Label className="text-lg font-medium text-[#3A6F8F]">Email address</Clerk.Label>
                 <Clerk.Input
                   type="email"
                   required
@@ -51,9 +49,7 @@ export default function LoginPage() {
               </Clerk.Field>
 
               <Clerk.Field name="password" className="space-y-3">
-                <Clerk.Label className="text-lg font-medium text-[#3A6F8F]">
-                  Password
-                </Clerk.Label>
+                <Clerk.Label className="text-lg font-medium text-[#3A6F8F]">Password</Clerk.Label>
                 <Clerk.Input
                   type="password"
                   required
@@ -68,15 +64,12 @@ export default function LoginPage() {
                     type="checkbox"
                     className="h-4 w-4 rounded border-[#3A6F8F] text-[#3A6F8F] focus:ring-2 focus:ring-[#3A6F8F]"
                     checked={rememberMe}
-                    onChange={e => setRememberMe(e.target.checked)}
+                    onChange={(e) => setRememberMe(e.target.checked)}
                   />
                   <span>Remember me</span>
                 </label>
 
-                <SignIn.Action
-                  navigate="forgot-password"
-                  className="text-sm text-[#B4B4B4] hover:underline"
-                >
+                <SignIn.Action navigate="forgot-password" className="text-sm text-[#B4B4B4] hover:underline">
                   Forgot password?
                 </SignIn.Action>
               </div>
@@ -96,9 +89,7 @@ export default function LoginPage() {
           >
             <SignIn.Strategy name="password">
               <Clerk.Field name="password" className="space-y-3">
-                <Clerk.Label className="text-lg font-medium text-zinc-950">
-                  Password
-                </Clerk.Label>
+                <Clerk.Label className="text-lg font-medium text-zinc-950">Password</Clerk.Label>
                 <Clerk.Input
                   type="password"
                   required
@@ -122,12 +113,8 @@ export default function LoginPage() {
               </p>
 
               <Clerk.Field name="code" className="space-y-3">
-                <Clerk.Label className="text-lg font-medium text-zinc-950">
-                  Email Code
-                </Clerk.Label>
-                <Clerk.Input
-                  className="w-full rounded-md bg-white px-4 py-3 text-lg outline-none ring-1 ring-inset ring-zinc-300 hover:ring-zinc-400 focus:ring-2 focus:ring-zinc-950 data-[invalid]:ring-red-400"
-                />
+                <Clerk.Label className="text-lg font-medium text-zinc-950">Email Code</Clerk.Label>
+                <Clerk.Input className="w-full rounded-md bg-white px-4 py-3 text-lg outline-none ring-1 ring-inset ring-zinc-300 hover:ring-zinc-400 focus:ring-2 focus:ring-zinc-950 data-[invalid]:ring-red-400" />
                 <Clerk.FieldError className="block text-sm text-red-400" />
               </Clerk.Field>
 
@@ -161,22 +148,14 @@ export default function LoginPage() {
             className="w-full space-y-8 rounded-2xl px-6 py-12 shadow-lg ring-1 ring-black/5 sm:w-[32rem] sm:px-10 backdrop-blur-md bg-white/50"
           >
             <Clerk.Field name="password">
-              <Clerk.Label className="text-lg font-medium text-zinc-950">
-                New password
-              </Clerk.Label>
-              <Clerk.Input
-                className="w-full rounded-md bg-white px-4 py-3 text-lg outline-none ring-1 ring-inset ring-zinc-300 hover:ring-zinc-400 focus:ring-2 focus:ring-zinc-950 data-[invalid]:ring-red-400"
-              />
+              <Clerk.Label className="text-lg font-medium text-zinc-950">New password</Clerk.Label>
+              <Clerk.Input className="w-full rounded-md bg-white px-4 py-3 text-lg outline-none ring-1 ring-inset ring-zinc-300 hover:ring-zinc-400 focus:ring-2 focus:ring-zinc-950 data-[invalid]:ring-red-400" />
               <Clerk.FieldError />
             </Clerk.Field>
 
             <Clerk.Field name="confirmPassword">
-              <Clerk.Label className="text-lg font-medium text-zinc-950">
-                Confirm password
-              </Clerk.Label>
-              <Clerk.Input
-                className="w-full rounded-md bg-white px-4 py-3 text-lg outline-none ring-1 ring-inset ring-zinc-300 hover:ring-zinc-400 focus:ring-2 focus:ring-zinc-950 data-[invalid]:ring-red-400"
-              />
+              <Clerk.Label className="text-lg font-medium text-zinc-950">Confirm password</Clerk.Label>
+              <Clerk.Input className="w-full rounded-md bg-white px-4 py-3 text-lg outline-none ring-1 ring-inset ring-zinc-300 hover:ring-zinc-400 focus:ring-2 focus:ring-zinc-950 data-[invalid]:ring-red-400" />
               <Clerk.FieldError />
             </Clerk.Field>
 
