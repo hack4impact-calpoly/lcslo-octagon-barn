@@ -117,6 +117,12 @@ export default function AdminEventDashboard() {
   const totalPages = Math.ceil(filtered.length / pageSize);
   const paginated = filtered.slice((currentPage - 1) * pageSize, currentPage * pageSize);
 
+  useEffect(() => {
+    if (currentPage > totalPages && totalPages > 0) {
+      setCurrentPage(1);
+    }
+  }, [totalPages, currentPage]);
+
   const updateStatus = async (id: string, status: EventRow["status"]) => {
     await fetch(`/api/event/${id}`, {
       method: "PUT",
@@ -227,33 +233,35 @@ export default function AdminEventDashboard() {
         </Link>
       </div>
       <div className="flex justify-center mt-4">
-        <Pager>
-          <PaginationPrevious
-            onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-            aria-disabled={currentPage === 1}
-            className={cn(currentPage === 1 && "pointer-events-none opacity-50")}
-          >
-            Previous
-          </PaginationPrevious>
-          <PaginationContent>
-            {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-              <PaginationItem key={page}>
-                {page === currentPage ? (
-                  <PaginationLink isActive>{page}</PaginationLink>
-                ) : page === 1 || page === totalPages || Math.abs(page - currentPage) <= 1 ? (
-                  <PaginationLink onClick={() => setCurrentPage(page)}>{page}</PaginationLink>
-                ) : page === currentPage - 2 || page === currentPage + 2 ? (
-                  <PaginationEllipsis />
-                ) : null}
-              </PaginationItem>
-            ))}
-          </PaginationContent>
-          <PaginationNext
-            onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-            aria-disabled={currentPage === totalPages}
-            className={cn(currentPage === totalPages && "pointer-events-none opacity-50")}
-          />
-        </Pager>
+        {filtered.length > 0 && (
+          <Pager>
+            <PaginationPrevious
+              onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+              aria-disabled={currentPage === 1}
+              className={cn(currentPage === 1 && "pointer-events-none opacity-50")}
+            >
+              Previous
+            </PaginationPrevious>
+            <PaginationContent>
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                <PaginationItem key={page}>
+                  {page === currentPage ? (
+                    <PaginationLink isActive>{page}</PaginationLink>
+                  ) : page === 1 || page === totalPages || Math.abs(page - currentPage) <= 1 ? (
+                    <PaginationLink onClick={() => setCurrentPage(page)}>{page}</PaginationLink>
+                  ) : page === currentPage - 2 || page === currentPage + 2 ? (
+                    <PaginationEllipsis />
+                  ) : null}
+                </PaginationItem>
+              ))}
+            </PaginationContent>
+            <PaginationNext
+              onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+              aria-disabled={currentPage === totalPages}
+              className={cn(currentPage === totalPages && "pointer-events-none opacity-50")}
+            />
+          </Pager>
+        )}
       </div>
     </div>
   );
