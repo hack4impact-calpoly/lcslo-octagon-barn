@@ -210,7 +210,7 @@ export default function AdminEventDashboard() {
                 <TableCell className="!text-center">
                   <Link
                     href={`/view/event/${e.id}`}
-                    className="bg-basic-blue text-white text-sm hover:bg-hover-blue px-6 py-3 rounded-full"
+                    className="bg-basic-blue text-white text-sm hover:bg-hover-blue px-4 py-2 rounded-full whitespace-nowrap inline-block"
                   >
                     View Event
                   </Link>
