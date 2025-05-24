@@ -98,6 +98,7 @@ export default function CreateEventPage() {
           numGuests: parseInt(numGuests),
           clerkId: user?.id,
           vendorList,
+          eventDetails,
         }),
       });
 
