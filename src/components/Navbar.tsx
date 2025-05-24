@@ -44,59 +44,52 @@ export default function Navbar() {
 
   useEffect(() => {
     if (!user?.id) return;
-    // replace with fetch (currently its dummy date hardcoded in)
-    const allDummyAlerts: IAlert[] = [
-      {
-        _id: new Types.ObjectId().toString(),
-        eventId: new Types.ObjectId(),
-        alertDateTime: new Date(),
-        updateType: "DocUpload",
-        descriptor: "New document uploaded for Wedding Event",
-        alertFrom: "user1",
-        alertTo: user.id, // User specific alert
-        isRead: false,
-      },
-      {
-        _id: new Types.ObjectId().toString(),
-        eventId: new Types.ObjectId(),
-        alertDateTime: new Date(Date.now() - 24 * 60 * 60 * 1000),
-        updateType: "Event",
-        descriptor: "Event is 30 days away",
-        alertFrom: "system",
-        alertTo: "user2", // Another user's alert - should only be visible to admins and user2
-        isRead: false,
-      },
-      {
-        _id: new Types.ObjectId().toString(),
-        eventId: new Types.ObjectId(),
-        alertDateTime: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000),
-        updateType: "DocApproval",
-        descriptor: "Document needs approval",
-        alertFrom: "system",
-        alertTo: "user3", // Another user's alert - should only be visible to admins and user3
-        isRead: true,
-      },
-    ];
 
-    // If admin, show all alerts
-    // If regular user, only show alerts meant for them
-    const filteredAlerts = isAdmin ? allDummyAlerts : allDummyAlerts.filter((alert) => alert.alertTo === user.id);
+    const alertTo = isAdmin ? "admin" : user.id;
 
-    setAlerts(filteredAlerts);
-    setUnreadCount(filteredAlerts.filter((alert) => !alert.isRead).length);
+    fetch(`/api/notification?alertTo=${alertTo}`)
+      .then((res) => res.json())
+      .then((data: IAlert[]) => setAlerts(data))
+      .catch((err) => console.error("Failed to load alerts", err));
   }, [user?.id, isAdmin]);
 
-  const markAsRead = (alertId: string) => {
-    setAlerts((prevAlerts) => prevAlerts.map((alert) => (alert._id === alertId ? { ...alert, isRead: true } : alert)));
-    setUnreadCount((prev) => Math.max(0, prev - 1));
+  useEffect(() => {
+    setUnreadCount(alerts.filter((alert) => !alert.isRead).length);
+  }, [alerts]);
+
+  const flipReadStatus = (alertId: string) => {
+    const alert = alerts.find((a) => a._id === alertId);
+    if (!alert) return;
+    const newIsRead = !alert.isRead;
+
+    setAlerts((prevAlerts) =>
+      prevAlerts.map((alert) => (alert._id === alertId ? { ...alert, isRead: newIsRead } : alert)),
+    );
+
+    fetch(`/api/notification/${alertId}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ isRead: newIsRead }),
+    });
   };
 
   const dismissAlert = (alertId: string) => {
     const alert = alerts.find((a) => a._id === alertId);
-    if (alert && !alert.isRead) {
-      setUnreadCount((prev) => Math.max(0, prev - 1));
-    }
+    if (!alert) return;
+
     setAlerts((prevAlerts) => prevAlerts.filter((alert) => alert._id !== alertId));
+
+    fetch(`/api/notification/${alertId}`, {
+      method: "DELETE",
+    })
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error("Failed to delete alert");
+        }
+      })
+      .catch((err) => console.error("Failed to dismiss alert", err));
   };
 
   const handleAlertClick = (event: React.MouseEvent, alertId: string) => {
@@ -105,7 +98,7 @@ export default function Navbar() {
     const isCloseButton = target.closest('button[data-dismiss="true"]');
 
     if (!isCloseButton) {
-      markAsRead(alertId);
+      flipReadStatus(alertId);
     }
   };
 
