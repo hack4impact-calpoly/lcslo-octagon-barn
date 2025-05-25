@@ -75,7 +75,7 @@ const SignUpPage: React.FC = () => {
       const result = await response.json();
       if (!response.ok) {
         if (response.status === 409) {
-          setApiError("User already exists. Please sign in instead.");
+          setApiError("Email already exists. Please sign in instead.");
         } else {
           setApiError(result.error || "Failed to create user");
         }
