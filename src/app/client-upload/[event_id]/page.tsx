@@ -94,6 +94,27 @@ async function uploadDocument(
   }
 }
 
+const updateEventWithDoc = async (eventId: string, docId: string) => {
+  try {
+    const res = await fetch(`/api/events/${eventId}`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ docId }),
+    });
+
+    if (!res.ok) {
+      const err = await res.json();
+      throw new Error(err.message || "Failed to update event");
+    }
+
+    console.log("Event updated with new document!");
+  } catch (error) {
+    console.error("Error updating event with document:", error);
+  }
+};
+
 // Deprecated function to reupload document
 // async function reuploadDocument(
 //   file: File,
@@ -358,7 +379,8 @@ const ClientUploadPage: React.FC = () => {
             if (file) {
               try {
                 setUploading(true);
-                await uploadDocument(file, user, eventId as string, documentType, documentName);
+                const { documentId } = await uploadDocument(file, user, eventId as string, documentType, documentName);
+                await updateEventWithDoc(eventId as string, documentId);
                 // TODO: Route to event page once completed
                 router.push(`/`);
               } catch (err) {
