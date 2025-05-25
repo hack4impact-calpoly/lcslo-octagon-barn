@@ -88,7 +88,7 @@ export default function DocumentView() {
       {/* Header Row: Back button, Title, and a placeholder */}
       <div className="w-full max-w-[1237px] mb-4 flex items-center justify-between">
         <Link href={`/view/event/${eventId}`}>
-          <Button variant="outline" className="bg-[#3A6F8F] text-white hover:bg-[#305a73]" size="sm">
+          <Button variant="outline" className="bg-[#3A6F8F] text-white hover:bg-[#305a73]" size="lg">
             Back
           </Button>
         </Link>
@@ -105,14 +105,7 @@ export default function DocumentView() {
             <iframe
               src={documentUrl}
               title="Document Preview"
-              className="w-full h-full rounded pb-20"
-              style={{
-                display: "flex",
-                margin: "auto",
-                border: "none",
-                width: "100%",
-                height: "125%",
-              }}
+              className="block mx-auto w-[100%] h-[100%] rounded border-0"
             />
           ) : (
             <p className="text-gray-500">Document Not Found</p>
