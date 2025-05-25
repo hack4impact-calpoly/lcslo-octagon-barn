@@ -40,7 +40,7 @@ export default function Page() {
   }, []);
 
   useEffect(() => {
-    const filteredData = unfilteredData.filter((item) => item.email.toLowerCase().startsWith(searchItem.toLowerCase()));
+    const filteredData = unfilteredData.filter((item) => item.name.toLowerCase().startsWith(searchItem.toLowerCase()));
     setData(filteredData);
   }, [searchItem, unfilteredData]);
 

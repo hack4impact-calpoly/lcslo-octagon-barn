@@ -127,7 +127,7 @@ export default function EventDetailsView() {
   }, [eventId]);
 
   // Loading and auth states
-  if (!isLoaded || loading || !eventData) {
+  if (!isLoaded || loading) {
     return <LoadingSpinner />;
   }
 
@@ -135,8 +135,8 @@ export default function EventDetailsView() {
     return <UnauthorizedState />;
   }
 
-  if (error) {
-    return <ErrorState message={error} />;
+  if (error || !eventData) {
+    return <ErrorState message={error ? error : "An unknown error occurred"} />;
   }
 
   // Event handlers
