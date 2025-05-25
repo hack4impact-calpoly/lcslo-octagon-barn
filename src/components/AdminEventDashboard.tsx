@@ -6,6 +6,7 @@ import { useState as useReactState } from "react";
 import Link from "next/link";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { LoadingSpinner, UnauthorizedState } from "@/components/loadingStates";
 import { Table, TableHeader, TableHead, TableBody, TableRow, TableCell } from "@/components/ui/table";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 import {
@@ -139,10 +140,10 @@ export default function AdminEventDashboard() {
   };
 
   if (!isLoaded) {
-    return <p className="text-center text-gray-500 text-sm">Loading ...</p>;
+    return <LoadingSpinner />;
   }
   if (!isAdmin) {
-    return <p className="text-red-500">Unauthorized</p>;
+    return <UnauthorizedState />;
   }
 
   return (
@@ -158,37 +159,39 @@ export default function AdminEventDashboard() {
           className="max-w-sm py-2 md:text-sm placeholder:text-sm ml-auto"
         />
       </div>
-
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead
-              className="cursor-pointer text-center text-sm text-black"
-              onClick={() => requestSort("eventName")}
-            >
-              Event Name {sortConfig?.key === "eventName" ? (sortConfig.direction === "asc" ? "▲" : "▼") : ""}
-            </TableHead>
-            <TableHead className="cursor-pointer text-center text-sm text-black">Client Name</TableHead>
-            <TableHead
-              className="cursor-pointer text-center text-sm text-black"
-              onClick={() => requestSort("eventDateStart")}
-            >
-              Start Date {sortConfig?.key === "eventDateStart" ? (sortConfig.direction === "asc" ? "▲" : "▼") : ""}
-            </TableHead>
-            <TableHead className="text-center cursor-pointer text-sm text-black" onClick={() => requestSort("status")}>
-              Status {sortConfig?.key === "status" ? (sortConfig.direction === "asc" ? "▲" : "▼") : ""}
-            </TableHead>
-            <TableHead className="text-center text-sm text-black">View</TableHead>
-            <TableHead className="text-center text-sm text-black">Delete</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {loading ? (
-            <p></p>
-          ) : paginated.length === 0 ? (
-            <p className="text-center text-gray-500 text-sm">No events found</p>
-          ) : (
-            paginated.map((e) => (
+      {loading ? (
+        <LoadingSpinner />
+      ) : paginated.length === 0 ? (
+        <p className="text-center text-gray-500 text-lg">No events found</p>
+      ) : (
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead
+                className="cursor-pointer text-center text-sm text-black"
+                onClick={() => requestSort("eventName")}
+              >
+                Event Name {sortConfig?.key === "eventName" ? (sortConfig.direction === "asc" ? "▲" : "▼") : ""}
+              </TableHead>
+              <TableHead className="cursor-pointer text-center text-sm text-black">Client Name</TableHead>
+              <TableHead
+                className="cursor-pointer text-center text-sm text-black"
+                onClick={() => requestSort("eventDateStart")}
+              >
+                Start Date {sortConfig?.key === "eventDateStart" ? (sortConfig.direction === "asc" ? "▲" : "▼") : ""}
+              </TableHead>
+              <TableHead
+                className="text-center cursor-pointer text-sm text-black"
+                onClick={() => requestSort("status")}
+              >
+                Status {sortConfig?.key === "status" ? (sortConfig.direction === "asc" ? "▲" : "▼") : ""}
+              </TableHead>
+              <TableHead className="text-center text-sm text-black">View</TableHead>
+              <TableHead className="text-center text-sm text-black">Delete</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {paginated.map((e) => (
               <TableRow key={e.id}>
                 <TableCell className="!text-center text-sm">{e.eventName}</TableCell>
                 <TableCell className="!text-center text-sm">{clientNames[e.clerkId] ?? e.clerkId}</TableCell>
@@ -221,10 +224,10 @@ export default function AdminEventDashboard() {
                   </Button>
                 </TableCell>
               </TableRow>
-            ))
-          )}
-        </TableBody>
-      </Table>
+            ))}
+          </TableBody>
+        </Table>
+      )}
       <div className="flex justify-end mt-4">
         <Link href="/create-event">
           <Button className="px-10 py-6 text-base bg-basic-blue text-white hover:bg-hover-blue rounded-full">
