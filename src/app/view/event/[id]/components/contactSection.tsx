@@ -53,13 +53,13 @@ export default function ContactSection({ adminName, email, phone, isEditing, isA
   return (
     <ul className="space-y-4 text-base">
       <li>
-        <span className="text-base font-medium">Admin:</span> <span className="text-base">{adminName || "N/A"}</span>
+        <span className="text-xl font-medium">Admin:</span> <span className="text-base">{adminName || "N/A"}</span>
       </li>
       <li>
-        <span className="text-base font-medium">Email:</span> <span className="text-base">{email}</span>
+        <span className="text-xl font-medium">Email:</span> <span className="text-base">{email}</span>
       </li>
       <li>
-        <span className="text-base font-medium">Phone:</span> <span className="text-base">{phone}</span>
+        <span className="text-xl font-medium">Phone:</span> <span className="text-base">{phone}</span>
       </li>
     </ul>
   );

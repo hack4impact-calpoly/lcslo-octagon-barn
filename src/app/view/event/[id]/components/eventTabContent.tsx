@@ -62,12 +62,14 @@ export default function EventTabContent({
                 onUpdate={(field, value) => onUpdateField(field, value)}
               />
 
+              {/*
               <DocumentList
                 documents={documents}
                 isEditing={isEditing}
                 isAdmin={isAdmin}
                 onRemoveDocument={onRemoveDocument}
               />
+            */}
             </div>
           </div>
         </TabsContent>

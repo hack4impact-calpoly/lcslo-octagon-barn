@@ -43,8 +43,8 @@
     "mime": ">=1.4.1",
     "mongoose": "^8.9.5",
     "next": "^14.2.26",
-    "qs": ">=6.2.4",
     "nodemailer": "^6.10.1",
+    "qs": ">=6.2.4",
     "radix-ui": "^1.0.1",
     "react": "^18",
     "react-day-picker": "^8.10.1",
@@ -87,8 +87,8 @@
     "request": ">=2.68.0",
     "superagent": ">=3.7.0",
     "tailwindcss": "^3.4.17",
-    "tunnel-agent": ">=0.6.0",
     "ts-jest": "^29.3.2",
+    "tunnel-agent": ">=0.6.0",
     "typescript": "^5"
   }
 }
