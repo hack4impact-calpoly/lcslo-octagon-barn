@@ -4,6 +4,7 @@ import { useUser } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
 import EventTile from "@/components/EventTile";
 import AdminEventDashboard from "@/components/AdminEventDashboard";
+import { LoadingSpinner } from "@/components/loadingStates";
 
 interface Event {
   id: string;
@@ -44,7 +45,7 @@ export default function Home() {
 
   // Show loading state
   if (!isLoaded) {
-    return <p className="text-center p-8">Loading...</p>;
+    return <LoadingSpinner />;
   }
 
   // If user is admin, render AdminEventDashboard component
@@ -77,7 +78,7 @@ export default function Home() {
                 />
               ))
             ) : (
-              <p className="text-center text-gray-500">No events found.</p>
+              <p className="text-center text-gray-500 text-lg">No events found</p>
             )}
           </div>
         </div>
