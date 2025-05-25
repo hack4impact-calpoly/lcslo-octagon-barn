@@ -4,12 +4,12 @@ import React, { useState, useEffect } from "react";
 import { useUser } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
 import { useParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import EventTile from "@/components/EventTile";
 import { LoadingSpinner, UnauthorizedState, ErrorState } from "@/components/loadingStates";
 import EventDetailsForm from "./components/eventDetailsForm";
 import EventTabContent from "./components/eventTabContent";
 
-// Type definitions
 interface IEventFrontend {
   clerkId: string;
   docIds: string[];
@@ -53,6 +53,8 @@ export default function EventDetailsView() {
   const params = useParams();
   const eventId = Array.isArray(params.id) ? params.id[0] : (params.id ?? "default-id");
   const [activeTab, setActiveTab] = useState<string>("details");
+  const [eventStatus, setEventStatus] = useState<string | null>(null);
+  const router = useRouter();
 
   const venueOptions: IEventFrontend["venue"][] = [
     "Full Facility",
@@ -62,7 +64,6 @@ export default function EventDetailsView() {
     "Other",
   ];
 
-  // Auth check
   useEffect(() => {
     if (isLoaded && user) {
       setAuthorized(true);
@@ -77,7 +78,6 @@ export default function EventDetailsView() {
     }
   }, [user, isLoaded]);
 
-  // Fetch event data
   useEffect(() => {
     if (eventId && eventId !== "default-id") {
       const fetchEvent = async () => {
@@ -91,7 +91,6 @@ export default function EventDetailsView() {
 
           const eventData = await response.json();
 
-          // Convert string dates to Date objects
           const formattedEvent = {
             ...eventData,
             eventDateStart: new Date(eventData.eventDateStart),
@@ -99,10 +98,8 @@ export default function EventDetailsView() {
             createdAt: new Date(eventData.createdAt),
           };
 
-          // Add default temp data fields
           const combinedData = {
             ...formattedEvent,
-            // Default temporary data fields
             clientName: "Client Name",
             adminName: "Admin Name",
             email: "contact@email.com",
@@ -114,6 +111,7 @@ export default function EventDetailsView() {
           setEventData(combinedData);
           setEditCache(combinedData);
           setError(null);
+          setEventStatus(formattedEvent.status);
         } catch (err) {
           console.error("Error fetching event:", err);
           setError("Failed to load event data");
@@ -126,7 +124,6 @@ export default function EventDetailsView() {
     }
   }, [eventId]);
 
-  // Loading and auth states
   if (!isLoaded || loading) {
     return <LoadingSpinner />;
   }
@@ -139,7 +136,6 @@ export default function EventDetailsView() {
     return <ErrorState message={error ? error : "An unknown error occurred"} />;
   }
 
-  // Event handlers
   const handleEditClick = () => {
     setEditCache({ ...eventData });
     setIsEditing(true);
@@ -156,7 +152,6 @@ export default function EventDetailsView() {
     if (!eventData) return;
 
     try {
-      // Extract only the IEvent fields to send to the backend
       const {
         clerkId,
         docIds,
@@ -172,7 +167,6 @@ export default function EventDetailsView() {
         numGuests,
       } = eventData;
 
-      // Prepare payload with only IEvent fields
       const payload = {
         clerkId,
         docIds,
@@ -202,7 +196,6 @@ export default function EventDetailsView() {
 
       const updatedEvent = await response.json();
 
-      // Update the state with the response from the server
       const formattedEvent = {
         ...updatedEvent,
         eventDateStart: new Date(updatedEvent.eventDateStart),
@@ -210,7 +203,6 @@ export default function EventDetailsView() {
         createdAt: new Date(updatedEvent.createdAt),
       };
 
-      // Combine with temporary data
       setEventData({
         ...formattedEvent,
         clientName: eventData.clientName,
@@ -260,85 +252,87 @@ export default function EventDetailsView() {
   };
 
   return (
-    <div className="p-4 md:p-8 lg:p-16">
-      {/* Tab and Buttons Container */}
-      <div className="w-3/4 mx-auto mb-6">
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-3 sm:space-y-0 mb-0">
-          <div className="flex border-b">
-            <Button
-              variant="ghost"
-              onClick={() => setActiveTab("details")}
-              className={`pb-1 px-4 rounded-b-none text-md border-b-2 text-lg ${activeTab === "details" ? "border-black text-black" : "border-transparent text-gray-500 hover:text-black hover:border-gray-300"}`}
-            >
-              Event Details
-            </Button>
-            <Button
-              variant="ghost"
-              onClick={() => setActiveTab("documents")}
-              className={`pb-1 px-4 rounded-b-none text-md border-b-2 text-lg ${activeTab === "documents" ? "border-black text-black" : "border-transparent text-gray-500 hover:text-black hover:border-gray-300"}`}
-            >
-              Documents
-            </Button>
-          </div>
-
-          {isAdmin && (
-            <div className="space-x-2 flex-shrink-0">
-              {isEditing ? (
-                <>
-                  <Button className="w-[5rem] lg:w-[7rem] text-base" variant="outline" onClick={handleSave}>
-                    Save
-                  </Button>
-                  <Button className="w-[5rem] lg:w-[7rem] text-base" variant="outline" onClick={handleCancel}>
-                    Cancel
-                  </Button>
-                  {/* <Button className="w-[5rem] lg:w-[7rem]" variant="outline">
-                    Upload
-                  </Button> */}
-                </>
-              ) : (
-                <Button className="w-[5rem] lg:w-[7rem] text-base" variant="outline" onClick={handleEditClick}>
-                  Edit
-                </Button>
-              )}
+    <>
+      {(eventStatus === "Completed" || eventStatus === "Cancelled") && (
+        <div className="p-4 bg-yellow-100 text-center mb-4 rounded">
+          <span className="font-semibold">Event is locked</span>
+        </div>
+      )}
+      <div className="p-4 md:p-8 lg:p-16">
+        <div className="w-3/4 mx-auto mb-6">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-3 sm:space-y-0 mb-0">
+            <div className="flex border-b">
+              <Button
+                variant="ghost"
+                onClick={() => setActiveTab("details")}
+                className={`pb-1 px-4 rounded-b-none text-md border-b-2 text-lg ${activeTab === "details" ? "border-black text-black" : "border-transparent text-gray-500 hover:text-black hover:border-gray-300"}`}
+              >
+                Event Details
+              </Button>
+              <Button
+                variant="ghost"
+                onClick={() => setActiveTab("documents")}
+                className={`pb-1 px-4 rounded-b-none text-md border-b-2 text-lg ${activeTab === "documents" ? "border-black text-black" : "border-transparent text-gray-500 hover:text-black hover:border-gray-300"}`}
+              >
+                Documents
+              </Button>
             </div>
+
+            {isAdmin && eventStatus !== "Completed" && eventStatus !== "Cancelled" && (
+              <div className="space-x-2 flex-shrink-0">
+                {isEditing ? (
+                  <>
+                    <Button className="w-[5rem] lg:w-[7rem] text-base" variant="outline" onClick={handleSave}>
+                      Save
+                    </Button>
+                    <Button className="w-[5rem] lg:w-[7rem] text-base" variant="outline" onClick={handleCancel}>
+                      Cancel
+                    </Button>
+                  </>
+                ) : (
+                  <Button className="w-[5rem] lg:w-[7rem] text-base" variant="outline" onClick={handleEditClick}>
+                    Edit
+                  </Button>
+                )}
+              </div>
+            )}
+          </div>
+        </div>
+
+        <div className="flex justify-center mb-6">
+          {isEditing && isAdmin ? (
+            <EventDetailsForm eventData={eventData} onUpdateField={handleUpdateField} venueOptions={venueOptions} />
+          ) : (
+            <EventTile
+              id={eventId}
+              eventName={eventData.eventName}
+              eventDateStart={eventData.eventDateStart}
+              eventDateEnd={eventData.eventDateEnd}
+              venue={eventData.venue}
+              numGuests={eventData.numGuests}
+              docsCompleted={eventData.docsCompleted}
+              docsTotal={eventData.docsTotal}
+              imageSrc={eventData.headerImageUrl || ""}
+              variant="detail"
+            />
           )}
         </div>
-      </div>
 
-      {/* Event Tile Section */}
-      <div className="flex justify-center mb-6">
-        {isEditing && isAdmin ? (
-          <EventDetailsForm eventData={eventData} onUpdateField={handleUpdateField} venueOptions={venueOptions} />
-        ) : (
-          <EventTile
-            id={eventId}
-            eventName={eventData.eventName}
-            eventDateStart={eventData.eventDateStart}
-            eventDateEnd={eventData.eventDateEnd}
-            venue={eventData.venue}
-            numGuests={eventData.numGuests}
-            docsCompleted={eventData.docsCompleted}
-            docsTotal={eventData.docsTotal}
-            imageSrc={eventData.headerImageUrl || ""}
-            variant="detail"
-          />
-        )}
+        <EventTabContent
+          activeTab={activeTab}
+          setActiveTab={setActiveTab}
+          eventDetails={eventData.eventDetails}
+          vendorList={eventData.vendorList}
+          documents={eventData.documents}
+          adminName={eventData.adminName}
+          email={eventData.email}
+          phone={eventData.phone}
+          isEditing={isEditing}
+          isAdmin={isAdmin}
+          onUpdateField={handleUpdateField}
+          onRemoveDocument={handleRemoveDocument}
+        />
       </div>
-
-      <EventTabContent
-        activeTab={activeTab}
-        setActiveTab={setActiveTab}
-        eventDetails={eventData.eventDetails}
-        vendorList={eventData.vendorList}
-        documents={eventData.documents}
-        adminName={eventData.adminName}
-        email={eventData.email}
-        phone={eventData.phone}
-        isEditing={isEditing}
-        isAdmin={isAdmin}
-        onUpdateField={handleUpdateField}
-        onRemoveDocument={handleRemoveDocument}
-      />
-    </div>
+    </>
   );
 }

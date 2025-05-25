@@ -154,6 +154,7 @@ const ClientUploadPage: React.FC = () => {
   const [documentType, setDocumentType] = useState<string>("");
   const [documentName, setDocumentName] = useState<string>("");
   const [uploading, setUploading] = useState<boolean>(false);
+  const [eventStatus, setEventStatus] = useState<string | null>(null);
 
   const [file, setFile] = useState<File | null>(null);
   const [checklist, setChecklist] = useState<boolean[]>(new Array(8).fill(false));
@@ -181,6 +182,7 @@ const ClientUploadPage: React.FC = () => {
           const event = await eventRes.json();
           const document = await documentRes.json();
           setEventClerkId(event.clerkId);
+          setEventStatus(event.status);
           setDocumentClerkId(document.clerkId);
         } else {
           setEventClerkId(null);
@@ -213,6 +215,15 @@ const ClientUploadPage: React.FC = () => {
 
   if (loading || !userIsLoaded) {
     return <div>Loading...</div>;
+  }
+
+  if (eventStatus === "Completed" || eventStatus === "Cancelled") {
+    return (
+      <div className="p-8 text-center">
+        <h2 className="text-2xl font-semibold mb-4">Event is locked</h2>
+        <Button onClick={() => router.back()}>Go Back</Button>
+      </div>
+    );
   }
 
   const handleChange = (file: File) => {
