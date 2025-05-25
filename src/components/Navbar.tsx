@@ -148,6 +148,17 @@ export default function Navbar() {
                         <div className="flex-1 mr-3">
                           <p className="text-sm font-medium">{alert.updateType}</p>
                           <p className="text-sm">{alert.descriptor}</p>
+                          <p className="text-xs text-neutral-500">
+                            <Link
+                              href={`/view/event/${alert.eventId}`}
+                              className="text-blue-500 hover:underline font-semibold"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                              }}
+                            >
+                              View Event
+                            </Link>
+                          </p>
                           <p className="text-xs text-neutral-500 mt-2">
                             {new Date(alert.alertDateTime).toLocaleString()}
                           </p>
