@@ -76,7 +76,7 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
       eventId,
       {
         $push: { docIds: docId },
-        $inc: { totalDocuments: 1 },
+        $inc: { docsTotal: 1 },
       },
       { new: true },
     );

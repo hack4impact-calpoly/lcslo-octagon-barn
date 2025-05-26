@@ -10,6 +10,7 @@ import { useParams, useRouter } from "next/navigation";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Spinner } from "@/components/ui/spinner";
+import { LoadingSpinner, UnauthorizedState } from "@/components/loadingStates";
 
 // Deprecated function to download document
 // async function downloadDocument(s3DocIdClient: string) {
@@ -96,7 +97,7 @@ async function uploadDocument(
 
 const updateEventWithDoc = async (eventId: string, docId: string) => {
   try {
-    const res = await fetch(`/api/events/${eventId}`, {
+    const res = await fetch(`/api/event/${eventId}`, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
@@ -221,8 +222,10 @@ const ClientUploadPage: React.FC = () => {
   const router = useRouter();
   const eventId = params.event_id;
 
-  const { isLoaded: userIsLoaded, user } = useUser();
+  const { user, isLoaded } = useUser();
   const [loading, setLoading] = useState<boolean>(true);
+  const [authorized, setAuthorized] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [eventClerkId, setEventClerkId] = useState<string | null>(null);
   const [documentType, setDocumentType] = useState<string>("");
   const [documentName, setDocumentName] = useState<string>("");
@@ -240,7 +243,15 @@ const ClientUploadPage: React.FC = () => {
   };
 
   useEffect(() => {
-    if (!userIsLoaded) return;
+    if (isLoaded && user) {
+      setAuthorized(true);
+    } else {
+      setAuthorized(false);
+    }
+  }, [user, isLoaded, eventClerkId]);
+
+  useEffect(() => {
+    if (!isLoaded) return;
 
     const fetchData = async () => {
       try {
@@ -250,35 +261,34 @@ const ClientUploadPage: React.FC = () => {
         if (eventRes.ok) {
           const event = await eventRes.json();
           setEventClerkId(event.clerkId);
+          setError(null);
         } else {
           setEventClerkId(null);
+          setError("Page not found");
         }
       } catch (error) {
         console.error("Error fetching data:", error);
         setEventClerkId(null);
+        setError("Failed to load page");
       } finally {
         setLoading(false);
       }
     };
 
     fetchData();
-  }, [userIsLoaded, eventId]);
+  }, [isLoaded, eventId]);
 
-  useEffect(() => {
-    if (loading || !userIsLoaded) return;
+  if (!isLoaded || loading) {
+    return <LoadingSpinner />;
+  }
 
-    if (!eventClerkId) {
-      router.push("/not-found");
-      return;
-    }
+  if (!authorized) {
+    return <UnauthorizedState />;
+  }
 
-    if (user?.id !== eventClerkId) {
-      router.push("/not-found");
-    }
-  }, [loading, userIsLoaded, eventClerkId, user?.id, router]);
-
-  if (loading || !userIsLoaded) {
-    return <div>Loading...</div>;
+  if (error || !eventClerkId || user?.id !== eventClerkId) {
+    router.push("/not-found");
+    return <LoadingSpinner />;
   }
 
   const handleChange = (file: File) => {
@@ -381,8 +391,7 @@ const ClientUploadPage: React.FC = () => {
                 setUploading(true);
                 const { documentId } = await uploadDocument(file, user, eventId as string, documentType, documentName);
                 await updateEventWithDoc(eventId as string, documentId);
-                // TODO: Route to event page once completed
-                router.push(`/`);
+                router.push(`/view/event/${eventId}`);
               } catch (err) {
                 console.error("Upload failed:", err);
               } finally {
