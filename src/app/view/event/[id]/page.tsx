@@ -28,9 +28,8 @@ interface IEventFrontend {
 
 interface ITempEventData {
   clientName?: string;
-  adminName?: string;
-  email: string;
-  phone: string;
+  clientEmail: string;
+  clientPhone: string;
   documents: IDocument[];
   headerImageUrl?: string;
 }
@@ -77,112 +76,66 @@ export default function EventDetailsView() {
     }
   }, [user, isLoaded]);
 
-  // Fetch event data
-  // useEffect(() => {
-  //   if (eventId && eventId !== "default-id") {
-  //     const fetchEvent = async () => {
-  //       try {
-  //         setLoading(true);
-  //         const response = await fetch(`/api/event/${eventId}`);
-
-  //         if (!response.ok) {
-  //           throw new Error("Failed to fetch event");
-  //         }
-
-  //         const eventData = await response.json();
-
-  //         // Convert string dates to Date objects
-  //         const formattedEvent = {
-  //           ...eventData,
-  //           eventDateStart: new Date(eventData.eventDateStart),
-  //           eventDateEnd: new Date(eventData.eventDateEnd),
-  //           createdAt: new Date(eventData.createdAt),
-  //         };
-
-  //         // Add default temp data fields
-  //         const combinedData = {
-  //           ...formattedEvent,
-  //           // Default temporary data fields
-  //           clientName: "Client Name",
-  //           adminName: "Admin Name",
-  //           email: "contact@email.com",
-  //           phone: "(805)-123-4567",
-  //           documents: [{ name: "brochure.pdf", url: "/brochure.pdf" }],
-  //           headerImageUrl: "/octagon_barn_plaza.jpg",
-  //         };
-
-  //         setEventData(combinedData);
-  //         setEditCache(combinedData);
-  //         setError(null);
-  //       } catch (err) {
-  //         console.error("Error fetching event:", err);
-  //         setError("Failed to load event data");
-  //       } finally {
-  //         setLoading(false);
-  //       }
-  //     };
-
-  //     fetchEvent();
-  //   }
-  // }, [eventId]);
   useEffect(() => {
     if (eventId && eventId !== "default-id") {
+      const fetchEvent = async () => {
+        try {
+          setLoading(true);
+          const response = await fetch(`/api/event/${eventId}`);
+
+          if (!response.ok) {
+            throw new Error("Failed to fetch event");
+          }
+
+          const eventData = await response.json();
+          console.log("Fetched event:", eventData);
+          if (!eventData.clerkId) {
+            throw new Error("clerkId is missing from event");
+          }
+
+          // fetch client info using clerkId from the event
+          const clientRes = await fetch(`/api/user/${eventData.clerkId}`);
+          if (!clientRes.ok) {
+            throw new Error("Failed to fetch client info");
+          }
+
+          const client = await clientRes.json();
+          if (!client) throw new Error("Client data is undefined");
+
+          // convert string dates to Date objects
+          const formattedEvent = {
+            ...eventData,
+            eventDateStart: new Date(eventData.eventDateStart),
+            eventDateEnd: new Date(eventData.eventDateEnd),
+            createdAt: new Date(eventData.createdAt),
+          };
+
+          // combine with real client info
+          const clientFirst = client.firstName ?? "";
+          const clientLast = client.lastName ?? "";
+          const clientName = [clientFirst, clientLast].filter(Boolean).join(" ").trim() || "Not Found";
+          const combinedData = {
+            ...formattedEvent,
+            clientName: clientName,
+            clientEmail: client.emailAddresses?.[0]?.emailAddress ?? "Not Found",
+            clientPhone: client.phoneNumbers?.[0]?.phoneNumber ?? "Not Found",
+            documents: [{ name: "brochure.pdf", url: "/brochure.pdf" }],
+            headerImageUrl: "/octagon_barn_plaza.jpg",
+          };
+
+          setEventData(combinedData);
+          setEditCache(combinedData);
+          setError(null);
+        } catch (err) {
+          console.error("Error fetching event or user:", err);
+          setError("Failed to load event or client data");
+        } finally {
+          setLoading(false);
+        }
+      };
       fetchEvent();
     }
   }, [eventId]);
-
-  const fetchEvent = async () => {
-    try {
-      setLoading(true);
-      const response = await fetch(`/api/event/${eventId}`);
-
-      if (!response.ok) {
-        throw new Error("Failed to fetch event");
-      }
-
-      const eventData = await response.json();
-      console.log("Fetched event:", eventData);
-      if (!eventData.clerkId) {
-        throw new Error("clerkId is missing from event");
-      }
-
-      // fetch client info using clerkId from the event
-      const clientRes = await fetch(`/api/user/${eventData.clerkId}`);
-      if (!clientRes.ok) {
-        throw new Error("Failed to fetch client info");
-      }
-
-      const { data: client } = await clientRes.json();
-      if (!client) throw new Error("Client data is undefined");
-
-      // convert string dates to Date objects
-      const formattedEvent = {
-        ...eventData,
-        eventDateStart: new Date(eventData.eventDateStart),
-        eventDateEnd: new Date(eventData.eventDateEnd),
-        createdAt: new Date(eventData.createdAt),
-      };
-
-      // combine with real client info
-      const combinedData = {
-        ...formattedEvent,
-        clientName: client ? `${client.firstName} ${client.lastName}` : "Unknown",
-        email: client.emailAddresses?.[0]?.emailAddress ?? "Not provided",
-        phone: client.phoneNumbers?.[0]?.phoneNumber ?? "Not provided",
-        documents: [{ name: "brochure.pdf", url: "/brochure.pdf" }],
-        headerImageUrl: "/octagon_barn_plaza.jpg",
-      };
-
-      setEventData(combinedData);
-      setEditCache(combinedData);
-      setError(null);
-    } catch (err) {
-      console.error("Error fetching event or user:", err);
-      setError("Failed to load event or client data");
-    } finally {
-      setLoading(false);
-    }
-  };
 
   // Loading and auth states
   if (!isLoaded || loading || !eventData) {
@@ -272,9 +225,8 @@ export default function EventDetailsView() {
       setEventData({
         ...formattedEvent,
         clientName: eventData.clientName,
-        adminName: eventData.adminName,
-        email: eventData.email,
-        phone: eventData.phone,
+        clientEmail: eventData.clientEmail,
+        cleintPhone: eventData.clientPhone,
         documents: eventData.documents,
         headerImageUrl: eventData.headerImageUrl,
       });
@@ -282,9 +234,8 @@ export default function EventDetailsView() {
       setEditCache({
         ...formattedEvent,
         clientName: eventData.clientName,
-        adminName: eventData.adminName,
-        email: eventData.email,
-        phone: eventData.phone,
+        clientEmail: eventData.clientEmail,
+        clientPhone: eventData.clientPhone,
         documents: eventData.documents,
         headerImageUrl: eventData.headerImageUrl,
       });
@@ -321,7 +272,7 @@ export default function EventDetailsView() {
     <div className="p-4 md:p-8 lg:p-16">
       {/* Tab and Buttons Container */}
       <div className="w-3/4 mx-auto mb-6">
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-3 sm:space-y-0 mb-0">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-0">
           {!isEditing && (
             <div className="flex border-b">
               <Button
@@ -348,6 +299,8 @@ export default function EventDetailsView() {
               </Button>
             </div>
           )}
+
+          <div className="flex-grow" />
 
           {isAdmin && (
             <div className="space-x-2 flex-shrink-0">
@@ -398,9 +351,9 @@ export default function EventDetailsView() {
         eventDetails={eventData.eventDetails}
         vendorList={eventData.vendorList}
         documents={eventData.documents}
-        adminName={eventData.adminName}
-        email={eventData.email}
-        phone={eventData.phone}
+        name={eventData.clientName}
+        email={eventData.clientEmail}
+        phone={eventData.clientPhone}
         isEditing={isEditing}
         isAdmin={isAdmin}
         onUpdateField={handleUpdateField}

@@ -13,9 +13,8 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
       return createErrorResponse("Not Found", "User not found", 404);
     }
 
-    return NextResponse.json({ data: user }, { status: 200 });
+    return createSuccessResponse(user, 200);
   } catch (error) {
-    console.error("Clerk user fetch failed:", error);
     return createErrorResponse("Server Error", "Failed to fetch user", 500);
   }
 }

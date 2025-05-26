@@ -14,7 +14,7 @@ interface EventTabContentProps {
   eventDetails: string;
   vendorList: string;
   documents: IDocument[];
-  adminName?: string;
+  name?: string;
   email: string;
   phone: string;
   isEditing: boolean;
@@ -28,7 +28,7 @@ export default function EventTabContent({
   eventDetails,
   vendorList,
   documents,
-  adminName,
+  name,
   email,
   phone,
   isEditing,
@@ -52,17 +52,13 @@ export default function EventTabContent({
             />
 
             {/* Right Column - Contact & Documents */}
-            <div className="space-y-4 bg-gray-200 p-4 rounded-lg shadow-md border border-gray-300">
-              <ContactSection
-                adminName={adminName}
-                email={email}
-                phone={phone}
-                isEditing={isEditing}
-                isAdmin={isAdmin}
-                onUpdate={(field, value) => onUpdateField(field, value)}
-              />
+            {(!isEditing || !isAdmin) && (
+              <div className="space-y-4 bg-gray-200 p-4 rounded-lg shadow-md border border-gray-300">
+                <ContactSection name={name} email={email} phone={phone} />
+              </div>
+            )}
 
-              {/*
+            {/*
               <DocumentList
                 documents={documents}
                 isEditing={isEditing}
@@ -70,7 +66,6 @@ export default function EventTabContent({
                 onRemoveDocument={onRemoveDocument}
               />
             */}
-            </div>
           </div>
         </TabsContent>
 

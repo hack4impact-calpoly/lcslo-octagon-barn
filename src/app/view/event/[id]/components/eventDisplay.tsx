@@ -18,7 +18,7 @@ export default function EventDisplay({
   return (
     <div className="space-y-4 bg-gray-200 p-4 rounded-lg shadow-md border border-gray-300">
       <div>
-        <label htmlFor="eventDetailsDisplay" className="block text-xl font-medium mb-1">
+        <label htmlFor="eventDetailsDisplay" className="block text-lg font-medium mb-1">
           Event Details:
         </label>
         {isEditing && isAdmin ? (
@@ -36,7 +36,7 @@ export default function EventDisplay({
         )}
       </div>
       <div>
-        <label htmlFor="vendorListDisplay" className="block text-xl font-medium mb-1">
+        <label htmlFor="vendorListDisplay" className="block text-lg font-medium mb-1">
           Vendor List:
         </label>
         {isEditing && isAdmin ? (
