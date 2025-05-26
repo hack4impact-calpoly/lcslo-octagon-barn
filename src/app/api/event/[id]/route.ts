@@ -59,3 +59,35 @@ export async function DELETE(req: NextRequest, { params }: { params: { id: strin
     return createErrorResponse("ServerError", "Failed to delete event", 500);
   }
 }
+
+export async function PATCH(req: NextRequest, { params }: { params: { id: string } }) {
+  const eventId = params.id;
+
+  try {
+    await connectToDB();
+
+    const { docId } = await req.json();
+
+    if (!docId) {
+      return createErrorResponse("BadRequest", "Missing docId in request body", 400);
+    }
+
+    const updatedEvent = await Event.findByIdAndUpdate(
+      eventId,
+      {
+        $push: { docIds: docId },
+        $inc: { docsTotal: 1 },
+      },
+      { new: true },
+    );
+
+    if (!updatedEvent) {
+      return createErrorResponse("NotFound", "Event not found", 404);
+    }
+
+    return createSuccessResponse(updatedEvent, 200);
+  } catch (error) {
+    console.error("Error updating event:", error);
+    return createErrorResponse("ServerError", "Internal server error", 500);
+  }
+}

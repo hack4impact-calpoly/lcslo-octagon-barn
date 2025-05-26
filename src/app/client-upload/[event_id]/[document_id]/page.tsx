@@ -150,11 +150,11 @@ const ClientUploadPage: React.FC = () => {
   const { isLoaded: userIsLoaded, user } = useUser();
   const [loading, setLoading] = useState<boolean>(true);
   const [eventClerkId, setEventClerkId] = useState<string | null>(null);
+  const [eventStatus, setEventStatus] = useState<string | null>(null);
   const [documentClerkId, setDocumentClerkId] = useState<string | null>(null);
   const [documentType, setDocumentType] = useState<string>("");
   const [documentName, setDocumentName] = useState<string>("");
   const [uploading, setUploading] = useState<boolean>(false);
-  const [eventStatus, setEventStatus] = useState<string | null>(null);
 
   const [file, setFile] = useState<File | null>(null);
   const [checklist, setChecklist] = useState<boolean[]>(new Array(8).fill(false));
@@ -180,9 +180,9 @@ const ClientUploadPage: React.FC = () => {
 
         if (eventRes.ok && documentRes.ok) {
           const event = await eventRes.json();
-          const document = await documentRes.json();
-          setEventClerkId(event.clerkId);
           setEventStatus(event.status);
+          setEventClerkId(event.clerkId);
+          const document = await documentRes.json();
           setDocumentClerkId(document.clerkId);
         } else {
           setEventClerkId(null);
@@ -216,7 +216,7 @@ const ClientUploadPage: React.FC = () => {
   if (loading || !userIsLoaded) {
     return <div>Loading...</div>;
   }
-
+  // Lock the page if the event is completed or cancelled
   if (eventStatus === "Completed" || eventStatus === "Cancelled") {
     return (
       <div className="p-8 text-center">
