@@ -1,5 +1,4 @@
 import { Clerk } from "@clerk/clerk-sdk-node";
-import { ClerkAPIResponseError } from "@clerk/clerk-sdk-node";
 import { createSuccessResponse, createErrorResponse } from "@/lib/response";
 
 const clerk = Clerk({ secretKey: process.env.CLERK_SECRET_KEY! });
