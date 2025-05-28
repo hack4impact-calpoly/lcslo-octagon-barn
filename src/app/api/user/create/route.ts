@@ -27,17 +27,9 @@ export async function POST(req: Request) {
   } catch (err: any) {
     console.error("Clerk User Creation Error:", err);
 
-    if (
-      err &&
-      typeof err === "object" &&
-      Array.isArray((err as any).errors) &&
-      (err as any).errors.length > 0
-    ) {
+    if (err && typeof err === "object" && Array.isArray((err as any).errors) && (err as any).errors.length > 0) {
       const first = (err as any).errors[0];
-      const humanMsg =
-        (first.longMessage as string) ||
-        (first.message as string) ||
-        "Password is too weak";
+      const humanMsg = (first.longMessage as string) || (first.message as string) || "Password is too weak";
 
       return createErrorResponse("Weak Password", humanMsg, 400);
     }

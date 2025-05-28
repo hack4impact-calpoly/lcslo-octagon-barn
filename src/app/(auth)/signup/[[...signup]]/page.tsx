@@ -96,14 +96,14 @@ const SignUpPage: React.FC = () => {
         if (response.status === 409) {
           setApiError("User already exists. Please sign in instead.");
         } else {
-          setErrors(prev => ({ 
-            ...prev, 
-            password: result.error || "Failed to create user" 
+          setErrors((prev) => ({
+            ...prev,
+            password: result.error || "Failed to create user",
           }));
         }
         return;
       }
-         
+
       // store user in session storage
       sessionStorage.setItem(
         "assignedUser",
@@ -203,7 +203,7 @@ const SignUpPage: React.FC = () => {
                   errors.phone ? "border-red-500" : "border-sky-600"
                 } focus:outline-none focus:border-sky-500`}
               />
-              {errors.phone && (<p className="text-red-500 text-sm mt-1">{errors.phone}</p>)}
+              {errors.phone && <p className="text-red-500 text-sm mt-1">{errors.phone}</p>}
             </div>
 
             <div className="col-span-2">
