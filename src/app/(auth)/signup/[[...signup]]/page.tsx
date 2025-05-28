@@ -9,6 +9,7 @@ interface FormValues {
   lastName: string;
   organization: string;
   email: string;
+  phone: string;
   password: string;
 }
 
@@ -20,6 +21,7 @@ const SignUpPage: React.FC = () => {
     lastName: "",
     organization: "",
     email: "",
+    phone: "",
     password: "",
   });
 
@@ -46,6 +48,13 @@ const SignUpPage: React.FC = () => {
       newErrors.email = "Email is required";
     } else if (!emailRegex.test(formValues.email)) {
       newErrors.email = "Invalid email format";
+    }
+
+    const phoneRegex = /^\+?[1-9]\d{9,14}$/;
+    if (!formValues.phone.trim()) {
+      newErrors.phone = "Phone number is required";
+    } else if (!phoneRegex.test(formValues.phone.trim())) {
+      newErrors.phone = "Invalid phone number format";
     }
 
     if (!formValues.password.trim()) {
@@ -76,6 +85,7 @@ const SignUpPage: React.FC = () => {
           firstName: formValues.firstName,
           lastName: formValues.lastName,
           email: formValues.email,
+          phone: formValues.phone,
           password: formValues.password,
         }),
       });
@@ -86,11 +96,14 @@ const SignUpPage: React.FC = () => {
         if (response.status === 409) {
           setApiError("User already exists. Please sign in instead.");
         } else {
-          setApiError(result.error || "Failed to create user");
+          setErrors(prev => ({ 
+            ...prev, 
+            password: result.error || "Failed to create user" 
+          }));
         }
-        throw new Error(result.error || "Unknown signup error");
+        return;
       }
-
+         
       // store user in session storage
       sessionStorage.setItem(
         "assignedUser",
@@ -177,6 +190,20 @@ const SignUpPage: React.FC = () => {
                 } focus:outline-none focus:border-sky-500`}
               />
               {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email}</p>}
+            </div>
+
+            <div className="col-span-2">
+              <label className="block mb-1 font-medium text-basic-blue">Phone Number (including country code)</label>
+              <input
+                type="tel"
+                name="phone"
+                value={formValues.phone}
+                onChange={handleChange}
+                className={`w-full px-3 py-2 border rounded ${
+                  errors.phone ? "border-red-500" : "border-sky-600"
+                } focus:outline-none focus:border-sky-500`}
+              />
+              {errors.phone && (<p className="text-red-500 text-sm mt-1">{errors.phone}</p>)}
             </div>
 
             <div className="col-span-2">
