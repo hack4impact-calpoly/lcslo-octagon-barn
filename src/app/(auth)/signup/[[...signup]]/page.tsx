@@ -3,11 +3,11 @@
 import React, { useState, FormEvent } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import PhoneInputWithCountry from "react-phone-number-input/input";
 
 interface FormValues {
   firstName: string;
   lastName: string;
-  organization: string;
   email: string;
   phone: string;
   password: string;
@@ -19,7 +19,6 @@ const SignUpPage: React.FC = () => {
   const [formValues, setFormValues] = useState<FormValues>({
     firstName: "",
     lastName: "",
-    organization: "",
     email: "",
     phone: "",
     password: "",
@@ -41,7 +40,6 @@ const SignUpPage: React.FC = () => {
 
     if (!formValues.firstName.trim()) newErrors.firstName = "First name is required";
     if (!formValues.lastName.trim()) newErrors.lastName = "Last name is required";
-    if (!formValues.organization.trim()) newErrors.organization = "Organization is required";
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!formValues.email.trim()) {
@@ -94,7 +92,7 @@ const SignUpPage: React.FC = () => {
 
       if (!response.ok) {
         if (response.status === 409) {
-          setApiError("User already exists. Please sign in instead.");
+          setApiError("User already exists");
         } else {
           setErrors((prev) => ({
             ...prev,
@@ -165,20 +163,6 @@ const SignUpPage: React.FC = () => {
             </div>
 
             <div className="col-span-2">
-              <label className="block mb-1 font-medium text-basic-blue">Organization</label>
-              <input
-                type="text"
-                name="organization"
-                value={formValues.organization}
-                onChange={handleChange}
-                className={`w-full px-3 py-2 border rounded ${
-                  errors.organization ? "border-red-500" : "border-sky-600"
-                } focus:outline-none focus:border-sky-500`}
-              />
-              {errors.organization && <p className="text-red-500 text-sm mt-1">{errors.organization}</p>}
-            </div>
-
-            <div className="col-span-2">
               <label className="block mb-1 font-medium text-basic-blue">Email Address</label>
               <input
                 type="email"
@@ -193,15 +177,16 @@ const SignUpPage: React.FC = () => {
             </div>
 
             <div className="col-span-2">
-              <label className="block mb-1 font-medium text-basic-blue">Phone Number (including country code)</label>
-              <input
-                type="tel"
-                name="phone"
+              <label className="block mb-1 font-medium text-basic-blue">Phone Number</label>
+
+              <PhoneInputWithCountry
+                defaultCountry="US"
                 value={formValues.phone}
-                onChange={handleChange}
+                onChange={(value) => setFormValues((prev) => ({ ...prev, phone: value || "" }))}
                 className={`w-full px-3 py-2 border rounded ${
                   errors.phone ? "border-red-500" : "border-sky-600"
                 } focus:outline-none focus:border-sky-500`}
+                placeholder="Enter phone number"
               />
               {errors.phone && <p className="text-red-500 text-sm mt-1">{errors.phone}</p>}
             </div>

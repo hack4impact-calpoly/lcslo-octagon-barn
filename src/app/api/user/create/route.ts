@@ -10,16 +10,15 @@ export async function POST(req: Request) {
     const existingUsers = await clerk.users.getUserList({ emailAddress: email });
 
     if (existingUsers.length > 0) {
-      return createErrorResponse("User exists", "User already exists. Please sign in instead.", 409);
+      return createErrorResponse("User exists", "User already exists", 409);
     }
 
     const user = await clerk.users.createUser({
       firstName,
       lastName,
       emailAddress: [email],
-      phoneNumber: [phone],
       password,
-      publicMetadata: { isAdmin: false },
+      publicMetadata: { isAdmin: false, phonNumber: phone },
     });
 
     return createSuccessResponse({ success: true, userId: user.id }, 200);
@@ -27,10 +26,12 @@ export async function POST(req: Request) {
     console.error("Clerk User Creation Error:", err);
 
     if (err && typeof err === "object" && Array.isArray((err as any).errors) && (err as any).errors.length > 0) {
-      const first = (err as any).errors[0];
-      const humanMsg = (first.longMessage as string) || (first.message as string) || "Password is too weak";
-
-      return createErrorResponse("Weak Password", humanMsg, 400);
+      for (const error of (err as any).errors) {
+        console.error("Clerk Error Details:", error);
+        if (error.code === "form_password_pwned") {
+          return createErrorResponse("Password Weak", "Password is too weak.", 400);
+        }
+      }
     }
 
     // Fallback for any other error

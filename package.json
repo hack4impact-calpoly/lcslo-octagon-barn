@@ -52,6 +52,7 @@
     "react-dom": "^18",
     "react-drag-drop-files": "^2.4.0",
     "react-loader-spinner": "^6.1.6",
+    "react-phone-number-input": "^3.4.12",
     "request": ">=2.68.0",
     "superagent": ">=3.7.0",
     "tailwind-merge": "^2.6.0",
