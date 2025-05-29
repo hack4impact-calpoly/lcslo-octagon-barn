@@ -49,7 +49,12 @@ export default function Navbar() {
 
     fetch(`/api/notification?alertTo=${alertTo}`)
       .then((res) => res.json())
-      .then((data: IAlert[]) => setAlerts(data))
+      .then((data: IAlert[]) => {
+        const sorted_alerts = data.sort(
+          (a, b) => new Date(b.alertDateTime).getTime() - new Date(a.alertDateTime).getTime(),
+        );
+        setAlerts(sorted_alerts);
+      })
       .catch((err) => console.error("Failed to load alerts", err));
   }, [user?.id, isAdmin]);
 
