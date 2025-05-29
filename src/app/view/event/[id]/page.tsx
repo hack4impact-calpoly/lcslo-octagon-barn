@@ -4,12 +4,12 @@ import React, { useState, useEffect } from "react";
 import { useUser } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
 import { useParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import EventTile from "@/components/EventTile";
 import { LoadingSpinner, UnauthorizedState, ErrorState } from "@/components/loadingStates";
 import EventDetailsForm from "./components/eventDetailsForm";
 import EventTabContent from "./components/eventTabContent";
 
-// Type definitions
 interface IEventFrontend {
   clerkId: string;
   docIds: string[];
@@ -52,6 +52,8 @@ export default function EventDetailsView() {
   const params = useParams();
   const eventId = Array.isArray(params.id) ? params.id[0] : (params.id ?? "default-id");
   const [activeTab, setActiveTab] = useState<string>("details");
+  const [eventStatus, setEventStatus] = useState<string | null>(null);
+  const router = useRouter();
 
   const venueOptions: IEventFrontend["venue"][] = [
     "Full Facility",
@@ -61,7 +63,6 @@ export default function EventDetailsView() {
     "Other",
   ];
 
-  // Auth check
   useEffect(() => {
     if (isLoaded && user) {
       setAuthorized(true);
@@ -126,6 +127,7 @@ export default function EventDetailsView() {
           setEventData(combinedData);
           setEditCache(combinedData);
           setError(null);
+          setEventStatus(formattedEvent.status);
         } catch (err) {
           console.error("Error fetching event or user:", err);
           setError("Failed to load event or client data");
@@ -137,7 +139,6 @@ export default function EventDetailsView() {
     }
   }, [eventId]);
 
-  // Loading and auth states
   if (!isLoaded || loading) {
     return <LoadingSpinner />;
   }
@@ -150,7 +151,6 @@ export default function EventDetailsView() {
     return <ErrorState message={error ? error : "An unknown error occurred"} />;
   }
 
-  // Event handlers
   const handleEditClick = () => {
     setEditCache({ ...eventData });
     setIsEditing(true);
@@ -167,7 +167,6 @@ export default function EventDetailsView() {
     if (!eventData) return;
 
     try {
-      // Extract only the IEvent fields to send to the backend
       const {
         clerkId,
         docIds,
@@ -183,7 +182,6 @@ export default function EventDetailsView() {
         numGuests,
       } = eventData;
 
-      // Prepare payload with only IEvent fields
       const payload = {
         clerkId,
         docIds,
@@ -213,7 +211,6 @@ export default function EventDetailsView() {
 
       const updatedEvent = await response.json();
 
-      // Update the state with the response from the server
       const formattedEvent = {
         ...updatedEvent,
         eventDateStart: new Date(updatedEvent.eventDateStart),
@@ -221,7 +218,6 @@ export default function EventDetailsView() {
         createdAt: new Date(updatedEvent.createdAt),
       };
 
-      // Combine with temporary data
       setEventData({
         ...formattedEvent,
         clientName: eventData.clientName,
@@ -270,6 +266,9 @@ export default function EventDetailsView() {
 
   return (
     <div className="p-4 md:p-8 lg:p-16">
+      {(eventStatus === "Completed" || eventStatus === "Cancelled") && (
+        <div className="bg-yellow-100 text-black text-center py-2 rounded mb-4">{`Event is labeled ${eventStatus.toLowerCase()}`}</div>
+      )}
       {/* Tab and Buttons Container */}
       <div className="w-3/4 mx-auto mb-6">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-0">
@@ -302,7 +301,7 @@ export default function EventDetailsView() {
 
           <div className="flex-grow" />
 
-          {isAdmin && (
+          {isAdmin && eventStatus !== "Completed" && eventStatus !== "Cancelled" && (
             <div className="space-x-2 flex-shrink-0">
               {isEditing ? (
                 <>
@@ -325,7 +324,6 @@ export default function EventDetailsView() {
         </div>
       </div>
 
-      {/* Event Tile Section */}
       <div className="flex justify-center mb-6">
         {isEditing && isAdmin ? (
           <EventDetailsForm eventData={eventData} onUpdateField={handleUpdateField} venueOptions={venueOptions} />
