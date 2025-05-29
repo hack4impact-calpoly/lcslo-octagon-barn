@@ -10,7 +10,7 @@ import { useParams, useRouter } from "next/navigation";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Spinner } from "@/components/ui/spinner";
-import { LoadingSpinner, UnauthorizedState } from "@/components/loadingStates";
+import { LoadingSpinner } from "@/components/loadingStates";
 
 // Deprecated function to download document
 // async function downloadDocument(s3DocIdClient: string) {
@@ -244,14 +244,6 @@ const ClientUploadPage: React.FC = () => {
   };
 
   useEffect(() => {
-    if (isLoaded && user) {
-      setAuthorized(true);
-    } else {
-      setAuthorized(false);
-    }
-  }, [user, isLoaded, eventClerkId]);
-
-  useEffect(() => {
     if (!isLoaded) return;
 
     const fetchData = async () => {
@@ -280,20 +272,34 @@ const ClientUploadPage: React.FC = () => {
     fetchData();
   }, [isLoaded, eventId]);
 
-  if (!isLoaded || loading) {
-    return <LoadingSpinner />;
-  }
+  useEffect(() => {
+    if (loading || !isLoaded) return;
 
-  if (!authorized) {
-    return <UnauthorizedState />;
+    if (!eventClerkId) {
+      router.push("/not-found");
+      return;
+    }
+
+    if (user?.id !== eventClerkId) {
+      router.push("/not-found");
+    } else {
+      setAuthorized(true);
+    }
+  }, [loading, isLoaded, eventClerkId, user?.id, router]);
+
+  if (!isLoaded || loading || !authorized) {
+    return <LoadingSpinner />;
   }
 
   // Lock the page if the event is completed or cancelled
   if (eventStatus === "Completed" || eventStatus === "Cancelled") {
     return (
       <div className="p-8 text-center">
-        <h2 className="text-2xl font-semibold mb-4">Event is locked</h2>
-        <Button onClick={() => router.back()}>Go Back</Button>
+        <h2 className="text-2xl font-semibold mb-4">{`Event is labeled ${eventStatus.toLowerCase()}`}</h2>
+        <p className="text-lg mb-6">You can no longer upload documents for this event</p>
+        <Button className="bg-[#3A6F8F] text-white px-8 py-4 text-2xl rounded-lg" onClick={() => router.back()}>
+          Go Back
+        </Button>
       </div>
     );
   }

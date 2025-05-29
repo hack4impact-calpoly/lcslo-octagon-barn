@@ -267,7 +267,7 @@ export default function EventDetailsView() {
   return (
     <div className="p-4 md:p-8 lg:p-16">
       {(eventStatus === "Completed" || eventStatus === "Cancelled") && (
-        <div className="bg-yellow-100 text-black text-center py-2 rounded mb-4">Event is locked</div>
+        <div className="bg-yellow-100 text-black text-center py-2 rounded mb-4">{`Event is labeled ${eventStatus.toLowerCase()}`}</div>
       )}
       {/* Tab and Buttons Container */}
       <div className="w-3/4 mx-auto mb-6">
