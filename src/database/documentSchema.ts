@@ -9,7 +9,7 @@ type IDocument = Document & {
   s3DocIdClient: string;
   createdAt: Date;
   uploadedAt: Date;
-  status: "Completed" | "Pending" | "Not Submitted";
+  status: "Accepted" | "Rejected" | "Pending" | "Not Submitted";
   checkList: string[];
 };
 

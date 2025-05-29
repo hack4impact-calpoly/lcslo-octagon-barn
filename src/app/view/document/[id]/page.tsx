@@ -77,8 +77,7 @@ export default function DocumentView() {
 
   // Authorization: Only allow document owner or admin to view the document.
   const isOwner = user?.id === document.clerkId;
-  const isAdmin = user?.publicMetadata?.role === "admin";
-
+  const isAdmin = user?.publicMetadata?.isAdmin === true;
   if (!isOwner && !isAdmin) {
     return <div className="flex items-center justify-center h-screen text-xl">No document found.</div>;
   }

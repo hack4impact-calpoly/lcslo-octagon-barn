@@ -109,7 +109,7 @@ const EventTile: React.FC<EventTileProps> = ({
             <User size={18} /> {numGuests || "N/A"}
           </p>
           <p className="text-lg flex items-center gap-2">
-            <FileText size={18} /> {docsCompleted}/{docsTotal}
+            <FileText size={18} /> {docsTotal}
           </p>
         </div>
       </div>

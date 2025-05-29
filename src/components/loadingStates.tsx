@@ -1,7 +1,7 @@
 import { RotatingLines } from "react-loader-spinner";
 
 export const LoadingSpinner = () => (
-  <div className="flex items-center justify-center h-screen">
+  <div className="absolute left-1/2 bottom-[300px] -translate-x-1/2">
     <RotatingLines strokeColor="black" strokeWidth="4" animationDuration="0.75" width="96" visible={true} />
   </div>
 );

@@ -2,6 +2,7 @@ import { Tabs, TabsContent } from "@/components/ui/tabs";
 import EventDisplay from "./eventDisplay";
 import ContactSection from "./contactSection";
 import DocumentList from "./documentList";
+import DocumentTable from "./documentTable";
 
 interface IDocument {
   name: string;
@@ -9,8 +10,8 @@ interface IDocument {
 }
 
 interface EventTabContentProps {
+  eventId: string;
   activeTab: string;
-  setActiveTab: (tab: string) => void;
   eventDetails: string;
   vendorList: string;
   documents: IDocument[];
@@ -24,6 +25,7 @@ interface EventTabContentProps {
 }
 
 export default function EventTabContent({
+  eventId,
   activeTab,
   eventDetails,
   vendorList,
@@ -71,9 +73,7 @@ export default function EventTabContent({
 
         {/* Documents tab content */}
         <TabsContent value="documents" className="mt-0 pt-4">
-          <div className="p-4 bg-gray-200 rounded-lg shadow-md border border-gray-300">
-            <p>Not implemented</p>
-          </div>
+          <DocumentTable eventId={eventId} isAdmin={isAdmin} />
         </TabsContent>
       </Tabs>
     </div>

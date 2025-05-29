@@ -10,7 +10,8 @@ import { useParams, useRouter } from "next/navigation";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Spinner } from "@/components/ui/spinner";
-import { LoadingSpinner } from "@/components/loadingStates";
+import { LoadingSpinner, UnauthorizedState } from "@/components/loadingStates";
+import Link from "next/link";
 
 // Deprecated function to download document
 // async function downloadDocument(s3DocIdClient: string) {
@@ -326,6 +327,13 @@ const ClientUploadPage: React.FC = () => {
       {/* Main Layout */}
 
       {/* Document Name and Select box for type*/}
+      <div className="flex items-center justify-between w-full max-w-5xl mb-6">
+        <Link href={`/view/event/${eventId}`}>
+          <Button variant="outline" className="bg-[#3A6F8F] text-white hover:bg-[#305a73]" size="lg">
+            Back
+          </Button>
+        </Link>
+      </div>
       <div className="flex w-full max-w-5xl gap-5 mb-6">
         <div className="w-2/3">
           <Input

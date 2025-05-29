@@ -10,7 +10,8 @@ import { useParams, useRouter } from "next/navigation";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Spinner } from "@/components/ui/spinner";
-import { LoadingSpinner } from "@/components/loadingStates";
+import { ErrorState, LoadingSpinner } from "@/components/loadingStates";
+import Link from "next/link";
 
 // Deprecated function to download document
 // async function downloadDocument(s3DocIdClient: string) {
@@ -157,6 +158,7 @@ const ClientUploadPage: React.FC = () => {
   const [documentType, setDocumentType] = useState<string>("");
   const [documentName, setDocumentName] = useState<string>("");
   const [uploading, setUploading] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
 
   const [file, setFile] = useState<File | null>(null);
   const [checklist, setChecklist] = useState<boolean[]>(new Array(8).fill(false));
@@ -186,14 +188,17 @@ const ClientUploadPage: React.FC = () => {
           setEventClerkId(event.clerkId);
           const document = await documentRes.json();
           setDocumentClerkId(document.clerkId);
+          setError(null);
         } else {
           setEventClerkId(null);
           setDocumentClerkId(null);
+          setError("Failed to fetch data");
         }
       } catch (error) {
         console.error("Error fetching data:", error);
         setEventClerkId(null);
         setDocumentClerkId(null);
+        setError("Failed to fetch data");
       } finally {
         setLoading(false);
       }
@@ -216,6 +221,10 @@ const ClientUploadPage: React.FC = () => {
       setAuthorized(true);
     }
   }, [loading, userIsLoaded, eventClerkId, documentClerkId, user?.id, router]);
+
+  if (error) {
+    return <ErrorState message={error}></ErrorState>;
+  }
 
   if (loading || !userIsLoaded || !authorized) {
     return <LoadingSpinner />;
@@ -250,6 +259,13 @@ const ClientUploadPage: React.FC = () => {
       {/* Main Layout */}
 
       {/* Document Name and Select box for type*/}
+      <div className="flex items-center justify-between w-full max-w-5xl mb-6">
+        <Link href={`/view/event/${eventId}`}>
+          <Button variant="outline" className="bg-[#3A6F8F] text-white hover:bg-[#305a73]" size="lg">
+            Back
+          </Button>
+        </Link>
+      </div>
       <div className="flex w-full max-w-5xl gap-5 mb-6">
         <div className="w-2/3">
           <Input
@@ -332,8 +348,7 @@ const ClientUploadPage: React.FC = () => {
               try {
                 setUploading(true);
                 await uploadDocument(file, user, eventId as string, documentId as string, documentType, documentName);
-                // TODO: Route to event page once completed
-                router.push(`/`);
+                router.push(`/view/event/${eventId}`);
               } catch (err) {
                 console.error("Upload failed:", err);
               } finally {
