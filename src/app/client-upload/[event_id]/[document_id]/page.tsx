@@ -9,7 +9,7 @@ import { UserResource } from "@clerk/types";
 import { useParams, useRouter } from "next/navigation";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
-import { Spinner } from "@/components/ui/spinner"
+import { Spinner } from "@/components/ui/spinner";
 import { ErrorState, LoadingSpinner } from "@/components/loadingStates";
 import Link from "next/link";
 
@@ -225,7 +225,7 @@ const ClientUploadPage: React.FC = () => {
   if (error) {
     return <ErrorState message={error}></ErrorState>;
   }
-  
+
   if (loading || !userIsLoaded || !authorized) {
     return <LoadingSpinner />;
   }
