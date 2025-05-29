@@ -23,6 +23,7 @@ interface IDocumentEntry {
 
 interface IDocumentTableProps {
   eventId: string;
+  eventStatus: "Upcoming" | "Ongoing" | "Completed" | "Cancelled";
   isAdmin: boolean;
 }
 
@@ -86,7 +87,7 @@ async function handleDeleteDocument(docId: string, eventId: string) {
   }
 }
 
-export default function DocumentTable({ eventId, isAdmin }: IDocumentTableProps) {
+export default function DocumentTable({ eventId, eventStatus, isAdmin }: IDocumentTableProps) {
   const { user, isLoaded } = useUser();
   const [authorized, setAuthorized] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -197,16 +198,20 @@ export default function DocumentTable({ eventId, isAdmin }: IDocumentTableProps)
                   </Link>
                 </td>
                 <td>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={async () => {
-                      await handleDeleteDocument(doc._id as string, doc.eventId as string);
-                      setDocuments((prev) => prev.filter((e) => e._id !== doc._id));
-                    }}
-                  >
-                    <i className="icon-[ic--baseline-delete-forever] text-rose-500 h-8 w-8" aria-hidden="true"></i>
-                  </Button>
+                  {eventStatus !== "Completed" && eventStatus !== "Cancelled" ? (
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={async () => {
+                        await handleDeleteDocument(doc._id as string, doc.eventId as string);
+                        setDocuments((prev) => prev.filter((e) => e._id !== doc._id));
+                      }}
+                    >
+                      <i className="icon-[ic--baseline-delete-forever] text-rose-500 h-8 w-8" aria-hidden="true"></i>
+                    </Button>
+                  ) : (
+                    <i className="icon-[ic--baseline-delete-forever] text-gray-500 h-8 w-8" aria-hidden="true"></i>
+                  )}
                 </td>
               </tr>
             ))}

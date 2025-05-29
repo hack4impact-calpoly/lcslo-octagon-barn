@@ -218,11 +218,17 @@ export default function AdminEventDashboard() {
                     View Event
                   </Link>
                 </TableCell>
-                <TableCell className="!text-center">
-                  <Button variant="ghost" size="icon" onClick={() => deleteEvent(e.id)}>
-                    <i className="icon-[ic--baseline-delete-forever] text-rose-500 h-6 w-6" aria-hidden="true"></i>
-                  </Button>
-                </TableCell>
+                {e.status !== "Completed" && e.status !== "Cancelled" ? (
+                  <TableCell className="!text-center">
+                    <Button variant="ghost" size="icon" onClick={() => deleteEvent(e.id)}>
+                      <i className="icon-[ic--baseline-delete-forever] text-rose-500 h-6 w-6" aria-hidden="true"></i>
+                    </Button>
+                  </TableCell>
+                ) : (
+                  <TableCell className="!text-center">
+                    <i className="icon-[ic--baseline-delete-forever] text-gray-500 h-6 w-6" aria-hidden="true"></i>
+                  </TableCell>
+                )}
               </TableRow>
             ))}
           </TableBody>

@@ -13,6 +13,7 @@ interface EventTabContentProps {
   eventId: string;
   activeTab: string;
   eventDetails: string;
+  eventStatus: "Upcoming" | "Ongoing" | "Completed" | "Cancelled";
   vendorList: string;
   documents: IDocument[];
   name?: string;
@@ -28,6 +29,7 @@ export default function EventTabContent({
   eventId,
   activeTab,
   eventDetails,
+  eventStatus,
   vendorList,
   documents,
   name,
@@ -73,7 +75,7 @@ export default function EventTabContent({
 
         {/* Documents tab content */}
         <TabsContent value="documents" className="mt-0 pt-4">
-          <DocumentTable eventId={eventId} isAdmin={isAdmin} />
+          <DocumentTable eventId={eventId} eventStatus={eventStatus} isAdmin={isAdmin} />
         </TabsContent>
       </Tabs>
     </div>

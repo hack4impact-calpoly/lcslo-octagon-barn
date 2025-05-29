@@ -52,7 +52,7 @@ export default function EventDetailsView() {
   const [editCache, setEditCache] = useState<(IEventFrontend & ITempEventData) | null>(null);
   const params = useParams();
   const eventId = Array.isArray(params.id) ? params.id[0] : (params.id ?? "default-id");
-  const [eventStatus, setEventStatus] = useState("");
+  const [eventStatus, setEventStatus] = useState<"Completed" | "Cancelled" | "Upcoming" | "Ongoing">("Upcoming");
   const [activeTab, setActiveTab] = useState<string>(() => {
     return localStorage.getItem("eventActiveTab") || "details";
   });
@@ -371,6 +371,7 @@ export default function EventDetailsView() {
         eventId={eventId}
         activeTab={activeTab}
         eventDetails={eventData.eventDetails}
+        eventStatus={eventStatus}
         vendorList={eventData.vendorList}
         documents={eventData.documents}
         name={eventData.clientName}
