@@ -250,11 +250,20 @@ export default function DocumentTable({ eventId, eventStatus, isAdmin }: IDocume
                 </Link>
               </td>
               <td>
-                <Link href={`/client-upload/${eventId}/${doc._id}`}>
-                  <Button className="bg-basic-blue text-white hover:bg-hover-blue px-4 py-1 rounded-lg w-[6rem]">
+                {eventStatus !== "Completed" && eventStatus !== "Cancelled" ? (
+                  <Link href={`/client-upload/${eventId}/${doc._id}`} passHref>
+                    <Button className="bg-basic-blue text-white hover:bg-hover-blue px-4 py-1 rounded-lg w-[6rem]">
+                      Reupload
+                    </Button>
+                  </Link>
+                ) : (
+                  <Button
+                    disabled
+                    className="bg-gray-400 text-gray-700 px-4 py-1 rounded-lg w-[6rem] cursor-not-allowed"
+                  >
                     Reupload
                   </Button>
-                </Link>
+                )}
               </td>
             </tr>
           ))}
