@@ -52,6 +52,7 @@ export default function EventDetailsView() {
   const [editCache, setEditCache] = useState<(IEventFrontend & ITempEventData) | null>(null);
   const params = useParams();
   const eventId = Array.isArray(params.id) ? params.id[0] : (params.id ?? "default-id");
+  const [eventStatus, setEventStatus] = useState("");
   const [activeTab, setActiveTab] = useState<string>(() => {
     return localStorage.getItem("eventActiveTab") || "details";
   });
@@ -125,7 +126,7 @@ export default function EventDetailsView() {
             documents: [{ name: "brochure.pdf", url: "/brochure.pdf" }],
             headerImageUrl: "/octagon_barn_plaza.jpg",
           };
-
+          setEventStatus(combinedData.status);
           setEventData(combinedData);
           setEditCache(combinedData);
           setError(null);
@@ -309,41 +310,42 @@ export default function EventDetailsView() {
           )}
 
           <div className="flex-grow" />
-
-          {isAdmin ? (
-            <div className="space-x-2 flex-shrink-0">
-              {isEditing ? (
-                <>
-                  <Button className="w-[5rem] lg:w-[7rem] text-base" variant="outline" onClick={handleSave}>
-                    Save
-                  </Button>
-                  <Button className="w-[5rem] lg:w-[7rem] text-base" variant="outline" onClick={handleCancel}>
-                    Cancel
-                  </Button>
-                </>
-              ) : (
-                activeTab === "details" && (
-                  <Button className="w-[5rem] lg:w-[7rem] text-base" variant="outline" onClick={handleEditClick}>
-                    Edit
-                  </Button>
-                )
-              )}
-            </div>
-          ) : (
-            activeTab === "documents" && (
+          {eventStatus !== "Completed" &&
+            eventStatus !== "Cancelled" &&
+            (isAdmin ? (
               <div className="space-x-2 flex-shrink-0">
-                <Link href={`/client-upload/${eventId}`}>
-                  <Button
-                    className="bg-basic-blue text-white hover:bg-hover-blue px-4 py-1 text-base rounded-lg lg:w-[12rem] h-[3rem]"
-                    variant="outline"
-                  >
-                    {/* <Button className="w-[5rem] lg:w-[10rem] text-base" variant="outline"> */}
-                    Add New Document
-                  </Button>
-                </Link>
+                {isEditing ? (
+                  <>
+                    <Button className="w-[5rem] lg:w-[7rem] text-base" variant="outline" onClick={handleSave}>
+                      Save
+                    </Button>
+                    <Button className="w-[5rem] lg:w-[7rem] text-base" variant="outline" onClick={handleCancel}>
+                      Cancel
+                    </Button>
+                  </>
+                ) : (
+                  activeTab === "details" && (
+                    <Button className="w-[5rem] lg:w-[7rem] text-base" variant="outline" onClick={handleEditClick}>
+                      Edit
+                    </Button>
+                  )
+                )}
               </div>
-            )
-          )}
+            ) : (
+              activeTab === "documents" && (
+                <div className="space-x-2 flex-shrink-0">
+                  <Link href={`/client-upload/${eventId}`}>
+                    <Button
+                      className="bg-basic-blue text-white hover:bg-hover-blue px-4 py-1 text-base rounded-lg lg:w-[12rem] h-[3rem]"
+                      variant="outline"
+                    >
+                      {/* <Button className="w-[5rem] lg:w-[10rem] text-base" variant="outline"> */}
+                      Add New Document
+                    </Button>
+                  </Link>
+                </div>
+              )
+            ))}
           {/* bg-blue-600 hover:bg-blue-700 */}
         </div>
       </div>
