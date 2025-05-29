@@ -134,6 +134,7 @@ const SignUpPage: React.FC = () => {
           {apiError && <p className="text-red-500 text-center">{apiError}</p>}
 
           <form onSubmit={handleSubmit} className="grid grid-cols-2 gap-4" noValidate>
+            {/* First Name */}
             <div className="col-span-1">
               <label className="block mb-1 font-medium text-basic-blue">First Name</label>
               <input
@@ -148,6 +149,7 @@ const SignUpPage: React.FC = () => {
               {errors.firstName && <p className="text-red-500 text-sm mt-1">{errors.firstName}</p>}
             </div>
 
+            {/* Last Name */}
             <div className="col-span-1">
               <label className="block mb-1 font-medium text-basic-blue">Last Name</label>
               <input
@@ -162,6 +164,7 @@ const SignUpPage: React.FC = () => {
               {errors.lastName && <p className="text-red-500 text-sm mt-1">{errors.lastName}</p>}
             </div>
 
+            {/* Email */}
             <div className="col-span-2">
               <label className="block mb-1 font-medium text-basic-blue">Email Address</label>
               <input
@@ -176,6 +179,7 @@ const SignUpPage: React.FC = () => {
               {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email}</p>}
             </div>
 
+            {/* Password */}
             <div className="col-span-2">
               <label className="block mb-1 font-medium text-basic-blue">Phone Number</label>
 
@@ -214,6 +218,7 @@ const SignUpPage: React.FC = () => {
               {errors.password && <p className="text-red-500 text-sm mt-1">{errors.password}</p>}
             </div>
 
+            {/* Submit */}
             <div className="col-span-2 mt-2 text-center">
               <button
                 type="submit"

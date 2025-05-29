@@ -13,5 +13,5 @@ export const UnauthorizedState = () => (
 );
 
 export const ErrorState = ({ message }: { message: string }) => (
-  <div className="flex items-center justify-center h-screen text-2xl font-bold text-red-500">`{message}</div>
+  <div className="flex items-center justify-center h-screen text-2xl font-bold text-black-500">{message}</div>
 );

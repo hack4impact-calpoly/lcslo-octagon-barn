@@ -4,6 +4,7 @@ import { useUser } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
 import EventTile from "@/components/EventTile";
 import AdminEventDashboard from "@/components/AdminEventDashboard";
+import { LoadingSpinner, ErrorState } from "@/components/loadingStates";
 
 interface Event {
   id: string;
@@ -21,6 +22,8 @@ export default function Home() {
   const { user, isLoaded } = useUser();
   const router = useRouter();
   const [events, setEvents] = useState<Event[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
   const userId = user?.id;
 
   // Redirect if user is not loaded or signed out
@@ -37,14 +40,23 @@ export default function Home() {
         .then((res) => res.json())
         .then((data) => {
           setEvents(data || []);
+          setLoading(false);
         })
-        .catch((err) => console.error("Failed to load events", err));
+        .catch((err) => {
+          console.error("Failed to load events", err);
+          setLoading(false);
+          setError("Failed to load page");
+        });
     }
   }, [userId]);
 
   // Show loading state
-  if (!isLoaded) {
-    return <p className="text-center p-8">Loading...</p>;
+  if (!isLoaded || loading) {
+    return <LoadingSpinner />;
+  }
+
+  if (error) {
+    return <ErrorState message={error ? error : "An unknown error occurred"} />;
   }
 
   // If user is admin, render AdminEventDashboard component
@@ -77,7 +89,7 @@ export default function Home() {
                 />
               ))
             ) : (
-              <p className="text-center text-gray-500">No events found.</p>
+              <p className="text-center text-gray-500 text-lg">No events found</p>
             )}
           </div>
         </div>
