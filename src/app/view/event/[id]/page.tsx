@@ -8,6 +8,7 @@ import EventTile from "@/components/EventTile";
 import { LoadingSpinner, UnauthorizedState, ErrorState } from "@/components/loadingStates";
 import EventDetailsForm from "./components/eventDetailsForm";
 import EventTabContent from "./components/eventTabContent";
+import Link from "next/link";
 
 // Type definitions
 interface IEventFrontend {
@@ -51,7 +52,9 @@ export default function EventDetailsView() {
   const [editCache, setEditCache] = useState<(IEventFrontend & ITempEventData) | null>(null);
   const params = useParams();
   const eventId = Array.isArray(params.id) ? params.id[0] : (params.id ?? "default-id");
-  const [activeTab, setActiveTab] = useState<string>("details");
+  const [activeTab, setActiveTab] = useState<string>(() => {
+    return localStorage.getItem("eventActiveTab") || "details";
+  });
 
   const venueOptions: IEventFrontend["venue"][] = [
     "Full Facility",
@@ -161,6 +164,11 @@ export default function EventDetailsView() {
       setEventData(editCache);
     }
     setIsEditing(false);
+  };
+
+  const handleTabChange = (tab: string) => {
+    setActiveTab(tab);
+    localStorage.setItem("eventActiveTab", tab);
   };
 
   const handleSave = async () => {
@@ -277,7 +285,7 @@ export default function EventDetailsView() {
             <div className="flex border-b">
               <Button
                 variant="ghost"
-                onClick={() => setActiveTab("details")}
+                onClick={() => handleTabChange("details")}
                 className={`pb-1 px-4 rounded-b-none text-md border-b-2 text-lg ${
                   activeTab === "details"
                     ? "border-black text-black"
@@ -288,7 +296,7 @@ export default function EventDetailsView() {
               </Button>
               <Button
                 variant="ghost"
-                onClick={() => setActiveTab("documents")}
+                onClick={() => handleTabChange("documents")}
                 className={`pb-1 px-4 rounded-b-none text-md border-b-2 text-lg ${
                   activeTab === "documents"
                     ? "border-black text-black"
@@ -302,7 +310,7 @@ export default function EventDetailsView() {
 
           <div className="flex-grow" />
 
-          {isAdmin && (
+          {isAdmin ? (
             <div className="space-x-2 flex-shrink-0">
               {isEditing ? (
                 <>
@@ -321,7 +329,22 @@ export default function EventDetailsView() {
                 )
               )}
             </div>
+          ) : (
+            activeTab === "documents" && (
+              <div className="space-x-2 flex-shrink-0">
+                <Link href={`/client-upload/${eventId}`}>
+                  <Button
+                    className="bg-basic-blue text-white hover:bg-hover-blue px-4 py-1 text-base rounded-lg lg:w-[12rem] h-[3rem]"
+                    variant="outline"
+                  >
+                    {/* <Button className="w-[5rem] lg:w-[10rem] text-base" variant="outline"> */}
+                    Add New Document
+                  </Button>
+                </Link>
+              </div>
+            )
           )}
+          {/* bg-blue-600 hover:bg-blue-700 */}
         </div>
       </div>
 
@@ -346,8 +369,8 @@ export default function EventDetailsView() {
       </div>
 
       <EventTabContent
+        eventId={eventId}
         activeTab={activeTab}
-        setActiveTab={setActiveTab}
         eventDetails={eventData.eventDetails}
         vendorList={eventData.vendorList}
         documents={eventData.documents}

@@ -10,6 +10,7 @@ import { useParams, useRouter } from "next/navigation";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Spinner } from "@/components/ui/spinner";
+import { ErrorState, LoadingSpinner } from "@/components/loadingStates";
 
 // Deprecated function to download document
 // async function downloadDocument(s3DocIdClient: string) {
@@ -154,6 +155,7 @@ const ClientUploadPage: React.FC = () => {
   const [documentType, setDocumentType] = useState<string>("");
   const [documentName, setDocumentName] = useState<string>("");
   const [uploading, setUploading] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
 
   const [file, setFile] = useState<File | null>(null);
   const [checklist, setChecklist] = useState<boolean[]>(new Array(8).fill(false));
@@ -182,14 +184,17 @@ const ClientUploadPage: React.FC = () => {
           const document = await documentRes.json();
           setEventClerkId(event.clerkId);
           setDocumentClerkId(document.clerkId);
+          setError(null);
         } else {
           setEventClerkId(null);
           setDocumentClerkId(null);
+          setError("Failed to fetch data");
         }
       } catch (error) {
         console.error("Error fetching data:", error);
         setEventClerkId(null);
         setDocumentClerkId(null);
+        setError("Failed to fetch data");
       } finally {
         setLoading(false);
       }
@@ -212,7 +217,11 @@ const ClientUploadPage: React.FC = () => {
   }, [loading, userIsLoaded, eventClerkId, documentClerkId, user?.id, router]);
 
   if (loading || !userIsLoaded) {
-    return <div>Loading...</div>;
+    return <LoadingSpinner />;
+  }
+
+  if (error) {
+    return <ErrorState message={error}></ErrorState>;
   }
 
   const handleChange = (file: File) => {
@@ -314,8 +323,7 @@ const ClientUploadPage: React.FC = () => {
               try {
                 setUploading(true);
                 await uploadDocument(file, user, eventId as string, documentId as string, documentType, documentName);
-                // TODO: Route to event page once completed
-                router.push(`/`);
+                router.push(`/view/event/${eventId}`);
               } catch (err) {
                 console.error("Upload failed:", err);
               } finally {
