@@ -9,9 +9,10 @@ import { UserResource } from "@clerk/types";
 import { useParams, useRouter } from "next/navigation";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
-import { Spinner } from "@/components/ui/spinner";
+import { Spinner } from "@/components/ui/spinner"
 import { ErrorState, LoadingSpinner } from "@/components/loadingStates";
 import Link from "next/link";
+
 // Deprecated function to download document
 // async function downloadDocument(s3DocIdClient: string) {
 //   try {
@@ -150,7 +151,9 @@ const ClientUploadPage: React.FC = () => {
 
   const { isLoaded: userIsLoaded, user } = useUser();
   const [loading, setLoading] = useState<boolean>(true);
+  const [authorized, setAuthorized] = useState<boolean>(false);
   const [eventClerkId, setEventClerkId] = useState<string | null>(null);
+  const [eventStatus, setEventStatus] = useState<string | null>(null);
   const [documentClerkId, setDocumentClerkId] = useState<string | null>(null);
   const [documentType, setDocumentType] = useState<string>("");
   const [documentName, setDocumentName] = useState<string>("");
@@ -181,8 +184,9 @@ const ClientUploadPage: React.FC = () => {
 
         if (eventRes.ok && documentRes.ok) {
           const event = await eventRes.json();
-          const document = await documentRes.json();
+          setEventStatus(event.status);
           setEventClerkId(event.clerkId);
+          const document = await documentRes.json();
           setDocumentClerkId(document.clerkId);
           setError(null);
         } else {
@@ -213,15 +217,29 @@ const ClientUploadPage: React.FC = () => {
 
     if (user?.id !== eventClerkId || user?.id !== documentClerkId) {
       router.push("/not-found");
+    } else {
+      setAuthorized(true);
     }
   }, [loading, userIsLoaded, eventClerkId, documentClerkId, user?.id, router]);
 
-  if (loading || !userIsLoaded) {
-    return <LoadingSpinner />;
-  }
-
   if (error) {
     return <ErrorState message={error}></ErrorState>;
+  }
+  
+  if (loading || !userIsLoaded || !authorized) {
+    return <LoadingSpinner />;
+  }
+  // Lock the page if the event is completed or cancelled
+  if (eventStatus === "Completed" || eventStatus === "Cancelled") {
+    return (
+      <div className="p-8 text-center">
+        <h2 className="text-2xl font-semibold mb-4">{`Event is labeled ${eventStatus.toLowerCase()}`}</h2>
+        <p className="text-lg mb-6">You can no longer upload documents for this event</p>
+        <Button className="bg-[#3A6F8F] text-white px-8 py-4 text-2xl rounded-lg" onClick={() => router.back()}>
+          Go Back
+        </Button>
+      </div>
+    );
   }
 
   const handleChange = (file: File) => {
