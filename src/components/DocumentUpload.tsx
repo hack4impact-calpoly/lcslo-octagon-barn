@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { FileUploader } from "react-drag-drop-files";
 import { Upload } from "lucide-react";
 
-const fileTypes = ["PDF", "JPEG", "PNG", "DOCX", "DOC", "WORD"];
+const fileTypes = ["PDF", "DOCX", "DOC", "WORD"];
 
 interface DocumentUploadProps {
   file: File | null;

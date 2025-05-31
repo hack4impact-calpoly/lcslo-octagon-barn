@@ -377,9 +377,10 @@ const ClientUploadPage: React.FC = () => {
         {/* Checklist */}
         {documentType === "Insurance/COI" && (
           <div className="w-1/3 border border-gray-300 rounded-lg p-6 bg-gray-50 shadow-md">
-            <h2 className="text-lg font-semibold mb-4">Checklist</h2>
+            <h2 className="text-lg font-semibold mb-4">Required Checklist</h2>
             <ul className="list-none pl-5 space-y-2">
               {[
+                "Document Naming Convention: Guest/VendorName_EventDate_COI (no spaces)",
                 "Additional Insured: The Land Conservancy of San Luis Obispo County, 1137 Pacific Street, San Luis Obispo, CA 93401.",
                 "Coverage on the Event Day (and day prior if onsite for setup)",
                 "$1 Million Each Occurrence Liability Limit",
