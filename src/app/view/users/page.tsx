@@ -1,0 +1,64 @@
+"use client";
+import { User, columns } from "./columns";
+import { DataTable } from "./data-table";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+
+async function getData(): Promise<User[]> {
+  const response = await fetch("/api/user", {
+    method: "GET",
+    cache: "no-store",
+  });
+  if (!response.ok) {
+    throw new Error("Failed to fetch data");
+  }
+  const userData = await response.json();
+  return userData.map((user: any) => ({
+    id: user.id,
+    name: user.firstName + " " + user.lastName,
+    email: user.emailAddresses[0].emailAddress,
+    date: new Date(user.createdAt).toLocaleDateString(),
+  }));
+}
+
+export default function Page() {
+  const [unfilteredData, setUnfilteredData] = useState<User[]>([]);
+  const [data, setData] = useState<User[]>([]);
+  const [searchItem, setSearchItem] = useState("");
+  const router = useRouter();
+
+  useEffect(() => {
+    getData()
+      .then((data) => {
+        setUnfilteredData(data);
+      })
+      .catch((error) => {
+        console.error("Error fetching data:", error);
+      });
+  }, []);
+
+  useEffect(() => {
+    const filteredData = unfilteredData.filter((item) => item.name.toLowerCase().startsWith(searchItem.toLowerCase()));
+    setData(filteredData);
+  }, [searchItem, unfilteredData]);
+
+  return (
+    <div className="container mx-auto py-10">
+      <div className="flex justify-center items-center text-3xl text-[var(--primary-blue)] rounded-l font-bold mb-4">
+        Clients
+      </div>
+      <div className="flex items-center justify-between py-5">
+        <Input
+          type="text"
+          placeholder="Search for clients"
+          value={searchItem}
+          onChange={(e) => setSearchItem(e.target.value)}
+          className="w-[500px] md:text-lg placeholder:text-lg pxd"
+        />
+      </div>
+      <DataTable columns={columns} data={data} />
+    </div>
+  );
+}

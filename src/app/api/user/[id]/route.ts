@@ -18,3 +18,14 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
     return createErrorResponse("Server Error", "Failed to fetch user", 500);
   }
 }
+
+export async function DELETE(req: NextRequest, { params }: { params: { id: string } }) {
+  try {
+    const userId = params.id;
+    await clerkClient.users.deleteUser(userId);
+
+    return createSuccessResponse({ message: "User deleted successfully" }, 200);
+  } catch (error) {
+    return createErrorResponse("Server Error", "Failed to delete user", 500);
+  }
+}
