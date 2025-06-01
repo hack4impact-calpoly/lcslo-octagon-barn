@@ -48,6 +48,7 @@ export default function EventDetailsView() {
   const [error, setError] = useState<string | null>(null);
 
   const [isEditing, setIsEditing] = useState(false);
+  const [isClientEditing, setIsClientEditing] = useState(false);
   const [eventData, setEventData] = useState<(IEventFrontend & ITempEventData) | null>(null);
   const [editCache, setEditCache] = useState<(IEventFrontend & ITempEventData) | null>(null);
   const params = useParams();
@@ -366,6 +367,57 @@ export default function EventDetailsView() {
           />
         )}
       </div>
+
+      {!isAdmin && activeTab === "details" && (
+        <div className="w-full max-w-2xl mx-auto mt-6">
+          <h2 className="text-xl font-semibold mb-2">Vendor List</h2>
+
+          {isClientEditing ? (
+            <>
+              <textarea
+                value={eventData.vendorList}
+                onChange={(e) => handleUpdateField("vendorList", e.target.value)}
+                className="w-full p-2 border rounded-md"
+                rows={5}
+              />
+              <div className="mt-2 space-x-2">
+                <Button
+                  variant="outline"
+                  onClick={async () => {
+                    await handleSave(); // Save and then hide edit
+                    setIsClientEditing(false);
+                  }}
+                >
+                  Save
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setEventData(editCache); // Revert
+                    setIsClientEditing(false);
+                  }}
+                >
+                  Cancel
+                </Button>
+              </div>
+            </>
+          ) : (
+            <>
+              <p className="whitespace-pre-wrap border p-2 rounded-md bg-gray-50">{eventData.vendorList}</p>
+              <Button
+                className="mt-2"
+                variant="outline"
+                onClick={() => {
+                  setEditCache({ ...eventData });
+                  setIsClientEditing(true);
+                }}
+              >
+                Edit Vendor List
+              </Button>
+            </>
+          )}
+        </div>
+      )}
 
       <EventTabContent
         eventId={eventId}
