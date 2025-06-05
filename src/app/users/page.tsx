@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { LoadingSpinner } from "@/components/loadingStates";
 
 async function getData(): Promise<User[]> {
   const response = await fetch("/api/user", {
@@ -28,14 +29,18 @@ export default function Page() {
   const [data, setData] = useState<User[]>([]);
   const [searchItem, setSearchItem] = useState("");
   const router = useRouter();
+  const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
+    setLoading(true);
     getData()
       .then((data) => {
         setUnfilteredData(data);
+        setLoading(false);
       })
       .catch((error) => {
         console.error("Error fetching data:", error);
+        setLoading(false);
       });
   }, []);
 
@@ -43,6 +48,10 @@ export default function Page() {
     const filteredData = unfilteredData.filter((item) => item.name.toLowerCase().startsWith(searchItem.toLowerCase()));
     setData(filteredData);
   }, [searchItem, unfilteredData]);
+
+  if (loading) {
+    return <LoadingSpinner />;
+  }
 
   return (
     <div className="container mx-auto py-10">

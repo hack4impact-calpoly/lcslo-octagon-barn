@@ -37,7 +37,10 @@ export default function AdminEventDashboard() {
   const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(false);
   const [sortConfig, setSortConfig] = useState<{ key: keyof EventRow; direction: "asc" | "desc" } | null>(null);
-  const [currentPage, setCurrentPage] = useState(1);
+  const [currentPage, setCurrentPage] = useState<number>(() => {
+    const stored = sessionStorage.getItem("currentPage");
+    return stored ? parseInt(stored, 10) : 1;
+  });
   const pageSize = 10;
 
   const requestSort = (key: keyof EventRow) => {
@@ -117,10 +120,14 @@ export default function AdminEventDashboard() {
 
   const totalPages = Math.ceil(filtered.length / pageSize);
   const paginated = filtered.slice((currentPage - 1) * pageSize, currentPage * pageSize);
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    sessionStorage.setItem("currentPage", page.toString());
+  };
 
   useEffect(() => {
     if (currentPage > totalPages && totalPages > 0) {
-      setCurrentPage(1);
+      handlePageChange(1);
     }
   }, [totalPages, currentPage]);
 
@@ -245,7 +252,7 @@ export default function AdminEventDashboard() {
         {filtered.length > 0 && (
           <Pager>
             <PaginationPrevious
-              onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+              onClick={() => handlePageChange(Math.max(1, currentPage - 1))}
               aria-disabled={currentPage === 1}
               className={cn(currentPage === 1 && "pointer-events-none opacity-50")}
             >
@@ -257,7 +264,7 @@ export default function AdminEventDashboard() {
                   {page === currentPage ? (
                     <PaginationLink isActive>{page}</PaginationLink>
                   ) : page === 1 || page === totalPages || Math.abs(page - currentPage) <= 1 ? (
-                    <PaginationLink onClick={() => setCurrentPage(page)}>{page}</PaginationLink>
+                    <PaginationLink onClick={() => handlePageChange(page)}>{page}</PaginationLink>
                   ) : page === currentPage - 2 || page === currentPage + 2 ? (
                     <PaginationEllipsis />
                   ) : null}
@@ -265,7 +272,7 @@ export default function AdminEventDashboard() {
               ))}
             </PaginationContent>
             <PaginationNext
-              onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+              onClick={() => handlePageChange(Math.min(totalPages, currentPage + 1))}
               aria-disabled={currentPage === totalPages}
               className={cn(currentPage === totalPages && "pointer-events-none opacity-50")}
             />
