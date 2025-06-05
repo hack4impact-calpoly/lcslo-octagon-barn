@@ -3,21 +3,21 @@ import { PutObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import client, { generateUniqueS3Key } from "@/lib/aws-s3";
 import { createErrorResponse, createSuccessResponse } from "@/lib/response";
+import connectDB from "@/database/db";
+import Event from "@/database/eventSchema";
+import Document from "@/database/documentSchema";
 
 export async function GET(request: NextRequest) {
   try {
+    // Connect to MongoDB
+    await connectDB();
     const searchParams = request.nextUrl.searchParams;
     const file = searchParams.get("file");
-    const userId = searchParams.get("userId");
     const eventId = searchParams.get("eventId");
     const documentId = searchParams.get("documentId");
 
     if (!file) {
       return createErrorResponse("Bad Request", "fileName is required", 400);
-    }
-
-    if (!userId) {
-      return createErrorResponse("Bad Request", "userId is required", 400);
     }
 
     if (!eventId) {
@@ -28,8 +28,20 @@ export async function GET(request: NextRequest) {
       return createErrorResponse("Bad Request", "documentId is required", 400);
     }
 
-    // Generate a unique S3 key
-    const s3Key = generateUniqueS3Key(userId, eventId, documentId, file);
+    // Lookup eventName and documentName from the database
+    const event = await Event.findById(eventId);
+    if (!event) {
+      return createErrorResponse("Not Found", "Event not found", 404);
+    }
+    const document = await Document.findById(documentId);
+    if (!document) {
+      return createErrorResponse("Not Found", "Document not found", 404);
+    }
+    const eventName = event.eventName.replace(/\s+/g, "_");
+    const documentName = document.documentName.replace(/\s+/g, "_");
+
+    // Generate a unique S3 key using eventName, documentName, and original filename
+    const s3Key = generateUniqueS3Key(eventName, documentName, file);
 
     const command = new PutObjectCommand({
       Bucket: process.env.S3_BUCKET_NAME as string,

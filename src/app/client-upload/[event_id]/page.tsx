@@ -56,7 +56,7 @@ async function uploadDocument(
     const documentId = createdDocument._id;
 
     // 2. Get the upload URL for the file
-    const url_string = `/api/upload-url?file=${encodeURIComponent(file.name)}&userId=${encodeURIComponent(user?.id || "")}&eventId=${encodeURIComponent(eventId)}&documentId=${encodeURIComponent(documentId)}`;
+    const url_string = `/api/upload-url?file=${encodeURIComponent(file.name)}&eventId=${encodeURIComponent(eventId)}&documentId=${encodeURIComponent(documentId)}`;
     const uploadUrlResponse = await fetch(url_string);
     if (!uploadUrlResponse.ok) throw new Error("Failed to get upload URL");
     const { uploadUrl, s3Key } = await uploadUrlResponse.json();
