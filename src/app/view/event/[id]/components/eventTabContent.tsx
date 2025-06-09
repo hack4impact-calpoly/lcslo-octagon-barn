@@ -9,6 +9,11 @@ interface IDocument {
   url: string;
 }
 
+interface IGeneralResource {
+  name: string;
+  url: string;
+}
+
 interface EventTabContentProps {
   eventId: string;
   activeTab: string;
@@ -23,6 +28,7 @@ interface EventTabContentProps {
   isAdmin: boolean;
   onUpdateField: (field: string, value: any) => void;
   onRemoveDocument: (index: number) => void;
+  generalResources?: IGeneralResource[];
 }
 
 export default function EventTabContent({
@@ -39,6 +45,7 @@ export default function EventTabContent({
   isAdmin,
   onUpdateField,
   onRemoveDocument,
+  generalResources,
 }: EventTabContentProps) {
   return (
     <div className="w-3/4 mx-auto">
@@ -58,7 +65,7 @@ export default function EventTabContent({
             {/* Right Column - Contact & Documents */}
             {(!isEditing || !isAdmin) && (
               <div className="space-y-4 bg-gray-200 p-4 rounded-lg shadow-md border border-gray-300">
-                <ContactSection name={name} email={email} phone={phone} />
+                <ContactSection name={name} email={email} phone={phone} generalResources={generalResources} />
               </div>
             )}
 
