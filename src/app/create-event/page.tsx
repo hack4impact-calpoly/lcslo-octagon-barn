@@ -230,7 +230,7 @@ export default function CreateEventPage() {
             className="w-1/2 bg-basic-blue hover:bg-hover-blue text-lg"
             onClick={() => {
               saveFormToSession();
-              router.push("/users");
+              router.push("/assign-users");
             }}
           >
             Assign User
