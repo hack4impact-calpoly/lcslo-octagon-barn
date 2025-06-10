@@ -4,41 +4,12 @@ import React, { useState, useEffect } from "react";
 import { useUser } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
 import { useParams } from "next/navigation";
-import { useRouter } from "next/navigation";
 import EventTile from "@/components/EventTile";
 import { LoadingSpinner, UnauthorizedState, ErrorState } from "@/components/loadingStates";
 import EventDetailsForm from "./components/eventDetailsForm";
 import EventTabContent from "./components/eventTabContent";
+import { IEventFrontend, ITempEventData } from "./components/event";
 import Link from "next/link";
-
-interface IEventFrontend {
-  clerkId: string;
-  docIds: string[];
-  venue: "Full Facility" | "Octagon Barn & Plaza" | "Shed & Courtyard" | "Milking Parlor" | "Other";
-  eventName: string;
-  eventDateStart: Date;
-  eventDateEnd: Date;
-  status: "Upcoming" | "Ongoing" | "Completed" | "Cancelled";
-  eventDetails: string;
-  vendorList: string;
-  createdAt: Date;
-  docsTotal: number;
-  docsCompleted: number;
-  numGuests: number;
-}
-
-interface ITempEventData {
-  clientName?: string;
-  clientEmail: string;
-  clientPhone: string;
-  documents: IDocument[];
-  headerImageUrl?: string;
-}
-
-interface IDocument {
-  name: string;
-  url: string;
-}
 
 export default function EventDetailsView() {
   const { user, isLoaded } = useUser();
@@ -48,7 +19,6 @@ export default function EventDetailsView() {
   const [error, setError] = useState<string | null>(null);
 
   const [isEditing, setIsEditing] = useState(false);
-  const [isClientEditing, setIsClientEditing] = useState(false);
   const [eventData, setEventData] = useState<(IEventFrontend & ITempEventData) | null>(null);
   const [editCache, setEditCache] = useState<(IEventFrontend & ITempEventData) | null>(null);
   const params = useParams();
@@ -57,7 +27,6 @@ export default function EventDetailsView() {
   const [activeTab, setActiveTab] = useState<string>(() => {
     return localStorage.getItem("eventActiveTab") || "details";
   });
-  const router = useRouter();
 
   const venueOptions: IEventFrontend["venue"][] = [
     "Full Facility",
@@ -231,7 +200,7 @@ export default function EventDetailsView() {
         ...formattedEvent,
         clientName: eventData.clientName,
         clientEmail: eventData.clientEmail,
-        cleintPhone: eventData.clientPhone,
+        clientPhone: eventData.clientPhone,
         documents: eventData.documents,
         headerImageUrl: eventData.headerImageUrl,
       });
@@ -368,60 +337,10 @@ export default function EventDetailsView() {
         )}
       </div>
 
-      {!isAdmin && activeTab === "details" && (
-        <div className="w-full max-w-2xl mx-auto mt-6">
-          <h2 className="text-xl font-semibold mb-2">Vendor List</h2>
-
-          {isClientEditing ? (
-            <>
-              <textarea
-                value={eventData.vendorList}
-                onChange={(e) => handleUpdateField("vendorList", e.target.value)}
-                className="w-full p-2 border rounded-md"
-                rows={5}
-              />
-              <div className="mt-2 space-x-2">
-                <Button
-                  variant="outline"
-                  onClick={async () => {
-                    await handleSave(); // Save and then hide edit
-                    setIsClientEditing(false);
-                  }}
-                >
-                  Save
-                </Button>
-                <Button
-                  variant="outline"
-                  onClick={() => {
-                    setEventData(editCache); // Revert
-                    setIsClientEditing(false);
-                  }}
-                >
-                  Cancel
-                </Button>
-              </div>
-            </>
-          ) : (
-            <>
-              <p className="whitespace-pre-wrap border p-2 rounded-md bg-gray-50">{eventData.vendorList}</p>
-              <Button
-                className="mt-2"
-                variant="outline"
-                onClick={() => {
-                  setEditCache({ ...eventData });
-                  setIsClientEditing(true);
-                }}
-              >
-                Edit Vendor List
-              </Button>
-            </>
-          )}
-        </div>
-      )}
-
       <EventTabContent
         eventId={eventId}
         activeTab={activeTab}
+        eventData={eventData}
         eventDetails={eventData.eventDetails}
         eventStatus={eventStatus}
         vendorList={eventData.vendorList}
@@ -429,10 +348,14 @@ export default function EventDetailsView() {
         name={eventData.clientName}
         email={eventData.clientEmail}
         phone={eventData.clientPhone}
+        editCache={editCache}
         isEditing={isEditing}
         isAdmin={isAdmin}
         onUpdateField={handleUpdateField}
+        onSave={handleSave}
         onRemoveDocument={handleRemoveDocument}
+        setEventData={setEventData}
+        setEditCache={setEditCache}
       />
     </div>
   );
