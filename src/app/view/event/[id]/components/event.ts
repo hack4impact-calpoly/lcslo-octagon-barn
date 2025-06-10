@@ -20,9 +20,15 @@ export interface ITempEventData {
   clientPhone: string;
   documents: IDocument[];
   headerImageUrl?: string;
+  generalResources?: IGeneralResource[];
 }
 
 interface IDocument {
+  name: string;
+  url: string;
+}
+
+export interface IGeneralResource {
   name: string;
   url: string;
 }

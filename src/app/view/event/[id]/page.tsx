@@ -8,7 +8,7 @@ import EventTile from "@/components/EventTile";
 import { LoadingSpinner, UnauthorizedState, ErrorState } from "@/components/loadingStates";
 import EventDetailsForm from "./components/eventDetailsForm";
 import EventTabContent from "./components/eventTabContent";
-import { IEventFrontend, ITempEventData } from "./components/event";
+import { IEventFrontend, ITempEventData, IGeneralResource } from "./components/event";
 import Link from "next/link";
 
 export default function EventDetailsView() {
@@ -84,6 +84,13 @@ export default function EventDetailsView() {
             createdAt: new Date(eventData.createdAt),
           };
 
+          // Default general resources - these should be removed and replaced with the backend fetching
+          const defaultGeneralResources: IGeneralResource[] = [
+            { name: "General Barn Policy", url: "/general-barn-policy.pdf" },
+            { name: "Brochure", url: "/brochure.pdf" },
+            { name: "Venue Map", url: "/venue-map.pdf" },
+          ];
+
           // combine with real client info
           const clientFirst = client.firstName ?? "";
           const clientLast = client.lastName ?? "";
@@ -95,6 +102,7 @@ export default function EventDetailsView() {
             clientPhone: client.phoneNumbers?.[0]?.phoneNumber ?? "Not Found",
             documents: [{ name: "brochure.pdf", url: "/brochure.pdf" }],
             headerImageUrl: "/octagon_barn_plaza.jpg",
+            generalResources: defaultGeneralResources,
           };
           setEventStatus(combinedData.status);
           setEventData(combinedData);
@@ -242,6 +250,18 @@ export default function EventDetailsView() {
     });
   };
 
+  const handleRemoveGeneralResource = (index: number) => {
+    if (!eventData) return;
+
+    const updatedResources = [...(eventData.generalResources || [])];
+    updatedResources.splice(index, 1);
+
+    setEventData({
+      ...eventData,
+      generalResources: updatedResources,
+    });
+  };
+
   return (
     <div className="p-4 md:p-8 lg:p-16">
       {(eventStatus === "Completed" || eventStatus === "Cancelled") && (
@@ -317,7 +337,12 @@ export default function EventDetailsView() {
 
       <div className="flex justify-center mb-6">
         {isEditing && isAdmin ? (
-          <EventDetailsForm eventData={eventData} onUpdateField={handleUpdateField} venueOptions={venueOptions} />
+          <EventDetailsForm
+            eventData={eventData}
+            onUpdateField={handleUpdateField}
+            venueOptions={venueOptions}
+            onRemoveGeneralResource={handleRemoveGeneralResource}
+          />
         ) : (
           <EventTile
             id={eventId}
@@ -351,6 +376,7 @@ export default function EventDetailsView() {
         onUpdateField={handleUpdateField}
         onSave={handleSave}
         onRemoveDocument={handleRemoveDocument}
+        generalResources={eventData.generalResources}
         setEventData={setEventData}
         setEditCache={setEditCache}
       />

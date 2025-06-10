@@ -2,7 +2,7 @@ import { Tabs, TabsContent } from "@/components/ui/tabs";
 import EventDisplay from "./eventDisplay";
 import ContactSection from "./contactSection";
 import DocumentTable from "./documentTable";
-import { IEventFrontend, ITempEventData } from "./event";
+import { IEventFrontend, ITempEventData, IGeneralResource } from "./event";
 
 interface IDocument {
   name: string;
@@ -26,6 +26,7 @@ interface EventTabContentProps {
   onUpdateField: (field: string, value: any) => void;
   onSave: () => void;
   onRemoveDocument: (index: number) => void;
+  generalResources?: IGeneralResource[];
   setEventData: React.Dispatch<React.SetStateAction<(IEventFrontend & ITempEventData) | null>>;
   setEditCache: React.Dispatch<React.SetStateAction<(IEventFrontend & ITempEventData) | null>>;
 }
@@ -49,6 +50,7 @@ export default function EventTabContent({
   setEventData,
   setEditCache,
   onRemoveDocument,
+  generalResources,
 }: EventTabContentProps) {
   return (
     <div className="w-3/4 mx-auto">
@@ -73,7 +75,7 @@ export default function EventTabContent({
             {/* Right Column - Contact & Documents */}
             {(!isEditing || !isAdmin) && (
               <div className="space-y-4 bg-gray-200 p-4 rounded-lg shadow-md border border-gray-300">
-                <ContactSection name={name} email={email} phone={phone} />
+                <ContactSection name={name} email={email} phone={phone} generalResources={generalResources} />
               </div>
             )}
 
