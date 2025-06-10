@@ -4,41 +4,12 @@ import React, { useState, useEffect } from "react";
 import { useUser } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
 import { useParams } from "next/navigation";
-import { useRouter } from "next/navigation";
 import EventTile from "@/components/EventTile";
 import { LoadingSpinner, UnauthorizedState, ErrorState } from "@/components/loadingStates";
 import EventDetailsForm from "./components/eventDetailsForm";
 import EventTabContent from "./components/eventTabContent";
+import { IEventFrontend, ITempEventData } from "./components/event";
 import Link from "next/link";
-
-interface IEventFrontend {
-  clerkId: string;
-  docIds: string[];
-  venue: "Full Facility" | "Octagon Barn & Plaza" | "Shed & Courtyard" | "Milking Parlor" | "Other";
-  eventName: string;
-  eventDateStart: Date;
-  eventDateEnd: Date;
-  status: "Upcoming" | "Ongoing" | "Completed" | "Cancelled";
-  eventDetails: string;
-  vendorList: string;
-  createdAt: Date;
-  docsTotal: number;
-  docsCompleted: number;
-  numGuests: number;
-}
-
-interface ITempEventData {
-  clientName?: string;
-  clientEmail: string;
-  clientPhone: string;
-  documents: IDocument[];
-  headerImageUrl?: string;
-}
-
-interface IDocument {
-  name: string;
-  url: string;
-}
 
 export default function EventDetailsView() {
   const { user, isLoaded } = useUser();
@@ -56,7 +27,6 @@ export default function EventDetailsView() {
   const [activeTab, setActiveTab] = useState<string>(() => {
     return sessionStorage.getItem("eventActiveTab") || "details";
   });
-  const router = useRouter();
 
   const venueOptions: IEventFrontend["venue"][] = [
     "Full Facility",
@@ -230,7 +200,7 @@ export default function EventDetailsView() {
         ...formattedEvent,
         clientName: eventData.clientName,
         clientEmail: eventData.clientEmail,
-        cleintPhone: eventData.clientPhone,
+        clientPhone: eventData.clientPhone,
         documents: eventData.documents,
         headerImageUrl: eventData.headerImageUrl,
       });
@@ -367,6 +337,7 @@ export default function EventDetailsView() {
       <EventTabContent
         eventId={eventId}
         activeTab={activeTab}
+        eventData={eventData}
         eventDetails={eventData.eventDetails}
         eventStatus={eventStatus}
         vendorList={eventData.vendorList}
@@ -374,10 +345,14 @@ export default function EventDetailsView() {
         name={eventData.clientName}
         email={eventData.clientEmail}
         phone={eventData.clientPhone}
+        editCache={editCache}
         isEditing={isEditing}
         isAdmin={isAdmin}
         onUpdateField={handleUpdateField}
+        onSave={handleSave}
         onRemoveDocument={handleRemoveDocument}
+        setEventData={setEventData}
+        setEditCache={setEditCache}
       />
     </div>
   );
