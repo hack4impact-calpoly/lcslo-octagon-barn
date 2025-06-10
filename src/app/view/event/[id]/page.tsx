@@ -54,7 +54,7 @@ export default function EventDetailsView() {
   const eventId = Array.isArray(params.id) ? params.id[0] : (params.id ?? "default-id");
   const [eventStatus, setEventStatus] = useState<"Completed" | "Cancelled" | "Upcoming" | "Ongoing">("Upcoming");
   const [activeTab, setActiveTab] = useState<string>(() => {
-    return localStorage.getItem("eventActiveTab") || "details";
+    return sessionStorage.getItem("eventActiveTab") || "details";
   });
   const router = useRouter();
 
@@ -168,7 +168,7 @@ export default function EventDetailsView() {
 
   const handleTabChange = (tab: string) => {
     setActiveTab(tab);
-    localStorage.setItem("eventActiveTab", tab);
+    sessionStorage.setItem("eventActiveTab", tab);
   };
 
   const handleSave = async () => {
