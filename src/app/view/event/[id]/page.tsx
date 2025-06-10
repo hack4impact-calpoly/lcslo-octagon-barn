@@ -333,10 +333,7 @@ export default function EventDetailsView() {
               activeTab === "documents" && (
                 <div className="space-x-2 flex-shrink-0">
                   <Link href={`/client-upload/${eventId}`}>
-                    <Button
-                      className="bg-basic-blue text-white hover:bg-hover-blue px-4 py-1 text-base rounded-lg lg:w-[12rem] h-[3rem]"
-                      variant="outline"
-                    >
+                    <Button className="bg-basic-blue text-white hover:bg-hover-blue px-4 py-1 text-base rounded-lg lg:w-[12rem] h-[3rem]">
                       {/* <Button className="w-[5rem] lg:w-[10rem] text-base" variant="outline"> */}
                       Add New Document
                     </Button>

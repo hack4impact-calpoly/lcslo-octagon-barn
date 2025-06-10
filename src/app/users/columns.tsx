@@ -40,8 +40,7 @@ export const columns: ColumnDef<User>[] = [
     cell: ({ row }) => {
       return (
         <Button
-          style={{ backgroundColor: "#3A6F8F" }}
-          className="text-white w-full px-2 py-1 text-lg rounded flex justify-center items-center"
+          className="text-white w-full px-2 py-1 text-lg bg-basic-blue hover:bg-hover-blue rounded flex justify-center items-center"
           onClick={() => {
             HandleAssignUser(row.original);
             window.location.href = "/create-event";

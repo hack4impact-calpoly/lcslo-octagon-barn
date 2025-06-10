@@ -39,10 +39,10 @@ export function DataTable<TData, TValue>({ columns, data }: DataTableProps<TData
                   <TableCell
                     className={
                       cell.column.id === "actions"
-                        ? "w-[200px] text-lg"
+                        ? "w-[100px] text-lg"
                         : cell.column.id === "date"
-                          ? "w-[200px] text-lg"
-                          : "w-auto text-lg"
+                          ? "w-[300px] text-lg"
+                          : "w-[400px] text-lg"
                     }
                     key={cell.id}
                   >

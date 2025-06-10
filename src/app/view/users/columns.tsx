@@ -12,6 +12,7 @@ export type User = {
 };
 
 const handleDeleteUser = async (row: User) => {
+  if (!confirm("Delete this users?")) return;
   try {
     const res = await fetch(`/api/user/${row.id}`, {
       method: "DELETE",
@@ -43,9 +44,12 @@ export const columns: ColumnDef<User>[] = [
   },
   {
     id: "actions",
+    header: "Delete",
     cell: ({ row }) => {
       return (
         <Button
+          variant="ghost"
+          size="icon"
           type="button"
           onClick={() => {
             handleDeleteUser(row.original);
