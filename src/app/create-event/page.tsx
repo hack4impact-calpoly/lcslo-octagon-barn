@@ -227,17 +227,17 @@ export default function CreateEventPage() {
         <div className="flex space-x-2">
           <Button
             type="button"
-            className="w-1/2 bg-[var(--primary-blue)] text-lg"
+            className="w-1/2 bg-basic-blue hover:bg-hover-blue text-lg"
             onClick={() => {
               saveFormToSession();
-              router.push("/users");
+              router.push("/assign-users");
             }}
           >
             Assign User
           </Button>
           <Button
             type="button"
-            className="w-1/2 bg-[var(--primary-blue)] text-lg"
+            className="w-1/2 bg-basic-blue hover:bg-hover-blue text-lg"
             onClick={() => {
               saveFormToSession();
               router.push("/signup");
@@ -251,7 +251,7 @@ export default function CreateEventPage() {
             <Button
               type="button"
               variant="destructive"
-              className="w-1/2 text-lg"
+              className="w-1/2 text-lg bg-red-500 hover:bg-red-700"
               onClick={() => {
                 sessionStorage.removeItem("eventForm");
                 sessionStorage.removeItem("assignedUser");
@@ -260,7 +260,7 @@ export default function CreateEventPage() {
             >
               Cancel
             </Button>
-            <Button type="submit" className="w-1/2 bg-[var(--primary-blue)] text-lg">
+            <Button type="submit" className="w-1/2 bg-basic-blue hover:bg-hover-blue text-lg">
               Create Event
             </Button>
           </div>
