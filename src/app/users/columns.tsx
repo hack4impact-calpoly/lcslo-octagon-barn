@@ -11,15 +11,22 @@ export type User = {
   date: string;
 };
 
-const HandleAssignUser = (row: User) => {
-  sessionStorage.setItem(
-    "assignedUser",
-    JSON.stringify({
-      name: row.name,
-      email: row.email,
-      id: row.id,
-    }),
-  );
+const handleDeleteUser = async (row: User) => {
+  if (!confirm("Delete this users?")) return;
+  try {
+    const res = await fetch(`/api/user/${row.id}`, {
+      method: "DELETE",
+    });
+
+    if (!res.ok) {
+      const data = await res.json();
+      throw new Error(data?.message || "Failed to delete user");
+    }
+
+    console.log("User deleted successfully");
+  } catch (error) {
+    console.log("Delete error:", error);
+  }
 };
 
 export const columns: ColumnDef<User>[] = [
@@ -37,17 +44,19 @@ export const columns: ColumnDef<User>[] = [
   },
   {
     id: "actions",
+    header: "Delete",
     cell: ({ row }) => {
       return (
         <Button
-          style={{ backgroundColor: "#3A6F8F" }}
-          className="text-white w-full px-2 py-1 text-lg rounded flex justify-center items-center"
+          variant="ghost"
+          size="icon"
+          type="button"
           onClick={() => {
-            HandleAssignUser(row.original);
-            window.location.href = "/create-event";
+            handleDeleteUser(row.original);
           }}
+          className="bg-transparent border-none p-0 m-0 cursor-pointer"
         >
-          Assign
+          <i className="icon-[ic--baseline-delete-forever] text-rose-500 h-6 w-6" aria-hidden="true"></i>
         </Button>
       );
     },

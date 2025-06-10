@@ -9,6 +9,7 @@ import EventTile from "@/components/EventTile";
 import { LoadingSpinner, UnauthorizedState, ErrorState } from "@/components/loadingStates";
 import EventDetailsForm from "./components/eventDetailsForm";
 import EventTabContent from "./components/eventTabContent";
+import Link from "next/link";
 
 interface IEventFrontend {
   clerkId: string;
@@ -51,8 +52,10 @@ export default function EventDetailsView() {
   const [editCache, setEditCache] = useState<(IEventFrontend & ITempEventData) | null>(null);
   const params = useParams();
   const eventId = Array.isArray(params.id) ? params.id[0] : (params.id ?? "default-id");
-  const [activeTab, setActiveTab] = useState<string>("details");
-  const [eventStatus, setEventStatus] = useState<string | null>(null);
+  const [eventStatus, setEventStatus] = useState<"Completed" | "Cancelled" | "Upcoming" | "Ongoing">("Upcoming");
+  const [activeTab, setActiveTab] = useState<string>(() => {
+    return sessionStorage.getItem("eventActiveTab") || "details";
+  });
   const router = useRouter();
 
   const venueOptions: IEventFrontend["venue"][] = [
@@ -123,7 +126,7 @@ export default function EventDetailsView() {
             documents: [{ name: "brochure.pdf", url: "/brochure.pdf" }],
             headerImageUrl: "/octagon_barn_plaza.jpg",
           };
-
+          setEventStatus(combinedData.status);
           setEventData(combinedData);
           setEditCache(combinedData);
           setError(null);
@@ -161,6 +164,11 @@ export default function EventDetailsView() {
       setEventData(editCache);
     }
     setIsEditing(false);
+  };
+
+  const handleTabChange = (tab: string) => {
+    setActiveTab(tab);
+    sessionStorage.setItem("eventActiveTab", tab);
   };
 
   const handleSave = async () => {
@@ -267,7 +275,7 @@ export default function EventDetailsView() {
   return (
     <div className="p-4 md:p-8 lg:p-16">
       {(eventStatus === "Completed" || eventStatus === "Cancelled") && (
-        <div className="bg-yellow-100 text-black text-center py-2 rounded mb-4">Event is locked</div>
+        <div className="bg-yellow-100 text-black text-center py-2 rounded mb-4">{`Event is labeled ${eventStatus.toLowerCase()}`}</div>
       )}
       {/* Tab and Buttons Container */}
       <div className="w-3/4 mx-auto mb-6">
@@ -276,7 +284,7 @@ export default function EventDetailsView() {
             <div className="flex border-b">
               <Button
                 variant="ghost"
-                onClick={() => setActiveTab("details")}
+                onClick={() => handleTabChange("details")}
                 className={`pb-1 px-4 rounded-b-none text-md border-b-2 text-lg ${
                   activeTab === "details"
                     ? "border-black text-black"
@@ -287,7 +295,7 @@ export default function EventDetailsView() {
               </Button>
               <Button
                 variant="ghost"
-                onClick={() => setActiveTab("documents")}
+                onClick={() => handleTabChange("documents")}
                 className={`pb-1 px-4 rounded-b-none text-md border-b-2 text-lg ${
                   activeTab === "documents"
                     ? "border-black text-black"
@@ -300,27 +308,40 @@ export default function EventDetailsView() {
           )}
 
           <div className="flex-grow" />
-
-          {isAdmin && eventStatus !== "Completed" && eventStatus !== "Cancelled" && (
-            <div className="space-x-2 flex-shrink-0">
-              {isEditing ? (
-                <>
-                  <Button className="w-[5rem] lg:w-[7rem] text-base" variant="outline" onClick={handleSave}>
-                    Save
-                  </Button>
-                  <Button className="w-[5rem] lg:w-[7rem] text-base" variant="outline" onClick={handleCancel}>
-                    Cancel
-                  </Button>
-                </>
-              ) : (
-                activeTab === "details" && (
-                  <Button className="w-[5rem] lg:w-[7rem] text-base" variant="outline" onClick={handleEditClick}>
-                    Edit
-                  </Button>
-                )
-              )}
-            </div>
-          )}
+          {eventStatus !== "Completed" &&
+            eventStatus !== "Cancelled" &&
+            (isAdmin ? (
+              <div className="space-x-2 flex-shrink-0">
+                {isEditing ? (
+                  <>
+                    <Button className="w-[5rem] lg:w-[7rem] text-base" variant="outline" onClick={handleSave}>
+                      Save
+                    </Button>
+                    <Button className="w-[5rem] lg:w-[7rem] text-base" variant="outline" onClick={handleCancel}>
+                      Cancel
+                    </Button>
+                  </>
+                ) : (
+                  activeTab === "details" && (
+                    <Button className="w-[5rem] lg:w-[7rem] text-base" variant="outline" onClick={handleEditClick}>
+                      Edit
+                    </Button>
+                  )
+                )}
+              </div>
+            ) : (
+              activeTab === "documents" && (
+                <div className="space-x-2 flex-shrink-0">
+                  <Link href={`/client-upload/${eventId}`}>
+                    <Button className="bg-basic-blue text-white hover:bg-hover-blue px-4 py-1 text-base rounded-lg lg:w-[12rem] h-[3rem]">
+                      {/* <Button className="w-[5rem] lg:w-[10rem] text-base" variant="outline"> */}
+                      Add New Document
+                    </Button>
+                  </Link>
+                </div>
+              )
+            ))}
+          {/* bg-blue-600 hover:bg-blue-700 */}
         </div>
       </div>
 
@@ -344,9 +365,10 @@ export default function EventDetailsView() {
       </div>
 
       <EventTabContent
+        eventId={eventId}
         activeTab={activeTab}
-        setActiveTab={setActiveTab}
         eventDetails={eventData.eventDetails}
+        eventStatus={eventStatus}
         vendorList={eventData.vendorList}
         documents={eventData.documents}
         name={eventData.clientName}

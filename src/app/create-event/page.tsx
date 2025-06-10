@@ -18,7 +18,18 @@ export default function CreateEventPage() {
   const [startDate, setStartDate] = useState<Date | undefined>();
   const [endDate, setEndDate] = useState<Date | undefined>();
   const [eventDetails, setEventDetails] = useState("");
-  const [vendorList, setVendorList] = useState("");
+  const [vendorList, setVendorList] = useState(`- Coordinator: 
+- Caterer:
+- Bartender: 
+- Rentals: 
+- Photo/Video: 
+- Florist: 
+- DJ/Band: 
+- Lighting/Draping: 
+- Staffing: 
+- Transportation: 
+- Ice: 
+- Other: `);
   const [user, setUser] = useState<{ name: string; email: string; id: string } | null>(null);
 
   // Validation state
@@ -139,6 +150,7 @@ export default function CreateEventPage() {
           value={eventName}
           onChange={(e) => setEventName(e.target.value)}
         />
+
         <div className="flex space-x-2">
           <Select key={venue} value={venue} onValueChange={(value) => setVenue(value)}>
             <SelectTrigger
@@ -181,22 +193,24 @@ export default function CreateEventPage() {
         </div>
 
         {errors.invalidDateRange && <p className="text-red-500">End time must be after the start time.</p>}
+
+        <div className="text-lg">Event Details:</div>
         <Textarea
           name="eventDetails"
-          placeholder="Event Details"
           value={eventDetails}
           onChange={(e) => setEventDetails(e.target.value)}
-          className={`h-24 bg-[var(--primary-fill)] !text-lg placeholder:text-lg placeholder:text-[var(--primary-blue)] ${errors.eventDetails ? "border-red-500" : ""}`}
+          className={`h-32 bg-[var(--primary-fill)] !text-lg placeholder:text-lg placeholder:text-[var(--primary-blue)] ${errors.eventDetails ? "border-red-500" : ""}`}
         />
 
+        <div className="text-lg">Vendor List:</div>
         <Textarea
           name="vendorList"
-          placeholder="Vendor list"
           value={vendorList}
           onChange={(e) => setVendorList(e.target.value)}
-          className={`h-24 bg-[var(--primary-fill)] !text-lg placeholder:text-lg placeholder:text-[var(--primary-blue)] ${errors.vendorList ? "border-red-500" : ""}`}
+          className={`h-48 bg-[var(--primary-fill)] !text-lg placeholder:text-lg placeholder:text-[var(--primary-blue)] ${errors.vendorList ? "border-red-500" : ""}`}
         />
 
+        <div className="text-lg">User:</div>
         <div
           className={`bg-[var(--primary-fill)] text-[var(--primary-blue)] text-lg rounded-md px-3 py-2 h-12 flex items-center placeholder:text-lg placeholder:text-[var(--primary-blue)] ${errors.user ? "border border-red-500" : ""}`}
         >
@@ -213,17 +227,17 @@ export default function CreateEventPage() {
         <div className="flex space-x-2">
           <Button
             type="button"
-            className="w-1/2 bg-[var(--primary-blue)] text-lg"
+            className="w-1/2 bg-basic-blue hover:bg-hover-blue text-lg"
             onClick={() => {
               saveFormToSession();
-              router.push("/users");
+              router.push("/assign-users");
             }}
           >
             Assign User
           </Button>
           <Button
             type="button"
-            className="w-1/2 bg-[var(--primary-blue)] text-lg"
+            className="w-1/2 bg-basic-blue hover:bg-hover-blue text-lg"
             onClick={() => {
               saveFormToSession();
               router.push("/signup");
@@ -237,7 +251,7 @@ export default function CreateEventPage() {
             <Button
               type="button"
               variant="destructive"
-              className="w-1/2 text-lg"
+              className="w-1/2 text-lg bg-red-500 hover:bg-red-700"
               onClick={() => {
                 sessionStorage.removeItem("eventForm");
                 sessionStorage.removeItem("assignedUser");
@@ -246,7 +260,7 @@ export default function CreateEventPage() {
             >
               Cancel
             </Button>
-            <Button type="submit" className="w-1/2 bg-[var(--primary-blue)] text-lg">
+            <Button type="submit" className="w-1/2 bg-basic-blue hover:bg-hover-blue text-lg">
               Create Event
             </Button>
           </div>

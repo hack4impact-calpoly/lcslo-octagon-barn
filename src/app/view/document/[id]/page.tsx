@@ -77,8 +77,7 @@ export default function DocumentView() {
 
   // Authorization: Only allow document owner or admin to view the document.
   const isOwner = user?.id === document.clerkId;
-  const isAdmin = user?.publicMetadata?.role === "admin";
-
+  const isAdmin = user?.publicMetadata?.isAdmin === true;
   if (!isOwner && !isAdmin) {
     return <div className="flex items-center justify-center h-screen text-xl">No document found.</div>;
   }
@@ -88,7 +87,7 @@ export default function DocumentView() {
       {/* Header Row: Back button, Title, and a placeholder */}
       <div className="w-full max-w-[1237px] mb-4 flex items-center justify-between">
         <Link href={`/view/event/${eventId}`}>
-          <Button variant="outline" className="bg-[#3A6F8F] text-white hover:bg-[#305a73]" size="lg">
+          <Button className="bg-basic-blue hover:bg-hover-blue text-base text-white" size="lg">
             Back
           </Button>
         </Link>

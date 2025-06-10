@@ -15,6 +15,7 @@
   "dependencies": {
     "@aws-sdk/client-s3": "^3.750.0",
     "@aws-sdk/s3-request-presigner": "^3.750.0",
+    "@clerk/backend": "^1.33.1",
     "@clerk/clerk-sdk-node": "^4.13.22",
     "@clerk/elements": "^0.22.23",
     "@clerk/nextjs": "^6.11.0",
@@ -51,6 +52,7 @@
     "react-dom": "^18",
     "react-drag-drop-files": "^2.4.0",
     "react-loader-spinner": "^6.1.6",
+    "react-phone-number-input": "^3.4.12",
     "request": ">=2.68.0",
     "superagent": ">=3.7.0",
     "tailwind-merge": "^2.6.0",
