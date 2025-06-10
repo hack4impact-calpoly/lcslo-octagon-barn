@@ -56,7 +56,7 @@ export default function Page() {
   return (
     <div className="container mx-auto py-10">
       <div className="flex justify-center items-center text-3xl text-[var(--primary-blue)] rounded-l font-bold mb-4">
-        Users
+        Assign Users
       </div>
       <div className="flex items-center justify-between py-5">
         <Input
@@ -68,6 +68,20 @@ export default function Page() {
         />
       </div>
       <DataTable columns={columns} data={data} />
+      <div className="flex justify-end py-8 space-x-6">
+        <Button
+          className="bg-red-500 hover:bg-red-700 text-white px-4 py-2 text-lg w-[250px]"
+          onClick={() => router.push("/create-event")}
+        >
+          Cancel
+        </Button>
+        <Button
+          className="bg-[#3A6F8F] text-white px-4 py-2 text-lg w-[250px] bg-basic-blue hover:bg-hover-blue"
+          onClick={() => router.push("/signup")}
+        >
+          Create User
+        </Button>
+      </div>
     </div>
   );
 }

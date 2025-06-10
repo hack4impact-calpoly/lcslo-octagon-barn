@@ -57,7 +57,7 @@ async function uploadDocument(
     const documentId = createdDocument._id;
 
     // 2. Get the upload URL for the file
-    const url_string = `/api/upload-url?file=${encodeURIComponent(file.name)}&userId=${encodeURIComponent(user?.id || "")}&eventId=${encodeURIComponent(eventId)}&documentId=${encodeURIComponent(documentId)}`;
+    const url_string = `/api/upload-url?file=${encodeURIComponent(file.name)}&eventId=${encodeURIComponent(eventId)}&documentId=${encodeURIComponent(documentId)}`;
     const uploadUrlResponse = await fetch(url_string);
     if (!uploadUrlResponse.ok) throw new Error("Failed to get upload URL");
     const { uploadUrl, s3Key } = await uploadUrlResponse.json();
@@ -329,7 +329,7 @@ const ClientUploadPage: React.FC = () => {
       {/* Document Name and Select box for type*/}
       <div className="flex items-center justify-between w-full max-w-5xl mb-6">
         <Link href={`/view/event/${eventId}`}>
-          <Button variant="outline" className="bg-[#3A6F8F] text-white hover:bg-[#305a73]" size="lg">
+          <Button className="bg-basic-blue hover:bg-hover-blue text-base text-white" size="lg">
             Back
           </Button>
         </Link>

@@ -1,15 +1,10 @@
 import { Tabs, TabsContent } from "@/components/ui/tabs";
 import EventDisplay from "./eventDisplay";
 import ContactSection from "./contactSection";
-import DocumentList from "./documentList";
 import DocumentTable from "./documentTable";
+import { IEventFrontend, ITempEventData, IGeneralResource } from "./event";
 
 interface IDocument {
-  name: string;
-  url: string;
-}
-
-interface IGeneralResource {
   name: string;
   url: string;
 }
@@ -17,6 +12,7 @@ interface IGeneralResource {
 interface EventTabContentProps {
   eventId: string;
   activeTab: string;
+  eventData: (IEventFrontend & ITempEventData) | null;
   eventDetails: string;
   eventStatus: "Upcoming" | "Ongoing" | "Completed" | "Cancelled";
   vendorList: string;
@@ -24,16 +20,21 @@ interface EventTabContentProps {
   name?: string;
   email: string;
   phone: string;
+  editCache: (IEventFrontend & ITempEventData) | null;
   isEditing: boolean;
   isAdmin: boolean;
   onUpdateField: (field: string, value: any) => void;
+  onSave: () => void;
   onRemoveDocument: (index: number) => void;
   generalResources?: IGeneralResource[];
+  setEventData: React.Dispatch<React.SetStateAction<(IEventFrontend & ITempEventData) | null>>;
+  setEditCache: React.Dispatch<React.SetStateAction<(IEventFrontend & ITempEventData) | null>>;
 }
 
 export default function EventTabContent({
   eventId,
   activeTab,
+  eventData,
   eventDetails,
   eventStatus,
   vendorList,
@@ -41,9 +42,13 @@ export default function EventTabContent({
   name,
   email,
   phone,
+  editCache,
   isEditing,
   isAdmin,
   onUpdateField,
+  onSave,
+  setEventData,
+  setEditCache,
   onRemoveDocument,
   generalResources,
 }: EventTabContentProps) {
@@ -55,11 +60,16 @@ export default function EventTabContent({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* Left Column - Event Details */}
             <EventDisplay
+              eventData={eventData}
               eventDetails={eventDetails}
               vendorList={vendorList}
+              editCache={editCache}
               isEditing={isEditing}
               isAdmin={isAdmin}
               onUpdateField={onUpdateField}
+              onSave={onSave}
+              setEventData={setEventData}
+              setEditCache={setEditCache}
             />
 
             {/* Right Column - Contact & Documents */}

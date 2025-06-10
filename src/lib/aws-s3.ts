@@ -10,25 +10,17 @@ const client = new S3Client({
 });
 
 /**
- * Generates a unique S3 key for a file based on user ID, event ID, document ID and filename
- * Format: hashedUserId/eventId/documentId/filename/timestamp_filename
+ * Generates a unique S3 key for a file based on event name, document name, and filename
+ * Format: eventName/documentName/fileName_timestamp
  *
- * @param userId - The user ID (Clerk ID) that will be hashed
- * @param eventId - The event ID associated with the file
- * @param documentId - The document ID associated with the file
+ * @param eventName - The name of the event (used as first folder)
+ * @param documentName - The logical document name (used as second folder)
  * @param fileName - Original filename
  * @returns A unique S3 key string
  */
-const SALT = process.env.S3_HASH_SALT || "fallback_salt";
-
-export function generateUniqueS3Key(userId: string, eventId: string, documentId: string, fileName: string): string {
-  const hashedUserId = crypto
-    .createHash("sha256")
-    .update(SALT + userId)
-    .digest("hex")
-    .substring(0, 16);
+export function generateUniqueS3Key(eventName: string, documentName: string, fileName: string): string {
   const timestamp = Date.now();
-  return `${hashedUserId}/${eventId}/${documentId}/${fileName}/${timestamp}`;
+  return `${eventName}/${documentName}/${fileName}_${timestamp}`;
 }
 
 export default client;

@@ -47,29 +47,33 @@ export default function ContactSection({ name, email, phone, generalResources = 
           <li>
             <span className="text-lg font-medium">Phone Number:</span> <span className="text-base">{phone}</span>
           </li>
+          <li>
+            <div className="space-y-3">
+              <h4 className="text-lg font-medium mt-1">General Resources:</h4>
+              {resourcesToShow.map((resource, index) => (
+                <div key={index} className="flex items-center">
+                  <FontAwesomeIcon icon={faFile} className="mr-3 text-gray-600" />
+                  <span
+                    className="mr-3 text-blue-500 cursor-pointer hover:underline"
+                    onClick={() => handleDownload(resource)}
+                  >
+                    {resource.name}
+                  </span>
+                  <button
+                    onClick={() => handleDownload(resource)}
+                    className="mr-4 hover:text-gray-800"
+                    title="Download"
+                  >
+                    <FontAwesomeIcon icon={faDownload} className="text-gray-600 cursor-pointer" />
+                  </button>
+                </div>
+              ))}
+            </div>
+          </li>
         </ul>
       </div>
 
       {/* General Resources Section */}
-      <div>
-        <h4 className="text-lg font-medium mb-3">General Resources:</h4>
-        <div className="space-y-3">
-          {resourcesToShow.map((resource, index) => (
-            <div key={index} className="flex items-center">
-              <FontAwesomeIcon icon={faFile} className="mr-3 text-gray-600" />
-              <span
-                className="mr-3 text-blue-500 cursor-pointer hover:underline"
-                onClick={() => handleDownload(resource)}
-              >
-                {resource.name}
-              </span>
-              <button onClick={() => handleDownload(resource)} className="mr-4 hover:text-gray-800" title="Download">
-                <FontAwesomeIcon icon={faDownload} className="text-gray-600 cursor-pointer" />
-              </button>
-            </div>
-          ))}
-        </div>
-      </div>
     </div>
   );
 }

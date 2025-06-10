@@ -162,7 +162,7 @@ export default function EventDetailsForm({
       </div>
 
       {/* General Resources Management Section */}
-      <div className="p-4 space-y-4 bg-gray-200 rounded-lg shadow-md border border-gray-300">
+      {/* <div className="p-4 space-y-4 bg-gray-200 rounded-lg shadow-md border border-gray-300">
         <h3 className="text-xl font-semibold mb-4 text-center">Manage General Resources</h3>
         <div className="space-y-3">
           {generalResources.map((resource, index) => (
@@ -187,7 +187,7 @@ export default function EventDetailsForm({
             <p className="text-sm text-gray-500 text-center py-4">No general resources available.</p>
           )}
         </div>
-      </div>
+      </div> */}
     </div>
   );
 }
