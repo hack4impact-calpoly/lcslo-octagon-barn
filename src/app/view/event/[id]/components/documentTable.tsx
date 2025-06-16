@@ -44,7 +44,6 @@ async function handleStatusChange(docId: string, newStatus: IDocumentEntry["stat
 }
 
 async function handleDeleteDocument(docId: string, eventId: string) {
-  if (!confirm("Confirm to Delete")) return;
   try {
     const deleteDocumentResponse = await fetch(`/api/document/${docId}`, {
       method: "DELETE",
@@ -208,9 +207,18 @@ export default function DocumentTable({ eventId, eventStatus, isAdmin }: IDocume
                         <Button
                           variant="ghost"
                           size="icon"
-                          onClick={async () => {
-                            await handleDeleteDocument(doc._id as string, doc.eventId as string);
-                            setDocuments((prev) => prev.filter((e) => e._id !== doc._id));
+                          onClick={() => {
+                            const confirmed = confirm("Confirm to Delete");
+                            if (!confirmed) return;
+
+                            handleDeleteDocument(doc._id as string, doc.eventId as string)
+                              .then(() => {
+                                setDocuments((prev) => prev.filter((e) => e._id !== doc._id));
+                              })
+                              .catch((err) => {
+                                console.error("Delete failed", err);
+                                alert("Failed to delete document");
+                              });
                           }}
                         >
                           <i
