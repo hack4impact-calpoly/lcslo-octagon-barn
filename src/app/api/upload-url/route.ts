@@ -4,39 +4,32 @@ import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import client, { generateUniqueS3Key } from "@/lib/aws-s3";
 import { createErrorResponse, createSuccessResponse } from "@/lib/response";
 import connectDB from "@/database/db";
-import Event from "@/database/eventSchema";
-import Document from "@/database/documentSchema";
 
 export async function GET(request: NextRequest) {
   try {
     // Connect to MongoDB
     await connectDB();
     const searchParams = request.nextUrl.searchParams;
-    const eventId = searchParams.get("eventId");
-    const documentId = searchParams.get("documentId");
+    const eventName = searchParams.get("eventName");
+    const documentName = searchParams.get("documentName");
 
-    if (!eventId) {
+    if (!eventName) {
       return createErrorResponse("Bad Request", "eventId is required", 400);
     }
 
-    if (!documentId) {
-      return createErrorResponse("Bad Request", "documentId is required", 400);
+    if (!documentName) {
+      return createErrorResponse("Bad Request", "documentName is required", 400);
     }
 
-    // Lookup eventName and documentName from the database
-    const event = await Event.findById(eventId);
-    if (!event) {
-      return createErrorResponse("Not Found", "Event not found", 404);
-    }
-    const document = await Document.findById(documentId);
-    if (!document) {
-      return createErrorResponse("Not Found", "Document not found", 404);
-    }
-    const eventName = event.eventName.replace(/\s+/g, "_");
-    const documentName = document.documentName.replace(/\s+/g, "_");
+    const sanitize = (name: string) => name.replace(/[\/\\]/g, "_");
+    const sanitizedEventName = sanitize(eventName);
+    const sanitizedDocumentName = sanitize(documentName);
+
+    console.log(sanitizedEventName + "999" + sanitizedDocumentName);
 
     // Generate a unique S3 key using eventName and documentName
-    const s3Key = generateUniqueS3Key(eventName, documentName);
+    const s3Key = generateUniqueS3Key(sanitizedEventName, sanitizedDocumentName);
+    console.log(s3Key);
 
     const command = new PutObjectCommand({
       Bucket: process.env.S3_BUCKET_NAME as string,
