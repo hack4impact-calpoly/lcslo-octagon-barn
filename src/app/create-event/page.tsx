@@ -95,6 +95,14 @@ export default function CreateEventPage() {
       return;
     }
 
+    let currentStatus = "Upcoming";
+    const currentDate = Date.now();
+    if (endDate && currentDate >= endDate?.getTime()) {
+      currentStatus = "Completed";
+    } else if (startDate && endDate && currentDate >= startDate?.getTime() && currentDate <= endDate?.getTime()) {
+      currentStatus = "Ongoing";
+    }
+
     // Submit the form if no errors
     try {
       const response = await fetch("/api/event", {
@@ -105,9 +113,10 @@ export default function CreateEventPage() {
           venue,
           eventDateStart: startDate,
           eventDateEnd: endDate,
-          status: "Upcoming",
+          status: currentStatus,
           numGuests: parseInt(numGuests),
           clerkId: user?.id,
+          clientName: user?.name,
           vendorList,
           eventDetails,
         }),

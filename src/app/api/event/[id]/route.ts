@@ -20,7 +20,7 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
   try {
     await connectToDB();
     const body = await req.json();
-    const { clerkId, eventDateStart, eventDateEnd, docsTotal, docsCompleted, numGuests, ...rest } = body;
+    const { clerkId, clientName, eventDateStart, eventDateEnd, docsTotal, docsCompleted, numGuests, ...rest } = body;
 
     const updateData: Record<string, any> = {
       ...rest,

@@ -12,13 +12,8 @@ export async function GET(request: NextRequest) {
     // Connect to MongoDB
     await connectDB();
     const searchParams = request.nextUrl.searchParams;
-    const file = searchParams.get("file");
     const eventId = searchParams.get("eventId");
     const documentId = searchParams.get("documentId");
-
-    if (!file) {
-      return createErrorResponse("Bad Request", "fileName is required", 400);
-    }
 
     if (!eventId) {
       return createErrorResponse("Bad Request", "eventId is required", 400);
@@ -40,8 +35,8 @@ export async function GET(request: NextRequest) {
     const eventName = event.eventName.replace(/\s+/g, "_");
     const documentName = document.documentName.replace(/\s+/g, "_");
 
-    // Generate a unique S3 key using eventName, documentName, and original filename
-    const s3Key = generateUniqueS3Key(eventName, documentName, file);
+    // Generate a unique S3 key using eventName and documentName
+    const s3Key = generateUniqueS3Key(eventName, documentName);
 
     const command = new PutObjectCommand({
       Bucket: process.env.S3_BUCKET_NAME as string,

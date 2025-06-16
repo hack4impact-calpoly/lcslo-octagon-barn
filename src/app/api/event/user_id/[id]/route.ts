@@ -12,6 +12,7 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
     const sanitizedEvents = events.map((event) => ({
       id: event._id,
       clerkId: event.clerkId,
+      clientName: event.clientName,
       docIds: event.docIds,
       venue: event.venue,
       eventName: event.eventName,

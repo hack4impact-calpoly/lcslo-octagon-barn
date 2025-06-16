@@ -2,6 +2,7 @@ import mongoose, { Schema, Document } from "mongoose";
 
 type IEvent = Document & {
   clerkId: string;
+  clientName: string;
   docIds: mongoose.Types.ObjectId[];
   venue: "Full Facility" | "Octagon Barn & Plaza" | "Shed & Courtyard" | "Milking Parlor" | "Other";
   eventName: string;
@@ -18,6 +19,7 @@ type IEvent = Document & {
 
 const EventSchema = new Schema<IEvent>({
   clerkId: { type: String, ref: "User", required: true },
+  clientName: { type: String, required: true },
   docIds: [{ type: Schema.Types.ObjectId, ref: "Document" }],
   venue: {
     type: String,
