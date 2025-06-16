@@ -18,14 +18,14 @@ Currently there is no streamlined process for vendors and clients to submit insu
 
 ### Team
 
-The LCSLO Octagon Barn team consists of {#} Cal Poly students. Over the course of about 9 months, we worked as a team to deploy this web application. The team members are listed below:
+The LCSLO Octagon Barn team consists of 14 Cal Poly students. Over the course of about 8 months, we worked as a team to deploy this web application. The team members are listed below:
 
-- [Sofia Dias](https://www.linkedin.com/) - Project Manager
-- [Kyle Taschek](https://www.linkedin.com/) - Tech Lead
-- [Aarav Sharma](https://www.linkedin.com/) - Tech Lead
-- [Brian Kwong](https://www.linkedin.com/) - Designer
-- [Navya Vemuri](https://www.linkedin.com/) - Designer
-- [Emily Yarvis](https://www.linkedin.com/) - Designer
+- [Kyle Taschek](https://www.linkedin.com/in/kyle-taschek-555923223/) - Tech Lead
+- [Aarav Sharma](https://www.linkedin.com/in/aaravsharma927/) - Tech Lead
+- [Sofia Dias](https://www.linkedin.com/in/sofiadias2024/) - Project Manager
+- [Brian Kwong](https://www.linkedin.com/in/brian-kwong-b68215249/) - Designer
+- [Navya Vemuri](https://www.linkedin.com/in/navyaavemuri/) - Designer
+- [Emily Yarvis](https://www.linkedin.com/in/emily-yarvis/) - Designer
 - [Sharan Krishna](https://www.linkedin.com/in/sharankrishna14/) - Developer
 - [Oli Lane](https://www.linkedin.com/in/oliver-lane-0919351bb/) - Developer
 - [Kevin Beltran](https://www.linkedin.com/in/kevin-beltran-4305a1236/) - Developer
@@ -34,7 +34,6 @@ The LCSLO Octagon Barn team consists of {#} Cal Poly students. Over the course o
 - [Sabrina Huang](https://www.linkedin.com/in/sabrina-huang-9b719b240) - Developer
 - [Justin Chan](https://www.linkedin.com/in/justchan/) - Developer
 - [Karina Lee](https://www.linkedin.com/in/karinaalee/) - Developer
-- [Spandan Suthar](https://www.linkedin.com/in/spandan-suthar/) - Developer
 
 ## Getting Started And Contributing
 
