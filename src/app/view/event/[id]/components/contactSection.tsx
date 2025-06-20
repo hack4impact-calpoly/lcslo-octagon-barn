@@ -44,9 +44,10 @@ export default function ContactSection({ name, email, phone, generalResources = 
           <li>
             <span className="text-lg font-medium">Email:</span> <span className="text-base">{email}</span>
           </li>
-          <li>
+          {/* Commented phone number out*/}
+          {/* <li>
             <span className="text-lg font-medium">Phone Number:</span> <span className="text-base">{phone}</span>
-          </li>
+          </li> */}
           <li>
             <div className="space-y-3">
               <h4 className="text-lg font-medium mt-1">General Resources:</h4>
