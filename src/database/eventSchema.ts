@@ -30,7 +30,7 @@ const EventSchema = new Schema<IEvent>({
   eventDateStart: { type: Date, required: true },
   eventDateEnd: { type: Date, required: true },
   status: { type: String, enum: ["Upcoming", "Ongoing", "Completed", "Cancelled"], required: true },
-  eventDetails: { type: String, default: "No Event Details" },
+  eventDetails: { type: String, default: "No Event Description" },
   vendorList: { type: String, default: "No Vendor List" },
   createdAt: { type: Date, default: Date.now },
   docsTotal: { type: Number, default: 0 },

@@ -41,7 +41,7 @@ async function uploadDocument(
     if (!eventResponse.ok) throw new Error("Failed to fetch event");
     const eventData = await eventResponse.json();
 
-    const url_string = `/api/upload-url?eventName=${encodeURIComponent(eventData.eventName)}&documentName=${encodeURIComponent(documentName ?? file.name)}`;
+    const url_string = `/api/upload-url?eventName=${encodeURIComponent(eventData.eventName)}&documentName=${encodeURIComponent(documentName !== "" ? documentName : file.name)}`;
     const uploadUrlResponse = await fetch(url_string);
     if (!uploadUrlResponse.ok) throw new Error("Failed to get upload URL");
     const { uploadUrl, s3Key } = await uploadUrlResponse.json();
