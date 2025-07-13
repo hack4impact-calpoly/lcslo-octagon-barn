@@ -102,7 +102,7 @@ export default function DocumentView() {
         <div className="absolute inset-0 border border-gray-300 rounded flex justify-center items-center bg-gray-50">
           {documentUrl ? (
             <iframe
-              src={documentUrl}
+              src={documentUrl ?? "Not Found"}
               title="Document Preview"
               className="block mx-auto w-[100%] h-[100%] rounded border-0"
             />

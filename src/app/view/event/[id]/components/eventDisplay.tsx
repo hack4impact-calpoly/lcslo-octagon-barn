@@ -33,7 +33,7 @@ export default function EventDisplay({
     <div className="space-y-4 bg-gray-200 p-4 rounded-lg shadow-md border border-gray-300">
       <div>
         <label htmlFor="eventDetailsDisplay" className="block text-lg font-medium mb-1">
-          Event Details:
+          Event Description:
         </label>
         {isEditing && isAdmin ? (
           <Textarea

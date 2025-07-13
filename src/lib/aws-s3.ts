@@ -1,5 +1,6 @@
 import { S3Client } from "@aws-sdk/client-s3";
-import crypto from "crypto";
+import { GetObjectCommand } from "@aws-sdk/client-s3";
+import mime from "mime-types";
 
 const client = new S3Client({
   region: process.env.S3_BUCKET_REGION as string,
@@ -15,12 +16,27 @@ const client = new S3Client({
  *
  * @param eventName - The name of the event (used as first folder)
  * @param documentName - The logical document name (used as second folder)
- * @param fileName - Original filename
  * @returns A unique S3 key string
  */
-export function generateUniqueS3Key(eventName: string, documentName: string, fileName: string): string {
+export function generateUniqueS3Key(eventName: string, documentName: string): string {
   const timestamp = Date.now();
-  return `${eventName}/${documentName}/${fileName}_${timestamp}`;
+  return `${eventName}/${documentName}/${documentName}_${timestamp}`;
+}
+
+async function getDownloadFilename(s3Key: string): Promise<string> {
+  const getCommand = new GetObjectCommand({
+    Bucket: process.env.S3_BUCKET_NAME!,
+    Key: s3Key,
+  });
+
+  const response = await client.send(getCommand);
+  const contentType = response.ContentType;
+  const extension = mime.extension(contentType || "") || "";
+
+  const rawName = s3Key.split("/").pop()?.split("_").slice(0, -1).join("_") || "download";
+  const filename = extension ? `${rawName}.${extension}` : rawName;
+  return filename;
 }
 
 export default client;
+export { getDownloadFilename };

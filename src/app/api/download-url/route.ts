@@ -1,7 +1,7 @@
 import { NextRequest } from "next/server";
 import { GetObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
-import client from "@/lib/aws-s3";
+import client, { getDownloadFilename } from "@/lib/aws-s3";
 import { createErrorResponse, createSuccessResponse } from "@/lib/response";
 
 export async function GET(request: NextRequest) {
@@ -13,14 +13,19 @@ export async function GET(request: NextRequest) {
       return createErrorResponse("Bad Request", "s3Key is required", 400);
     }
 
+    const fileName = await getDownloadFilename(s3Key);
+
     const command = new GetObjectCommand({
       Bucket: process.env.S3_BUCKET_NAME as string,
       Key: s3Key,
+      ResponseContentDisposition: `inline; filename="${fileName}"`,
     });
 
     const downloadUrl = await getSignedUrl(client, command, {
       expiresIn: 900, // URL expires in 15 minutes
     });
+
+    console.log(downloadUrl);
 
     return createSuccessResponse({ downloadUrl }, 200);
   } catch (error) {

@@ -159,6 +159,7 @@ export default function Navbar() {
                               className="text-blue-500 hover:underline font-semibold"
                               onClick={(e) => {
                                 e.stopPropagation();
+                                sessionStorage.setItem("eventActiveTab", "documents");
                               }}
                             >
                               View Event

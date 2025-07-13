@@ -24,9 +24,7 @@ export default function EventDetailsView() {
   const params = useParams();
   const eventId = Array.isArray(params.id) ? params.id[0] : (params.id ?? "default-id");
   const [eventStatus, setEventStatus] = useState<"Completed" | "Cancelled" | "Upcoming" | "Ongoing">("Upcoming");
-  const [activeTab, setActiveTab] = useState<string>(() => {
-    return sessionStorage.getItem("eventActiveTab") || "details";
-  });
+  const [activeTab, setActiveTab] = useState<string>("details");
 
   const venueOptions: IEventFrontend["venue"][] = [
     "Full Facility",
@@ -35,6 +33,13 @@ export default function EventDetailsView() {
     "Milking Parlor",
     "Other",
   ];
+
+  useEffect(() => {
+    const storedTab = sessionStorage.getItem("eventActiveTab");
+    if (storedTab) {
+      setActiveTab(storedTab);
+    }
+  }, []);
 
   useEffect(() => {
     if (isLoaded && user) {
@@ -322,7 +327,7 @@ export default function EventDetailsView() {
             ) : (
               activeTab === "documents" && (
                 <div className="space-x-2 flex-shrink-0">
-                  <Link href={`/client-upload/${eventId}`}>
+                  <Link href={`/upload/${eventId}`}>
                     <Button className="bg-basic-blue text-white hover:bg-hover-blue px-4 py-1 text-base rounded-lg lg:w-[12rem] h-[3rem]">
                       {/* <Button className="w-[5rem] lg:w-[10rem] text-base" variant="outline"> */}
                       Add New Document

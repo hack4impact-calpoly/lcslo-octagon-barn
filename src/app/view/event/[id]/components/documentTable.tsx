@@ -44,7 +44,6 @@ async function handleStatusChange(docId: string, newStatus: IDocumentEntry["stat
 }
 
 async function handleDeleteDocument(docId: string, eventId: string) {
-  if (!confirm("Confirm to Delete")) return;
   try {
     const deleteDocumentResponse = await fetch(`/api/document/${docId}`, {
       method: "DELETE",
@@ -152,123 +151,149 @@ export default function DocumentTable({ eventId, eventStatus, isAdmin }: IDocume
   if (isAdmin) {
     return (
       <div>
-        <table className="min-w-full border-separate border-spacing-y-2 text-center">
-          <thead className="bg-gray-100 text-gray-700">
-            <tr>
-              <th className="px-4 py-2">Name</th>
-              <th className="px-4 py-2">Type</th>
-              <th className="px-4 py-2">Status</th>
-              <th className="px-4 py-2">Date Created</th>
-              <th className="px-4 py-2">View</th>
-              <th className="px-4 py-2">Delete</th>
-            </tr>
-          </thead>
-          <tbody>
-            {documents.map((doc, index) => (
-              <tr key={doc._id} className="bg-white shadow-sm rounded">
-                <td className="px-4 py-2 min-w-[150px] max-w-[250px] truncate"> {doc.documentName} </td>
-                <td className="px-4 py-2">{doc.documentType}</td>
-                <td className="px-4 py-2 max-w-[100px]">
-                  <Select
-                    value={doc.status}
-                    onValueChange={(val) => {
-                      const typedVal = val as IDocumentEntry["status"];
-                      handleStatusChange(doc._id as string, typedVal);
-                      setDocuments((prev) => prev?.map((d) => (d._id === doc._id ? { ...d, status: typedVal } : d)));
-                    }}
-                  >
-                    <SelectTrigger className={getStatusClass(doc.status)}>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {["Accepted", "Rejected", "Pending", "Not Submitted"].map((status) => (
-                        <SelectItem key={status} value={status} className="text-sm">
-                          {status}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </td>
-                <td className="px-4 py-2">{new Date(doc.createdAt).toLocaleDateString()}</td>
-                <td className="px-4 py-2">
-                  <Link href={`/view/document/${doc._id}`}>
-                    <Button className="bg-basic-blue text-white hover:bg-hover-blue px-4 py-1 rounded-lg w-[6rem]">
-                      View
-                    </Button>
-                  </Link>
-                </td>
-                <td>
-                  {eventStatus !== "Completed" && eventStatus !== "Cancelled" ? (
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={async () => {
-                        await handleDeleteDocument(doc._id as string, doc.eventId as string);
-                        setDocuments((prev) => prev.filter((e) => e._id !== doc._id));
-                      }}
-                    >
-                      <i className="icon-[ic--baseline-delete-forever] text-rose-500 h-8 w-8" aria-hidden="true"></i>
-                    </Button>
-                  ) : (
-                    <i className="icon-[ic--baseline-delete-forever] text-gray-500 h-8 w-8" aria-hidden="true"></i>
-                  )}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+        {documents.length === 0 ? (
+          <div className="flex items-center justify-center text-xl">No Documents</div>
+        ) : (
+          <div>
+            <table className="min-w-full border-separate border-spacing-y-2 text-center">
+              <thead className="bg-gray-100 text-gray-700">
+                <tr>
+                  <th className="px-4 py-2">Name</th>
+                  <th className="px-4 py-2">Type</th>
+                  <th className="px-4 py-2">Status</th>
+                  <th className="px-4 py-2">Date Created</th>
+                  <th className="px-4 py-2">View</th>
+                  <th className="px-4 py-2">Delete</th>
+                </tr>
+              </thead>
+              <tbody>
+                {documents.map((doc, index) => (
+                  <tr key={doc._id} className="bg-white shadow-sm rounded">
+                    <td className="px-4 py-2 min-w-[150px] max-w-[250px] truncate"> {doc.documentName} </td>
+                    <td className="px-4 py-2">{doc.documentType}</td>
+                    <td className="px-4 py-2 max-w-[100px]">
+                      <Select
+                        value={doc.status}
+                        onValueChange={(val) => {
+                          const typedVal = val as IDocumentEntry["status"];
+                          handleStatusChange(doc._id as string, typedVal);
+                          setDocuments((prev) =>
+                            prev?.map((d) => (d._id === doc._id ? { ...d, status: typedVal } : d)),
+                          );
+                        }}
+                      >
+                        <SelectTrigger className={getStatusClass(doc.status)}>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {["Accepted", "Rejected", "Pending", "Not Submitted"].map((status) => (
+                            <SelectItem key={status} value={status} className="text-sm">
+                              {status}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </td>
+                    <td className="px-4 py-2">{new Date(doc.createdAt).toLocaleDateString()}</td>
+                    <td className="px-4 py-2">
+                      <Link href={`/view/document/${doc._id}`}>
+                        <Button className="bg-basic-blue text-white hover:bg-hover-blue px-4 py-1 rounded-lg w-[6rem]">
+                          View
+                        </Button>
+                      </Link>
+                    </td>
+                    <td>
+                      {eventStatus !== "Completed" && eventStatus !== "Cancelled" ? (
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => {
+                            const confirmed = confirm("Confirm to Delete");
+                            if (!confirmed) return;
+
+                            handleDeleteDocument(doc._id as string, doc.eventId as string)
+                              .then(() => {
+                                setDocuments((prev) => prev.filter((e) => e._id !== doc._id));
+                              })
+                              .catch((err) => {
+                                console.error("Delete failed", err);
+                                alert("Failed to delete document");
+                              });
+                          }}
+                        >
+                          <i
+                            className="icon-[ic--baseline-delete-forever] text-rose-500 h-8 w-8"
+                            aria-hidden="true"
+                          ></i>
+                        </Button>
+                      ) : (
+                        <i className="icon-[ic--baseline-delete-forever] text-gray-500 h-8 w-8" aria-hidden="true"></i>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
     );
   }
   return (
     <div>
-      <table className="min-w-full border-separate border-spacing-y-2 text-center">
-        <thead className="bg-gray-100 text-gray-700">
-          <tr>
-            <th className="px-4 py-2">Document Name</th>
-            <th className="px-4 py-2">Type</th>
-            <th className="px-4 py-2">Status</th>
-            <th className="px-4 py-2">Date Created</th>
-            <th className="px-4 py-2">View</th>
-            <th className="px-4 py-2">Reupload</th>
-          </tr>
-        </thead>
-        <tbody>
-          {documents.map((doc, index) => (
-            <tr key={index} className="bg-white shadow-sm rounded">
-              <td className="px-4 py-2 min-w-[150px] max-w-[250px] truncate"> {doc.documentName} </td>
-              <td className="px-4 py-2">{doc.documentType}</td>
-              <td className="px-4 py-2">
-                <span className={getStatusClass(doc.status)}>{doc.status}</span>
-              </td>
-              <td className="px-4 py-2">{new Date(doc.createdAt).toLocaleDateString()}</td>
-              <td className="px-4 py-2">
-                <Link href={`/view/document/${doc._id}`}>
-                  <Button className="bg-basic-blue text-white hover:bg-hover-blue px-4 py-1 rounded-lg w-[6rem]">
-                    View
-                  </Button>
-                </Link>
-              </td>
-              <td>
-                {eventStatus !== "Completed" && eventStatus !== "Cancelled" ? (
-                  <Link href={`/client-upload/${eventId}/${doc._id}`} passHref>
-                    <Button className="bg-basic-blue text-white hover:bg-hover-blue px-4 py-1 rounded-lg w-[6rem]">
-                      Reupload
-                    </Button>
-                  </Link>
-                ) : (
-                  <Button
-                    disabled
-                    className="bg-gray-400 text-gray-700 px-4 py-1 rounded-lg w-[6rem] cursor-not-allowed"
-                  >
-                    Reupload
-                  </Button>
-                )}
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+      {documents.length === 0 ? (
+        <div className="flex items-center justify-center text-xl">No Documents</div>
+      ) : (
+        <div>
+          <table className="min-w-full border-separate border-spacing-y-2 text-center">
+            <thead className="bg-gray-100 text-gray-700">
+              <tr>
+                <th className="px-4 py-2">Document Name</th>
+                <th className="px-4 py-2">Type</th>
+                <th className="px-4 py-2">Status</th>
+                <th className="px-4 py-2">Date Created</th>
+                <th className="px-4 py-2">View</th>
+                <th className="px-4 py-2">Reupload</th>
+              </tr>
+            </thead>
+            <tbody>
+              {documents.map((doc, index) => (
+                <tr key={index} className="bg-white shadow-sm rounded">
+                  <td className="px-4 py-2 min-w-[150px] max-w-[250px] truncate"> {doc.documentName} </td>
+                  <td className="px-4 py-2">{doc.documentType}</td>
+                  <td className="px-4 py-2">
+                    <span className={getStatusClass(doc.status)}>{doc.status}</span>
+                  </td>
+                  <td className="px-4 py-2">{new Date(doc.createdAt).toLocaleDateString()}</td>
+                  <td className="px-4 py-2">
+                    <Link href={`/view/document/${doc._id}`}>
+                      <Button className="bg-basic-blue text-white hover:bg-hover-blue px-4 py-1 rounded-lg w-[6rem]">
+                        View
+                      </Button>
+                    </Link>
+                  </td>
+                  <td>
+                    {eventStatus !== "Completed" && eventStatus !== "Cancelled" ? (
+                      <Link href={`/upload/${eventId}/${doc._id}`} passHref>
+                        <Button className="bg-basic-blue text-white hover:bg-hover-blue px-4 py-1 rounded-lg w-[6rem]">
+                          Reupload
+                        </Button>
+                      </Link>
+                    ) : (
+                      <Button
+                        disabled
+                        className="bg-gray-400 text-gray-700 px-4 py-1 rounded-lg w-[6rem] cursor-not-allowed"
+                      >
+                        Reupload
+                      </Button>
+                    )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
     </div>
   );
 

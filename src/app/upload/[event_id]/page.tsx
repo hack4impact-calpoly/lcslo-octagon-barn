@@ -10,55 +10,28 @@ import { useParams, useRouter } from "next/navigation";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Spinner } from "@/components/ui/spinner";
-import { ErrorState, LoadingSpinner } from "@/components/loadingStates";
+import { LoadingSpinner, UnauthorizedState } from "@/components/loadingStates";
 import Link from "next/link";
-
-// Deprecated function to download document
-// async function downloadDocument(s3DocIdClient: string) {
-//   try {
-//     // Get the download URL for the file using the s3DocIdClient or S3Key
-//     const url_string = `/api/download-url?s3Key=${encodeURIComponent(s3DocIdClient)}`;
-//     const downloadDocResponse = await fetch(url_string);
-//     if (!downloadDocResponse) throw new Error("Failed to get download URL");
-//     const { downloadUrl } = await downloadDocResponse.json();
-//     window.open(downloadUrl, "_blank");
-//   } catch (err) {
-//     alert("Download failed");
-//     console.error("Download failed: ", err);
-//     throw err;
-//   }
-// }
 
 async function uploadDocument(
   file: File,
   user: UserResource | null | undefined,
   eventId: string,
-  documentId: string,
   documentType: string,
   documentName: string,
 ) {
   try {
-    // 1. Get the s3docIdClient
-    var docToDelete: boolean = false;
-    var s3RetrievedDocIdClient: string = "";
-    const getDocumentResponse = await fetch(`/api/document/${documentId}`);
-    if (!getDocumentResponse.ok) throw new Error("Failed to get document record");
-    const document = await getDocumentResponse.json();
+    // 1. Get the upload URL for the file in S3
+    const eventResponse = await fetch(`/api/event/${eventId}`);
+    if (!eventResponse.ok) throw new Error("Failed to fetch event");
+    const eventData = await eventResponse.json();
 
-    // Check if the document has an s3DocIdClient
-    // If it does not, it means the admin requested a document and the client has not uploaded it yet
-    if (!(typeof document.s3DocIdClient === "undefined" || document.s3DocIdClient === null)) {
-      s3RetrievedDocIdClient = document.s3DocIdClient;
-      docToDelete = true;
-    }
-
-    // 2. Get the upload URL for the file
-    const url_string = `/api/upload-url?file=${encodeURIComponent(file.name)}&eventId=${encodeURIComponent(eventId)}&documentId=${encodeURIComponent(documentId)}`;
+    const url_string = `/api/upload-url?eventName=${encodeURIComponent(eventData.eventName)}&documentName=${encodeURIComponent(documentName !== "" ? documentName : file.name)}`;
     const uploadUrlResponse = await fetch(url_string);
     if (!uploadUrlResponse.ok) throw new Error("Failed to get upload URL");
     const { uploadUrl, s3Key } = await uploadUrlResponse.json();
 
-    // 3. Upload document with uploadUrl
+    // 2. Upload document with uploadUrl in S3
     const uploadDocResponse = await fetch("/api/upload-document", {
       method: "PUT",
       body: (() => {
@@ -70,38 +43,28 @@ async function uploadDocument(
     });
     if (!uploadDocResponse.ok) throw new Error("Failed to upload document");
 
-    // 4. Delete the old document in S3
-    if (docToDelete) {
-      const deleteS3DocumentResponse = await fetch("/api/delete-document", {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          s3Key: s3RetrievedDocIdClient,
-        }),
-      });
-      if (!deleteS3DocumentResponse.ok) throw new Error("Failed to delete document record in S3");
-    }
-
-    // 5. Update document object in MongoDB
-    const updateDocResponse = await fetch(`/api/document/${documentId}`, {
-      method: "PUT",
+    // 3. Create document object and fetch event in MongoDB
+    const createDocResponse = await fetch(`/api/document`, {
+      method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        s3DocIdClient: s3Key,
-        uploadedAt: new Date(),
+        clerkId: user?.id,
+        eventId: eventId,
         documentName: documentName || file.name,
         documentType: documentType,
+        s3DocIdClient: s3Key,
+        uploadedAt: new Date(),
         status: "Pending",
       }),
     });
-    if (!updateDocResponse.ok) throw new Error("Failed to create document record");
-    const updatedDocument = await updateDocResponse.json();
+    if (!createDocResponse.ok) throw new Error("Failed to create document record");
+    const createdDocument = await createDocResponse.json();
+    const documentId = createdDocument._id;
+
     alert("Uploaded Successfully");
-    return updatedDocument.s3DocIdClient;
+    return { documentId };
   } catch (err) {
     alert("Upload failed");
     console.error("Upload failed: ", err);
@@ -109,60 +72,55 @@ async function uploadDocument(
   }
 }
 
-// Deprecated function to delete document
-// async function deleteDocument(documentId: string, s3DocIdClient: string, resetUploadState: () => void) {
-//   try {
-//     const deleteS3DocumentResponse = await fetch("/api/delete-document", {
-//       method: "DELETE",
-//       headers: {
-//         "Content-Type": "application/json",
-//       },
-//       body: JSON.stringify({
-//         s3Key: s3DocIdClient,
-//       }),
-//     });
-//     if (!deleteS3DocumentResponse.ok) throw new Error("Failed to delete document record in S3");
+const updateEventWithDoc = async (eventId: string, docId: string) => {
+  try {
+    const res = await fetch(`/api/event/${eventId}`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ docId }),
+    });
 
-//     const updateMongoDocumentResponse = await fetch(`/api/document/${documentId}`, {
-//       method: "PUT",
-//       headers: {
-//         "Content-Type": "application/json",
-//       },
-//       body: JSON.stringify({
-//         $unset: { s3DocIdClient: "" },
-//       }),
-//     });
-//     if (!updateMongoDocumentResponse.ok)
-//       throw new Error("Failed to delete S3DocIdClient attribute in the document in MongoDB");
+    if (!res.ok) {
+      const err = await res.json();
+      throw new Error(err.message || "Failed to update event");
+    }
 
-//     resetUploadState();
-//     alert("Deleted Successfully");
-//   } catch (err) {
-//     alert("Deletion Failed");
-//     console.error("Deletion Failed: ", err);
-//     throw err;
-//   }
-// }
+    console.log("Event updated with new document!");
+  } catch (error) {
+    console.error("Error updating event with document:", error);
+  }
+};
 
 const ClientUploadPage: React.FC = () => {
   const params = useParams();
   const router = useRouter();
   const eventId = params.event_id;
-  const documentId = params.document_id;
 
-  const { isLoaded: userIsLoaded, user } = useUser();
+  const { user, isLoaded } = useUser();
   const [loading, setLoading] = useState<boolean>(true);
-  const [authorized, setAuthorized] = useState<boolean>(false);
+  const [authorized, setAuthorized] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [eventClerkId, setEventClerkId] = useState<string | null>(null);
   const [eventStatus, setEventStatus] = useState<string | null>(null);
-  const [documentClerkId, setDocumentClerkId] = useState<string | null>(null);
   const [documentType, setDocumentType] = useState<string>("");
   const [documentName, setDocumentName] = useState<string>("");
   const [uploading, setUploading] = useState<boolean>(false);
-  const [error, setError] = useState<string | null>(null);
 
   const [file, setFile] = useState<File | null>(null);
-  const [checklist, setChecklist] = useState<boolean[]>(new Array(8).fill(false));
+  const insurance_list = [
+    "Document Naming Convention: Guest/VendorName_EventDate_COI (no spaces)",
+    "Additional Insured: The Land Conservancy of San Luis Obispo County, 1137 Pacific Street, San Luis Obispo, CA 93401.",
+    "Coverage on the Event Day (and day prior if onsite for setup)",
+    "$1 Million Each Occurrence Liability Limit",
+    "$2 Million General Aggregate Liability Limit",
+    "$5,000 Medical Expense",
+    "$1,000 Deductible",
+    "Host Liquor Liability (if alcohol is served)",
+    "Waiver of Subrogation",
+  ];
+  const [checklist, setChecklist] = useState<boolean[]>(new Array(insurance_list.length).fill(false));
 
   const SpinnerWithText = () => {
     return (
@@ -173,63 +131,53 @@ const ClientUploadPage: React.FC = () => {
   };
 
   useEffect(() => {
-    if (!userIsLoaded) return;
+    if (!isLoaded) return;
 
     const fetchData = async () => {
       try {
         setLoading(true);
-        const [eventRes, documentRes] = await Promise.all([
-          fetch(`/api/event/${eventId}`),
-          fetch(`/api/document/${documentId}`),
-        ]);
+        const [eventRes] = await Promise.all([fetch(`/api/event/${eventId}`)]);
 
-        if (eventRes.ok && documentRes.ok) {
+        if (eventRes.ok) {
           const event = await eventRes.json();
-          setEventStatus(event.status);
           setEventClerkId(event.clerkId);
-          const document = await documentRes.json();
-          setDocumentClerkId(document.clerkId);
+          setEventStatus(event.status);
           setError(null);
         } else {
           setEventClerkId(null);
-          setDocumentClerkId(null);
-          setError("Failed to fetch data");
+          setError("Page not found");
         }
       } catch (error) {
         console.error("Error fetching data:", error);
         setEventClerkId(null);
-        setDocumentClerkId(null);
-        setError("Failed to fetch data");
+        setError("Failed to load page");
       } finally {
         setLoading(false);
       }
     };
 
     fetchData();
-  }, [userIsLoaded, eventId, documentId]);
+  }, [isLoaded, eventId]);
 
   useEffect(() => {
-    if (loading || !userIsLoaded) return;
+    if (loading || !isLoaded) return;
 
-    if (!eventClerkId || !documentClerkId) {
+    if (!eventClerkId) {
       router.push("/not-found");
       return;
     }
 
-    if (user?.id !== eventClerkId || user?.id !== documentClerkId) {
+    if (user?.id !== eventClerkId) {
       router.push("/not-found");
     } else {
       setAuthorized(true);
     }
-  }, [loading, userIsLoaded, eventClerkId, documentClerkId, user?.id, router]);
+  }, [loading, isLoaded, eventClerkId, user?.id, router]);
 
-  if (error) {
-    return <ErrorState message={error}></ErrorState>;
-  }
-
-  if (loading || !userIsLoaded || !authorized) {
+  if (!isLoaded || loading || !authorized) {
     return <LoadingSpinner />;
   }
+
   // Lock the page if the event is completed or cancelled
   if (eventStatus === "Completed" || eventStatus === "Cancelled") {
     return (
@@ -241,6 +189,11 @@ const ClientUploadPage: React.FC = () => {
         </Button>
       </div>
     );
+  }
+
+  if (error || !eventClerkId || user?.id !== eventClerkId) {
+    router.push("/not-found");
+    return <LoadingSpinner />;
   }
 
   const handleChange = (file: File) => {
@@ -312,17 +265,7 @@ const ClientUploadPage: React.FC = () => {
           <div className="w-1/3 border border-gray-300 rounded-lg p-6 bg-gray-50 shadow-md">
             <h2 className="text-lg font-semibold mb-4">Required Checklist</h2>
             <ul className="list-none pl-5 space-y-2">
-              {[
-                "Document Naming Convention: Guest/VendorName_EventDate_COI (no spaces)",
-                "Additional Insured: The Land Conservancy of San Luis Obispo County, 1137 Pacific Street, San Luis Obispo, CA 93401.",
-                "Coverage on the Event Day (and day prior if onsite for setup)",
-                "$1 Million Each Occurrence Liability Limit",
-                "$2 Million General Aggregate Liability Limit",
-                "$5,000 Medical Expense",
-                "$1,000 Deductible",
-                "Host Liquor Liability (if alcohol is served)",
-                "Waiver of Subrogation",
-              ].map((item, index) => (
+              {insurance_list.map((item, index) => (
                 <li key={index} className="text-gray-700 flex items-start gap-2">
                   <input
                     type="checkbox"
@@ -349,7 +292,8 @@ const ClientUploadPage: React.FC = () => {
             if (file) {
               try {
                 setUploading(true);
-                await uploadDocument(file, user, eventId as string, documentId as string, documentType, documentName);
+                const { documentId } = await uploadDocument(file, user, eventId as string, documentType, documentName);
+                await updateEventWithDoc(eventId as string, documentId);
                 router.push(`/view/event/${eventId}`);
               } catch (err) {
                 console.error("Upload failed:", err);

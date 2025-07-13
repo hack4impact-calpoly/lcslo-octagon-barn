@@ -10,6 +10,7 @@ export async function GET() {
     const sanitizedEvents = events.map((event) => ({
       id: event._id,
       clerkId: event.clerkId,
+      clientName: event.clientName,
       docIds: event.docIds,
       venue: event.venue,
       eventName: event.eventName,
@@ -34,12 +35,22 @@ export async function POST(req: NextRequest) {
 
   try {
     const body = await req.json();
-    if (!body.clerkId || !body.eventName || !body.venue || !body.eventDateStart || !body.eventDateEnd || !body.status) {
+    if (
+      !body.clerkId ||
+      !body.clientName ||
+      !body.eventName ||
+      !body.venue ||
+      !body.eventDateStart ||
+      !body.eventDateEnd ||
+      !body.status
+    ) {
       return createErrorResponse("BadRequest", "Missing required fields", 400);
     }
-    const { clerkId, venue, eventName, eventDateStart, eventDateEnd, status, ...rest } = body;
+
+    const { clerkId, clientName, venue, eventName, eventDateStart, eventDateEnd, status, ...rest } = body;
     const newEvent = new Event({
       clerkId,
+      clientName,
       venue,
       eventName,
       eventDateStart: new Date(eventDateStart),
